@@ -754,11 +754,18 @@ async function parseZipFile(file) {
 function parseIniContent(content) {
     const settings = {};
     const lines = content.split(/\r?\n/);
+    let currentSection = '';
     
     for (const line of lines) {
         const trimmed = line.trim();
-        // Skip empty lines, comments, and section headers
-        if (!trimmed || trimmed.startsWith(';') || trimmed.startsWith('#') || trimmed.startsWith('[')) {
+        // Skip empty lines and comments
+        if (!trimmed || trimmed.startsWith(';') || trimmed.startsWith('#')) {
+            continue;
+        }
+        
+        // Track section headers
+        if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+            currentSection = trimmed.slice(1, -1);
             continue;
         }
         
@@ -767,7 +774,10 @@ function parseIniContent(content) {
         if (eqIndex > 0) {
             const key = trimmed.substring(0, eqIndex).trim();
             const value = trimmed.substring(eqIndex + 1).trim();
+            // Store with section context
             settings[key] = value;
+            // Also store section-qualified key for special lookups
+            settings[`${currentSection}:${key}`] = value;
         }
     }
     
@@ -775,25 +785,40 @@ function parseIniContent(content) {
 }
 
 function applyParsedSettings(parsedSettings, fileType) {
-    const managedSettings = fileType === 'gameUserSettings' 
-        ? Object.values(gameUserSettings).flat().map(s => s.name)
-        : Object.values(gameIniSettings).flat().map(s => s.name);
+    // Build a lookup for settings with their section info
+    const settingsLookup = {};
+    const allSettings = fileType === 'gameUserSettings' 
+        ? Object.values(gameUserSettings).flat()
+        : Object.values(gameIniSettings).flat();
+    
+    for (const setting of allSettings) {
+        const section = setting.section || (fileType === 'gameUserSettings' ? 'ServerSettings' : '/script/shootergame.shootergamemode');
+        const sectionKey = setting.sectionKey || setting.name;
+        settingsLookup[setting.name] = { section, sectionKey };
+    }
     
     let appliedCount = 0;
     
-    for (const [key, value] of Object.entries(parsedSettings)) {
-        // Only apply settings we manage
-        if (managedSettings.includes(key)) {
-            const input = document.querySelector(`input[data-setting-name="${key}"][data-file-type="${fileType}"]`);
+    for (const setting of allSettings) {
+        const { section, sectionKey } = settingsLookup[setting.name];
+        
+        // Try section-qualified lookup first, then fallback to key only
+        let value = parsedSettings[`${section}:${sectionKey}`];
+        if (value === undefined) {
+            value = parsedSettings[sectionKey];
+        }
+        
+        if (value !== undefined) {
+            const input = document.querySelector(`input[data-setting-name="${setting.name}"][data-file-type="${fileType}"]`);
             if (input) {
                 if (input.type === 'checkbox') {
                     input.checked = value === 'True' || value === 'true' || value === '1';
                     const label = input.closest('.checkbox-container')?.querySelector('.checkbox-label');
                     if (label) label.textContent = input.checked ? 'Enabled' : 'Disabled';
-                    updateValue(key, input.checked ? 'True' : 'False', fileType);
+                    updateValue(setting.name, input.checked ? 'True' : 'False', fileType);
                 } else {
                     input.value = value;
-                    updateValue(key, value, fileType);
+                    updateValue(setting.name, value, fileType);
                 }
                 
                 // Update modified state
@@ -927,33 +952,51 @@ function setupBackToTop() {
 }
 
 function generateGameUserSettingsIni() {
-    // Get all managed setting names
-    const managedSettings = {};
+    // Build a map of settings with their section info
+    const settingsMeta = {};
     for (const [sectionId, settings] of Object.entries(gameUserSettings)) {
         settings.forEach(setting => {
-            managedSettings[setting.name] = currentValues.gameUserSettings[setting.name];
+            settingsMeta[setting.name] = {
+                value: currentValues.gameUserSettings[setting.name],
+                section: setting.section || 'ServerSettings',
+                sectionKey: setting.sectionKey || setting.name
+            };
         });
     }
 
     // If we have an original file, preserve it and only update managed settings
     if (originalFiles.gameUserSettings) {
-        return mergeWithOriginal(originalFiles.gameUserSettings, managedSettings);
+        return mergeWithOriginalSectioned(originalFiles.gameUserSettings, settingsMeta);
     }
 
-    // Generate fresh file
-    let content = '[ServerSettings]\n';
-    for (const [name, value] of Object.entries(managedSettings)) {
-        content += `${name}=${value}\n`;
+    // Generate fresh file - group by section
+    const sections = {};
+    for (const [name, meta] of Object.entries(settingsMeta)) {
+        if (!sections[meta.section]) {
+            sections[meta.section] = [];
+        }
+        sections[meta.section].push({ key: meta.sectionKey, value: meta.value });
     }
 
-    // Add session settings section
-    content += '\n[SessionSettings]\n';
-    content += 'SessionName=My ARK Server\n';
+    // Build content with proper section ordering
+    let content = '';
+    
+    // ServerSettings first
+    if (sections['ServerSettings']) {
+        content += '[ServerSettings]\n';
+        sections['ServerSettings'].forEach(s => {
+            content += `${s.key}=${s.value}\n`;
+        });
+        delete sections['ServerSettings'];
+    }
 
-    // Add MessageOfTheDay section
-    content += '\n[MessageOfTheDay]\n';
-    content += 'Message=Welcome to the server!\n';
-    content += 'Duration=20\n';
+    // Then other sections
+    for (const [section, settings] of Object.entries(sections)) {
+        content += `\n[${section}]\n`;
+        settings.forEach(s => {
+            content += `${s.key}=${s.value}\n`;
+        });
+    }
 
     return content;
 }
@@ -1032,6 +1075,103 @@ function mergeWithOriginal(originalContent, managedSettings) {
         for (const [key, value] of missedSettings) {
             result.splice(insertIndex, 0, `${key}=${value}`);
             insertIndex++;
+        }
+    }
+    
+    return result.join('\n');
+}
+
+function mergeWithOriginalSectioned(originalContent, settingsMeta) {
+    const lines = originalContent.split(/\r?\n/);
+    const updatedSettings = new Set();
+    const result = [];
+    let currentSection = '';
+    
+    // Build a lookup by sectionKey for each section
+    const sectionKeyLookup = {};
+    for (const [name, meta] of Object.entries(settingsMeta)) {
+        const section = meta.section;
+        const key = meta.sectionKey;
+        if (!sectionKeyLookup[section]) {
+            sectionKeyLookup[section] = {};
+        }
+        sectionKeyLookup[section][key] = { name, value: meta.value };
+    }
+    
+    for (const line of lines) {
+        const trimmed = line.trim();
+        
+        // Track section headers
+        if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+            currentSection = trimmed.slice(1, -1);
+            result.push(line);
+            continue;
+        }
+        
+        // Keep empty lines and comments as-is
+        if (!trimmed || trimmed.startsWith(';') || trimmed.startsWith('#')) {
+            result.push(line);
+            continue;
+        }
+        
+        // Check if this is a key=value pair we manage in the current section
+        const eqIndex = trimmed.indexOf('=');
+        if (eqIndex > 0) {
+            const key = trimmed.substring(0, eqIndex).trim();
+            
+            // Check if this key in this section is one we manage
+            if (sectionKeyLookup[currentSection] && sectionKeyLookup[currentSection][key]) {
+                const meta = sectionKeyLookup[currentSection][key];
+                result.push(`${key}=${meta.value}`);
+                updatedSettings.add(meta.name);
+            } else {
+                // Keep original line (unmanaged setting)
+                result.push(line);
+            }
+        } else {
+            result.push(line);
+        }
+    }
+    
+    // Add any managed settings that weren't in the original file
+    // Group by section
+    const missedBySection = {};
+    for (const [name, meta] of Object.entries(settingsMeta)) {
+        if (!updatedSettings.has(name)) {
+            if (!missedBySection[meta.section]) {
+                missedBySection[meta.section] = [];
+            }
+            missedBySection[meta.section].push({ key: meta.sectionKey, value: meta.value });
+        }
+    }
+    
+    // Find or create sections for missed settings
+    for (const [section, settings] of Object.entries(missedBySection)) {
+        // Check if section exists in result
+        const sectionHeader = `[${section}]`;
+        let sectionIndex = result.findIndex(line => line.trim() === sectionHeader);
+        
+        if (sectionIndex === -1) {
+            // Section doesn't exist, add it at the end
+            result.push('');
+            result.push(sectionHeader);
+            for (const s of settings) {
+                result.push(`${s.key}=${s.value}`);
+            }
+        } else {
+            // Section exists, find where to insert (after section header, before next section)
+            let insertIndex = sectionIndex + 1;
+            while (insertIndex < result.length) {
+                const line = result[insertIndex].trim();
+                if (line.startsWith('[') && line.endsWith(']')) {
+                    break;
+                }
+                insertIndex++;
+            }
+            // Insert before the next section or at end of file
+            for (let i = settings.length - 1; i >= 0; i--) {
+                result.splice(insertIndex, 0, `${settings[i].key}=${settings[i].value}`);
+            }
         }
     }
     

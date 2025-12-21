@@ -1,80 +1,80 @@
-# ARK: Survival Ascended Server Configuration Generator
-
-A web-based tool for generating server configuration files for ARK: Survival Ascended. No more manually editing INI files or hunting through wiki pages ‚Äì just adjust the settings you want and download your config files.
-
-## What is this?
-
-If you've ever tried to set up an ARK server, you know the pain of dealing with `GameUserSettings.ini` and `Game.ini`. This tool makes it easy:
-
-- **Browse all the settings** in a clean, organized interface
-- **See what each setting does** with helpful tooltips and descriptions
-- **Use official rate presets** (1x, 2x, 3x, Smalltribes, Arkpocalypse) as starting points
-- **Export your config** as downloadable INI files or copy them to clipboard
-- **Import existing configs** to tweak your current setup
-
-## Features
-
-### üéÆ Official Server Presets
-One-click presets that match official ARK server rates:
-- 1x Default (Official rates)
-- 2x Rates (Evolution Event)
-- 3x Rates (Boosted)
-- 4.5x/4x (Smalltribes)
-- 5x Rates (Arkpocalypse)
-
-### üì• Import Your Existing Config
-Already have a server running? Just drag and drop your INI files (or a ZIP containing both) and the tool will load your current settings. When you export, it preserves any custom lines that aren't managed by the tool.
-
-### üì§ Easy Export Options
-- Download both files as a ZIP
-- Download individual INI files
-- Copy to clipboard for quick pasting
-
-### üîç Search & Filter
-Quickly find the setting you're looking for with the search bar. Settings are organized into logical categories like General, Rates, Player, Dino, Structures, PvP/PvE, Breeding, and Environment.
-
-### üíæ Auto-Save
-Your changes are automatically saved to your browser's local storage. Come back later and pick up where you left off.
-
-### üì± Mobile Friendly
-Works on phones and tablets too, so you can tweak your server settings on the go.
-
-## Settings Included
-
-The tool covers all the commonly used ASA settings:
-
-- **General Server** ‚Äì passwords, player limits, map options, voice chat
-- **Rates & Multipliers** ‚Äì XP, taming, harvesting, loot quality
-- **Player Settings** ‚Äì damage, resistance, food/water drain, health regen
-- **Dino Settings** ‚Äì damage, resistance, taming, limits
-- **Structure Settings** ‚Äì build limits, decay, platform saddles
-- **PvP/PvE Settings** ‚Äì offline protection, alliances, decay options
-- **Breeding** ‚Äì mating, egg hatching, baby maturation, imprinting
-- **Environment** ‚Äì day/night cycle, weather, corpse decay
-- **Stat Multipliers** ‚Äì per-level stats for players and dinos
-
-All settings include descriptions pulled from the official ARK Wiki.
-
-## How to Use
-
-1. **Pick a preset** or start from default 1x rates
-2. **Adjust settings** ‚Äì click on any setting card to see details, use the +/- buttons or type values directly
-3. **Search** if you're looking for something specific
-4. **Export** when you're done ‚Äì download the files or copy to clipboard
-5. **Upload to your server** ‚Äì drop the INI files in your server's config folder
-
-## Tech Stack
-
-Just vanilla HTML, CSS, and JavaScript. No frameworks, no build step, no dependencies (except JSZip for ZIP file handling). Open `index.html` in a browser and you're good to go.
-
-## Contributing
-
-Found a bug or want to add a feature? Feel free to open an issue or submit a PR!
-
-## Author
-
-**Krisada Wasoontarajaroen**
-
----
-
-*This tool is not affiliated with Studio Wildcard or the official ARK: Survival Ascended team. Settings and descriptions are based on the [ARK Official Community Wiki](https://ark.wiki.gg/wiki/Server_configuration).*
+-#- -A-R-K-:- -S-u-r-v-i-v-a-l- -A-s-c-e-n-d-e-d- -S-e-r-v-e-r- -C-o-n-f-i-g-u-r-a-t-i-o-n- -G-e-n-e-r-a-t-o-r-
+-
+-A- -w-e-b---b-a-s-e-d- -t-o-o-l- -f-o-r- -g-e-n-e-r-a-t-i-n-g- -s-e-r-v-e-r- -c-o-n-f-i-g-u-r-a-t-i-o-n- -f-i-l-e-s- -f-o-r- -A-R-K-:- -S-u-r-v-i-v-a-l- -A-s-c-e-n-d-e-d-.- -N-o- -m-o-r-e- -m-a-n-u-a-l-l-y- -e-d-i-t-i-n-g- -I-N-I- -f-i-l-e-s- -o-r- -h-u-n-t-i-n-g- -t-h-r-o-u-g-h- -w-i-k-i- -p-a-g-e-s- -‚-Ä-ì- -j-u-s-t- -a-d-j-u-s-t- -t-h-e- -s-e-t-t-i-n-g-s- -y-o-u- -w-a-n-t- -a-n-d- -d-o-w-n-l-o-a-d- -y-o-u-r- -c-o-n-f-i-g- -f-i-l-e-s-.-
+-
+-#-#- -W-h-a-t- -i-s- -t-h-i-s-?-
+-
+-I-f- -y-o-u-'-v-e- -e-v-e-r- -t-r-i-e-d- -t-o- -s-e-t- -u-p- -a-n- -A-R-K- -s-e-r-v-e-r-,- -y-o-u- -k-n-o-w- -t-h-e- -p-a-i-n- -o-f- -d-e-a-l-i-n-g- -w-i-t-h- -`-G-a-m-e-U-s-e-r-S-e-t-t-i-n-g-s-.-i-n-i-`- -a-n-d- -`-G-a-m-e-.-i-n-i-`-.- -T-h-i-s- -t-o-o-l- -m-a-k-e-s- -i-t- -e-a-s-y-:-
+-
+--- -*-*-B-r-o-w-s-e- -a-l-l- -t-h-e- -s-e-t-t-i-n-g-s-*-*- -i-n- -a- -c-l-e-a-n-,- -o-r-g-a-n-i-z-e-d- -i-n-t-e-r-f-a-c-e-
+--- -*-*-S-e-e- -w-h-a-t- -e-a-c-h- -s-e-t-t-i-n-g- -d-o-e-s-*-*- -w-i-t-h- -h-e-l-p-f-u-l- -t-o-o-l-t-i-p-s- -a-n-d- -d-e-s-c-r-i-p-t-i-o-n-s-
+--- -*-*-U-s-e- -o-f-f-i-c-i-a-l- -r-a-t-e- -p-r-e-s-e-t-s-*-*- -(-1-x-,- -2-x-,- -3-x-,- -S-m-a-l-l-t-r-i-b-e-s-,- -A-r-k-p-o-c-a-l-y-p-s-e-)- -a-s- -s-t-a-r-t-i-n-g- -p-o-i-n-t-s-
+--- -*-*-E-x-p-o-r-t- -y-o-u-r- -c-o-n-f-i-g-*-*- -a-s- -d-o-w-n-l-o-a-d-a-b-l-e- -I-N-I- -f-i-l-e-s- -o-r- -c-o-p-y- -t-h-e-m- -t-o- -c-l-i-p-b-o-a-r-d-
+--- -*-*-I-m-p-o-r-t- -e-x-i-s-t-i-n-g- -c-o-n-f-i-g-s-*-*- -t-o- -t-w-e-a-k- -y-o-u-r- -c-u-r-r-e-n-t- -s-e-t-u-p-
+-
+-#-#- -F-e-a-t-u-r-e-s-
+-
+-#-#-#- --ü-é-Æ- -O-f-f-i-c-i-a-l- -S-e-r-v-e-r- -P-r-e-s-e-t-s-
+-O-n-e---c-l-i-c-k- -p-r-e-s-e-t-s- -t-h-a-t- -m-a-t-c-h- -o-f-f-i-c-i-a-l- -A-R-K- -s-e-r-v-e-r- -r-a-t-e-s-:-
+--- -1-x- -D-e-f-a-u-l-t- -(-O-f-f-i-c-i-a-l- -r-a-t-e-s-)-
+--- -2-x- -R-a-t-e-s- -(-E-v-o-l-u-t-i-o-n- -E-v-e-n-t-)-
+--- -3-x- -R-a-t-e-s- -(-B-o-o-s-t-e-d-)-
+--- -4-.-5-x-/-4-x- -(-S-m-a-l-l-t-r-i-b-e-s-)-
+--- -5-x- -R-a-t-e-s- -(-A-r-k-p-o-c-a-l-y-p-s-e-)-
+-
+-#-#-#- --ü-ì-•- -I-m-p-o-r-t- -Y-o-u-r- -E-x-i-s-t-i-n-g- -C-o-n-f-i-g-
+-A-l-r-e-a-d-y- -h-a-v-e- -a- -s-e-r-v-e-r- -r-u-n-n-i-n-g-?- -J-u-s-t- -d-r-a-g- -a-n-d- -d-r-o-p- -y-o-u-r- -I-N-I- -f-i-l-e-s- -(-o-r- -a- -Z-I-P- -c-o-n-t-a-i-n-i-n-g- -b-o-t-h-)- -a-n-d- -t-h-e- -t-o-o-l- -w-i-l-l- -l-o-a-d- -y-o-u-r- -c-u-r-r-e-n-t- -s-e-t-t-i-n-g-s-.- -W-h-e-n- -y-o-u- -e-x-p-o-r-t-,- -i-t- -p-r-e-s-e-r-v-e-s- -a-n-y- -c-u-s-t-o-m- -l-i-n-e-s- -t-h-a-t- -a-r-e-n-'-t- -m-a-n-a-g-e-d- -b-y- -t-h-e- -t-o-o-l-.-
+-
+-#-#-#- --ü-ì-§- -E-a-s-y- -E-x-p-o-r-t- -O-p-t-i-o-n-s-
+--- -D-o-w-n-l-o-a-d- -b-o-t-h- -f-i-l-e-s- -a-s- -a- -Z-I-P-
+--- -D-o-w-n-l-o-a-d- -i-n-d-i-v-i-d-u-a-l- -I-N-I- -f-i-l-e-s-
+--- -C-o-p-y- -t-o- -c-l-i-p-b-o-a-r-d- -f-o-r- -q-u-i-c-k- -p-a-s-t-i-n-g-
+-
+-#-#-#- --ü-î-ç- -S-e-a-r-c-h- -&- -F-i-l-t-e-r-
+-Q-u-i-c-k-l-y- -f-i-n-d- -t-h-e- -s-e-t-t-i-n-g- -y-o-u-'-r-e- -l-o-o-k-i-n-g- -f-o-r- -w-i-t-h- -t-h-e- -s-e-a-r-c-h- -b-a-r-.- -S-e-t-t-i-n-g-s- -a-r-e- -o-r-g-a-n-i-z-e-d- -i-n-t-o- -l-o-g-i-c-a-l- -c-a-t-e-g-o-r-i-e-s- -l-i-k-e- -G-e-n-e-r-a-l-,- -R-a-t-e-s-,- -P-l-a-y-e-r-,- -D-i-n-o-,- -S-t-r-u-c-t-u-r-e-s-,- -P-v-P-/-P-v-E-,- -B-r-e-e-d-i-n-g-,- -a-n-d- -E-n-v-i-r-o-n-m-e-n-t-.-
+-
+-#-#-#- --ü-í-æ- -A-u-t-o---S-a-v-e-
+-Y-o-u-r- -c-h-a-n-g-e-s- -a-r-e- -a-u-t-o-m-a-t-i-c-a-l-l-y- -s-a-v-e-d- -t-o- -y-o-u-r- -b-r-o-w-s-e-r-'-s- -l-o-c-a-l- -s-t-o-r-a-g-e-.- -C-o-m-e- -b-a-c-k- -l-a-t-e-r- -a-n-d- -p-i-c-k- -u-p- -w-h-e-r-e- -y-o-u- -l-e-f-t- -o-f-f-.-
+-
+-#-#-#- --ü-ì-±- -M-o-b-i-l-e- -F-r-i-e-n-d-l-y-
+-W-o-r-k-s- -o-n- -p-h-o-n-e-s- -a-n-d- -t-a-b-l-e-t-s- -t-o-o-,- -s-o- -y-o-u- -c-a-n- -t-w-e-a-k- -y-o-u-r- -s-e-r-v-e-r- -s-e-t-t-i-n-g-s- -o-n- -t-h-e- -g-o-.-
+-
+-#-#- -S-e-t-t-i-n-g-s- -I-n-c-l-u-d-e-d-
+-
+-T-h-e- -t-o-o-l- -c-o-v-e-r-s- -a-l-l- -t-h-e- -c-o-m-m-o-n-l-y- -u-s-e-d- -A-S-A- -s-e-t-t-i-n-g-s-:-
+-
+--- -*-*-G-e-n-e-r-a-l- -S-e-r-v-e-r-*-*- -‚-Ä-ì- -p-a-s-s-w-o-r-d-s-,- -p-l-a-y-e-r- -l-i-m-i-t-s-,- -m-a-p- -o-p-t-i-o-n-s-,- -v-o-i-c-e- -c-h-a-t-
+--- -*-*-R-a-t-e-s- -&- -M-u-l-t-i-p-l-i-e-r-s-*-*- -‚-Ä-ì- -X-P-,- -t-a-m-i-n-g-,- -h-a-r-v-e-s-t-i-n-g-,- -l-o-o-t- -q-u-a-l-i-t-y-
+--- -*-*-P-l-a-y-e-r- -S-e-t-t-i-n-g-s-*-*- -‚-Ä-ì- -d-a-m-a-g-e-,- -r-e-s-i-s-t-a-n-c-e-,- -f-o-o-d-/-w-a-t-e-r- -d-r-a-i-n-,- -h-e-a-l-t-h- -r-e-g-e-n-
+--- -*-*-D-i-n-o- -S-e-t-t-i-n-g-s-*-*- -‚-Ä-ì- -d-a-m-a-g-e-,- -r-e-s-i-s-t-a-n-c-e-,- -t-a-m-i-n-g-,- -l-i-m-i-t-s-
+--- -*-*-S-t-r-u-c-t-u-r-e- -S-e-t-t-i-n-g-s-*-*- -‚-Ä-ì- -b-u-i-l-d- -l-i-m-i-t-s-,- -d-e-c-a-y-,- -p-l-a-t-f-o-r-m- -s-a-d-d-l-e-s-
+--- -*-*-P-v-P-/-P-v-E- -S-e-t-t-i-n-g-s-*-*- -‚-Ä-ì- -o-f-f-l-i-n-e- -p-r-o-t-e-c-t-i-o-n-,- -a-l-l-i-a-n-c-e-s-,- -d-e-c-a-y- -o-p-t-i-o-n-s-
+--- -*-*-B-r-e-e-d-i-n-g-*-*- -‚-Ä-ì- -m-a-t-i-n-g-,- -e-g-g- -h-a-t-c-h-i-n-g-,- -b-a-b-y- -m-a-t-u-r-a-t-i-o-n-,- -i-m-p-r-i-n-t-i-n-g-
+--- -*-*-E-n-v-i-r-o-n-m-e-n-t-*-*- -‚-Ä-ì- -d-a-y-/-n-i-g-h-t- -c-y-c-l-e-,- -w-e-a-t-h-e-r-,- -c-o-r-p-s-e- -d-e-c-a-y-
+--- -*-*-S-t-a-t- -M-u-l-t-i-p-l-i-e-r-s-*-*- -‚-Ä-ì- -p-e-r---l-e-v-e-l- -s-t-a-t-s- -f-o-r- -p-l-a-y-e-r-s- -a-n-d- -d-i-n-o-s-
+-
+-A-l-l- -s-e-t-t-i-n-g-s- -i-n-c-l-u-d-e- -d-e-s-c-r-i-p-t-i-o-n-s- -p-u-l-l-e-d- -f-r-o-m- -t-h-e- -o-f-f-i-c-i-a-l- -A-R-K- -W-i-k-i-.-
+-
+-#-#- -H-o-w- -t-o- -U-s-e-
+-
+-1-.- -*-*-P-i-c-k- -a- -p-r-e-s-e-t-*-*- -o-r- -s-t-a-r-t- -f-r-o-m- -d-e-f-a-u-l-t- -1-x- -r-a-t-e-s-
+-2-.- -*-*-A-d-j-u-s-t- -s-e-t-t-i-n-g-s-*-*- -‚-Ä-ì- -c-l-i-c-k- -o-n- -a-n-y- -s-e-t-t-i-n-g- -c-a-r-d- -t-o- -s-e-e- -d-e-t-a-i-l-s-,- -u-s-e- -t-h-e- -+-/--- -b-u-t-t-o-n-s- -o-r- -t-y-p-e- -v-a-l-u-e-s- -d-i-r-e-c-t-l-y-
+-3-.- -*-*-S-e-a-r-c-h-*-*- -i-f- -y-o-u-'-r-e- -l-o-o-k-i-n-g- -f-o-r- -s-o-m-e-t-h-i-n-g- -s-p-e-c-i-f-i-c-
+-4-.- -*-*-E-x-p-o-r-t-*-*- -w-h-e-n- -y-o-u-'-r-e- -d-o-n-e- -‚-Ä-ì- -d-o-w-n-l-o-a-d- -t-h-e- -f-i-l-e-s- -o-r- -c-o-p-y- -t-o- -c-l-i-p-b-o-a-r-d-
+-5-.- -*-*-U-p-l-o-a-d- -t-o- -y-o-u-r- -s-e-r-v-e-r-*-*- -‚-Ä-ì- -d-r-o-p- -t-h-e- -I-N-I- -f-i-l-e-s- -i-n- -y-o-u-r- -s-e-r-v-e-r-'-s- -c-o-n-f-i-g- -f-o-l-d-e-r-
+-
+-#-#- -T-e-c-h- -S-t-a-c-k-
+-
+-J-u-s-t- -v-a-n-i-l-l-a- -H-T-M-L-,- -C-S-S-,- -a-n-d- -J-a-v-a-S-c-r-i-p-t-.- -N-o- -f-r-a-m-e-w-o-r-k-s-,- -n-o- -b-u-i-l-d- -s-t-e-p-,- -n-o- -d-e-p-e-n-d-e-n-c-i-e-s- -(-e-x-c-e-p-t- -J-S-Z-i-p- -f-o-r- -Z-I-P- -f-i-l-e- -h-a-n-d-l-i-n-g-)-.- -O-p-e-n- -`-i-n-d-e-x-.-h-t-m-l-`- -i-n- -a- -b-r-o-w-s-e-r- -a-n-d- -y-o-u-'-r-e- -g-o-o-d- -t-o- -g-o-.-
+-
+-#-#- -C-o-n-t-r-i-b-u-t-i-n-g-
+-
+-F-o-u-n-d- -a- -b-u-g- -o-r- -w-a-n-t- -t-o- -a-d-d- -a- -f-e-a-t-u-r-e-?- -F-e-e-l- -f-r-e-e- -t-o- -o-p-e-n- -a-n- -i-s-s-u-e- -o-r- -s-u-b-m-i-t- -a- -P-R-!-
+-
+-#-#- -A-u-t-h-o-r-
+-
+-*-*-K-r-i-s-a-d-a- -W-a-s-o-o-n-t-a-r-a-j-a-r-o-e-n-*-*-
+-
+-------
+-
+-*-T-h-i-s- -t-o-o-l- -i-s- -n-o-t- -a-f-f-i-l-i-a-t-e-d- -w-i-t-h- -S-t-u-d-i-o- -W-i-l-d-c-a-r-d- -o-r- -t-h-e- -o-f-f-i-c-i-a-l- -A-R-K-:- -S-u-r-v-i-v-a-l- -A-s-c-e-n-d-e-d- -t-e-a-m-.- -S-e-t-t-i-n-g-s- -a-n-d- -d-e-s-c-r-i-p-t-i-o-n-s- -a-r-e- -b-a-s-e-d- -o-n- -t-h-e- -[-A-R-K- -O-f-f-i-c-i-a-l- -C-o-m-m-u-n-i-t-y- -W-i-k-i-]-(-h-t-t-p-s-:-/-/-a-r-k-.-w-i-k-i-.-g-g-/-w-i-k-i-/-S-e-r-v-e-r-_-c-o-n-f-i-g-u-r-a-t-i-o-n-)-.-*-

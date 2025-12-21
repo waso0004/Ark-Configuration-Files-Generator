@@ -4,11 +4,14 @@
 const gameUserSettings = {
     // General Server Settings
     'server-general': [
+        { name: 'SessionName', default: 'My ARK Server', type: 'text', section: 'SessionSettings', description: 'The name of your server as it appears in the server browser.', effect: 'This is what players see when browsing for servers to join.' },
         { name: 'ServerPassword', default: '', type: 'text', description: 'Password required for players to join the server.', effect: 'When set, players must enter this password to connect to your server.' },
         { name: 'ServerAdminPassword', default: '', type: 'text', description: 'Password for server administration and RCON access.', effect: 'Required for using admin commands and RCON connections. Use a strong password.' },
         { name: 'RCONEnabled', default: 'False', type: 'boolean', description: 'Enable Remote Console (RCON) for remote server management.', effect: 'When enabled, allows remote administration of the server via RCON protocol.' },
         { name: 'RCONPort', default: '27020', type: 'integer', description: 'Port used for RCON connections.', effect: 'Change this if port 27020 is already in use or blocked by firewall.' },
-        { name: 'MaxPlayers', default: '70', type: 'integer', description: 'Maximum number of players allowed on the server.', effect: 'Higher values allow more players but increase server resource usage.' },
+        { name: 'MaxPlayers', default: '70', type: 'integer', section: '/Script/Engine.GameSession', description: 'Maximum number of players allowed on the server.', effect: 'Higher values allow more players but increase server resource usage.' },
+        { name: 'MessageOfTheDay', default: 'Welcome to the server!', type: 'text', section: 'MessageOfTheDay', sectionKey: 'Message', description: 'Message displayed to players when they join.', effect: 'Players see this message when connecting to the server.' },
+        { name: 'MessageDuration', default: '20', type: 'integer', section: 'MessageOfTheDay', sectionKey: 'Duration', description: 'How long the MOTD is displayed in seconds.', effect: 'Higher values keep the welcome message on screen longer.' },
         { name: 'MapPlayerLocation', default: 'False', type: 'boolean', description: 'Show player location on the map.', effect: 'When enabled, players can see their exact position on the in-game map.' },
         { name: 'AllowThirdPersonPlayer', default: 'True', type: 'boolean', description: 'Allow players to use third-person view.', effect: 'When disabled, players are locked to first-person view only.' },
         { name: 'ServerCrosshair', default: 'True', type: 'boolean', description: 'Enable crosshair for all players.', effect: 'When disabled, removes the crosshair for a more immersive experience.' },
@@ -130,6 +133,88 @@ const gameUserSettings = {
         { name: 'AllowHideDamageSourceFromLogs', default: 'True', type: 'boolean', description: 'Hide damage source in logs.', effect: 'When enabled, allows hiding who dealt damage in tribe logs.' },
     ],
 
+    // Tek Bunker Settings (Lost Colony)
+    'server-bunker': [
+        { name: 'LimitBunkersPerTribe', default: 'True', type: 'boolean', description: 'Limit bunkers per tribe.', effect: 'When enabled, restricts how many Tek Bunkers each tribe can own.' },
+        { name: 'LimitBunkersPerTribeNum', default: '3', type: 'integer', description: 'Max bunkers per tribe.', effect: 'Sets the maximum number of Tek Bunkers allowed per tribe.' },
+        { name: 'AllowBunkersInPreventionZones', default: 'False', type: 'boolean', description: 'Allow bunkers in prevention zones.', effect: 'When enabled, allows Tek Bunkers to be placed in no-build zones.' },
+        { name: 'AllowRidingDinosInsideBunkers', default: 'True', type: 'boolean', description: 'Allow riding dinos inside bunkers.', effect: 'When enabled, players can ride dinosaurs inside Tek Bunkers.' },
+        { name: 'AllowBunkerModulesAboveGround', default: 'False', type: 'boolean', description: 'Allow bunker modules above ground.', effect: 'When enabled, Tek Bunker modules can be placed above ground level.' },
+        { name: 'AllowDinoAIInsideBunkers', default: 'True', type: 'boolean', description: 'Allow dino AI inside bunkers.', effect: 'When enabled, dinosaur AI functions normally inside Tek Bunkers.' },
+        { name: 'AllowBunkerModulesInPreventionZones', default: 'False', type: 'boolean', description: 'Allow modules in prevention zones.', effect: 'When enabled, bunker modules can be placed in no-build zones.' },
+        { name: 'MinDistanceBetweenBunkers', default: '3000', type: 'float', description: 'Minimum distance between bunkers.', effect: 'Sets the minimum spacing required between Tek Bunkers.' },
+        { name: 'EnemyAccessBunkerHPThreshold', default: '0.25', type: 'float', description: 'Enemy access HP threshold.', effect: 'HP percentage at which enemies can access the bunker (0.25 = 25%).' },
+        { name: 'BunkerUnderHPThresholdDmgMultiplier', default: '0.05', type: 'float', description: 'Damage multiplier under HP threshold.', effect: 'Damage multiplier applied to bunkers below HP threshold.' },
+    ],
+
+    // CryoHospital Settings (Lost Colony)
+    'server-cryohospital': [
+        { name: 'CryoHospitalHoursToRegenHP', default: '1.0', type: 'float', description: 'Hours to regen HP in CryoHospital.', effect: 'Time in hours for dinos to fully regenerate health in CryoHospital.' },
+        { name: 'CryoHospitalHoursToRegenFood', default: '24.0', type: 'float', description: 'Hours to regen food in CryoHospital.', effect: 'Time in hours for dinos to fully regenerate food in CryoHospital.' },
+        { name: 'CryoHospitalHoursToDrainTorpor', default: '1.0', type: 'float', description: 'Hours to drain torpor in CryoHospital.', effect: 'Time in hours for dinos to fully drain torpor in CryoHospital.' },
+        { name: 'CryoHospitalMatingCooldownReduction', default: '2.0', type: 'float', description: 'Mating cooldown reduction multiplier.', effect: 'Multiplier for how fast mating cooldown is reduced in CryoHospital.' },
+    ],
+
+    // Bloodforge Settings (Lost Colony)
+    'server-bloodforge': [
+        { name: 'BloodforgeReinforceExtraDurability', default: '0.3', type: 'float', description: 'Extra durability from Bloodforge.', effect: 'Additional durability percentage added by Bloodforge reinforcement.' },
+        { name: 'BloodforgeReinforceResourceCostMultiplier', default: '3.0', type: 'float', description: 'Resource cost multiplier.', effect: 'Multiplier for resources required to reinforce items in Bloodforge.' },
+        { name: 'BloodforgeReinforceSpeedMultiplier', default: '0.1', type: 'float', description: 'Reinforce speed multiplier.', effect: 'Speed multiplier for Bloodforge reinforcement process.' },
+    ],
+
+    // Outpost Settings (Lost Colony)
+    'server-outpost': [
+        { name: 'MaxActiveOutposts', default: '', type: 'integer', description: 'Max active outposts.', effect: 'Maximum number of active outposts allowed per tribe.' },
+        { name: 'MaxActiveResourceCaches', default: '', type: 'integer', description: 'Max active resource caches.', effect: 'Maximum number of active resource caches allowed per tribe.' },
+        { name: 'MaxActiveCityOutposts', default: '', type: 'integer', description: 'Max active city outposts.', effect: 'Maximum number of active city outposts allowed per tribe.' },
+    ],
+
+    // Blueprint & Quality Caps
+    'server-blueprints': [
+        { name: 'MaxBlueprintDinoLevel', default: '300', type: 'integer', description: 'Max blueprint dino level.', effect: 'Maximum level for Meks and Enforcers when spawned from blueprints.' },
+        { name: 'MaxBlueprintDinoQuality', default: '200', type: 'integer', description: 'Max blueprint dino quality.', effect: 'Maximum quality for Mek/Enforcer blueprints and spawner items.' },
+        { name: 'MaxBlueprintItemQuality', default: '200', type: 'integer', description: 'Max blueprint item quality.', effect: 'Maximum quality for all item blueprints.' },
+        { name: 'MaxBlueprintScoutQuality', default: '2000', type: 'integer', description: 'Max Scout blueprint quality.', effect: 'Maximum quality for Scout weapon and blueprints.' },
+    ],
+
+    // Cryopod Settings
+    'server-cryopod': [
+        { name: 'DisableCryopodEnemyCheck', default: 'False', type: 'boolean', description: 'Disable cryopod enemy check.', effect: 'When enabled, ignores enemy player/structure/dino checks for cryopod deployment.' },
+        { name: 'AllowCryoFridgeOnSaddle', default: 'False', type: 'boolean', description: 'Allow cryofridge on saddles.', effect: 'When enabled, allows Cryofridge to be placed on rafts and platform saddles.' },
+        { name: 'DisableCryopodFridgeRequirement', default: 'False', type: 'boolean', description: 'Disable cryofridge requirement.', effect: 'When enabled, removes the Cryofridge requirement for releasing cryopodded dinos.' },
+        { name: 'CryopodFridgeCooldowntime', default: '90', type: 'integer', description: 'Cryofridge activation timer.', effect: 'Seconds to wait before cryofridge activates after placement.' },
+    ],
+
+    // Soft Tame Limit Settings
+    'server-tamelimit': [
+        { name: 'DestroyTamesOverTheSoftTameLimit', default: 'False', type: 'boolean', description: 'Enable soft tame limit enforcement.', effect: 'When enabled, destroys tames over the soft limit after countdown.' },
+        { name: 'MaxTamedDinos_SoftTameLimit', default: '5000', type: 'integer', description: 'Soft tame limit.', effect: 'Server-wide soft tame limit before enforcement kicks in.' },
+        { name: 'MaxTamedDinos_SoftTameLimit_CountdownForDeletionDuration', default: '604800', type: 'integer', description: 'Soft limit deletion countdown.', effect: 'Seconds before dinos over soft limit are destroyed (default 7 days).' },
+    ],
+
+    // Creature-Specific Settings
+    'server-creatures': [
+        { name: 'ArmadoggoDeathCooldown', default: '3600', type: 'integer', description: 'Armadoggo companion cooldown.', effect: 'Seconds before Armadoggo (Extinction) can reappear in Companion Mode after taking fatal damage.' },
+        { name: 'YoungIceFoxDeathCooldown', default: '3600', type: 'integer', description: 'Veilwyn companion cooldown.', effect: 'Seconds before Veilwyn (Lost Colony) can reappear in Companion Mode after taking fatal damage.' },
+        { name: 'ForceGachaUnhappyInCaves', default: 'True', type: 'boolean', description: 'Force Gachas unhappy in caves.', effect: 'When true (default), Gachas are forced to be unhappy inside caves. Set to false to disable this restriction.' },
+        { name: 'MaxCosmoWeaponAmmo', default: '', type: 'integer', description: 'Max Cosmo web ammo.', effect: 'Maximum ammo capacity for Cosmo\'s web weapon.' },
+        { name: 'CosmoWeaponAmmoReloadAmount', default: '', type: 'integer', description: 'Cosmo ammo reload amount.', effect: 'Amount of ammo Cosmo reloads per interval.' },
+        { name: 'WorldBossKingKaijuSpawnTime', default: '19:00:00', type: 'string', description: 'King Titan spawn time.', effect: 'Time of day when King Titan spawns on Extinction (format: HH:MM:SS).' },
+    ],
+
+    // Cosmetics & Mods
+    'server-cosmetics': [
+        { name: 'CosmeticWhitelistOverride', default: '', type: 'string', description: 'Custom cosmetics whitelist URL.', effect: 'URL to override the approved custom cosmetics list for your server.' },
+        { name: 'ForceExploitedTameDeletion', default: 'False', type: 'boolean', description: 'Delete exploited tames.', effect: 'When enabled, deletes unintentional tamed creatures and prevents cryopod deployment.' },
+    ],
+
+    // PvP-Specific Settings
+    'server-pvp-specific': [
+        { name: 'AllowTeslaCoilCaveBuildingPVP', default: 'False', type: 'boolean', description: 'Allow Tesla Coil in caves.', effect: 'When enabled, allows Tesla Coil placement inside caves on PvP servers.' },
+        { name: 'MaxGateFrameOnSaddles', default: '', type: 'integer', description: 'Max gate frames on saddles.', effect: 'Maximum number of gate frames (and gates) allowed on platform saddles.' },
+        { name: 'IgnorePVPMountedWeaponryRestrictions', default: 'False', type: 'boolean', description: 'Ignore mounted weapon restrictions.', effect: 'When enabled, allows weapons on restricted mounts in PvP.' },
+    ],
+
     // Breeding & Taming
     'server-breeding': [
         { name: 'MatingIntervalMultiplier', default: '1.0', type: 'float', description: 'Mating cooldown multiplier.', effect: 'Lower values mean shorter wait between breeding the same dino.' },
@@ -140,8 +225,6 @@ const gameUserSettings = {
         { name: 'CropGrowthSpeedMultiplier', default: '1.0', type: 'float', description: 'Crop growth speed.', effect: 'Higher values mean crops grow faster in plots.' },
         { name: 'CropDecaySpeedMultiplier', default: '1.0', type: 'float', description: 'Crop decay speed.', effect: 'Lower values mean crops spoil slower in plots.' },
         { name: 'PoopIntervalMultiplier', default: '1.0', type: 'float', description: 'Poop frequency multiplier.', effect: 'Lower values mean dinos poop more frequently (more fertilizer).' },
-        { name: 'DisableCryopodEnemyCheck', default: 'False', type: 'boolean', description: 'Disable cryopod enemy check.', effect: 'When enabled, allows deploying cryopods near enemies.' },
-        { name: 'DisableCryopodFridgeRequirement', default: 'False', type: 'boolean', description: 'Disable cryofridge requirement.', effect: 'When enabled, cryopods don\'t need a cryofridge to stay charged.' },
         { name: 'DisableDinoBreedingStructures', default: 'False', type: 'boolean', description: 'Disable breeding structures.', effect: 'When enabled, disables structures like the Egg Incubator.' },
     ],
 
@@ -181,6 +264,19 @@ const gameIniSettings = {
         { name: 'BabyImprintAmountMultiplier', default: '1.0', type: 'float', description: 'Imprint amount per cuddle.', effect: 'Higher values mean each cuddle gives more imprint percentage.' },
         { name: 'MutagenLevelBoost', default: '5', type: 'integer', description: 'Mutagen level boost (wild tames).', effect: 'Higher values give more bonus levels when using Mutagen on wild tames.' },
         { name: 'MutagenLevelBoost_Bred', default: '1', type: 'integer', description: 'Mutagen level boost (bred dinos).', effect: 'Higher values give more bonus levels when using Mutagen on bred dinos.' },
+        { name: 'OverrideBondedPassImprintMultiplier', default: '', type: 'float', description: 'Bonded imprint pass multiplier.', effect: 'Percentage of imprint passed to bonded babies (Gigantoraptor).' },
+    ],
+
+    // Tribe Tower Settings (Lost Colony)
+    'game-tower': [
+        { name: 'TribeTowerBonusMultiplier', default: '2.0', type: 'float', description: 'Tribe Tower bonus multiplier.', effect: 'Multiplies the bonus effects from Tribe Towers.' },
+    ],
+
+
+
+    // Memorial & Valguero Settings
+    'game-memorial': [
+        { name: 'ValgueroMemorialEntries', default: '', type: 'string', description: 'Valguero memorial names.', effect: 'List of memorial names separated by semicolons (Name1;Name2;Name3).' },
     ],
 
     // Stats Multipliers

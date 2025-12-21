@@ -715,7 +715,7 @@ footer a {
 }
 
 footer a:hover {
-    color: var(--accent-secondary);
+    color: #5de0ff;
     text-decoration: underline;
 }
 
