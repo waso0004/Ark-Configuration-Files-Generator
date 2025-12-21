@@ -1,0 +1,875 @@
+/* CSS Variables */
+:root {
+    --bg-primary: #0a1628;
+    --bg-secondary: #0d1f35;
+    --bg-card: #122438;
+    --bg-input: #1a3048;
+    --accent-primary: #00d4ff;
+    --accent-secondary: #0a2940;
+    --accent-gold: #d4a855;
+    --text-primary: #ffffff;
+    --text-secondary: #8ec8e8;
+    --text-muted: #5a8aa8;
+    --border-color: #1e4a6e;
+    --success: #4ade80;
+    --warning: #d4a855;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --glow-cyan: 0 0 20px rgba(0, 212, 255, 0.3);
+}
+
+/* Reset & Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* Header */
+header {
+    background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+    padding: 2rem;
+    text-align: center;
+    border-bottom: 2px solid var(--accent-primary);
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+}
+
+.header-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+    color: var(--accent-primary);
+}
+
+.header-content p {
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+}
+
+/* Main Container */
+main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Settings Panel - unified container */
+.settings-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow);
+}
+
+/* Controls */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.tabs {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Actions & Presets Section */
+.actions-section,
+.preset-section {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+
+.actions-section h3,
+.preset-section h3 {
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.drop-zone {
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: var(--bg-input);
+}
+
+.drop-zone:hover {
+    border-color: var(--accent-primary);
+    background: rgba(0, 212, 255, 0.05);
+}
+
+.drop-zone.drag-over {
+    border-color: var(--accent-primary);
+    background: rgba(0, 212, 255, 0.15);
+    border-style: solid;
+    transform: scale(1.02);
+}
+
+.drop-zone-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+.drop-icon {
+    font-size: 2.5rem;
+}
+
+.drop-text {
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.drop-subtext {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.import-status {
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid var(--accent-primary);
+    color: var(--accent-primary);
+    font-size: 0.85rem;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.import-status.active {
+    display: flex;
+}
+
+.import-status-content {
+    flex: 1;
+}
+
+.import-status .file-list {
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+.clear-import-btn {
+    background: transparent;
+    border: 1px solid #ff4444;
+    color: #ff4444;
+    width: 60px;
+    height: 60px;
+    padding: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.clear-import-btn:hover {
+    background: #ff4444;
+    color: var(--bg-primary);
+}
+
+.actions-buttons,
+.preset-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 0.75rem;
+}
+
+.action-btn,
+.preset-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: var(--bg-input);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 0;
+    width: 100%;
+    text-align: center;
+    word-break: break-word;
+}
+
+.action-btn:hover,
+.preset-btn:hover {
+    border-color: var(--accent-primary);
+    background: var(--bg-secondary);
+    transform: translateY(-2px);
+}
+
+.action-btn.accent {
+    border-color: var(--accent-primary);
+    background: rgba(0, 212, 255, 0.1);
+}
+
+.action-btn.accent:hover {
+    background: rgba(0, 212, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+}
+
+.action-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.action-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    margin-bottom: 0.15rem;
+    text-align: center;
+}
+
+.action-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.tab-btn {
+    padding: 0.75rem 1.5rem;
+    background: var(--bg-input);
+    border: 2px solid var(--border-color);
+    color: var(--text-secondary);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.tab-btn:hover {
+    background: var(--bg-input);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+}
+
+.tab-btn.active {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: #0a1628;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+}
+
+.tab-btn.reset-btn {
+    background: var(--bg-input);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+.tab-btn.reset-btn:hover {
+    background: var(--accent-primary);
+    color: #0a1628;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+}
+
+/* Search */
+.search-container {
+    margin-bottom: 1rem;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: var(--bg-input);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.search-container input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.search-container input::placeholder {
+    color: var(--text-muted);
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Settings Section */
+.settings-section {
+    background: var(--bg-input);
+    border-radius: 8px;
+    margin: 0;
+    overflow: visible;
+    box-shadow: none;
+    border: 1px solid var(--border-color);
+}
+
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: var(--bg-secondary);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.3s ease, border-radius 0.3s ease;
+    border-radius: 8px 8px 0 0;
+}
+
+.section-title.collapsed {
+    border-radius: 8px;
+}
+
+.section-title:hover {
+    background: var(--accent-secondary);
+}
+
+.section-title span:first-child {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.toggle-icon {
+    transition: transform 0.3s ease;
+    color: var(--text-secondary);
+}
+
+.section-title.collapsed .toggle-icon {
+    transform: rotate(-90deg);
+}
+
+/* Settings Grid */
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1rem;
+    padding: 1.5rem;
+    position: relative;
+    overflow: visible;
+}
+
+.settings-grid.collapsed {
+    display: none;
+}
+
+/* Setting Card */
+.setting-card {
+    background: var(--bg-input);
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.setting-card:hover {
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+}
+
+.setting-card.modified {
+    border-color: var(--success);
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.2);
+}
+
+/* Tooltip */
+.setting-card .tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    transform: none;
+    background: var(--bg-secondary);
+    border: 1px solid var(--accent-primary);
+    border-radius: 8px;
+    padding: 1rem;
+    width: 100%;
+    max-width: 100%;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    margin-bottom: 10px;
+}
+
+.setting-card:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+.tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 20px;
+    transform: none;
+    border: 8px solid transparent;
+    border-top-color: var(--accent-primary);
+}
+
+.tooltip-title {
+    font-weight: 700;
+    color: var(--accent-primary);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.tooltip-section {
+    margin-bottom: 0.75rem;
+}
+
+.tooltip-section:last-child {
+    margin-bottom: 0;
+}
+
+.tooltip-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+}
+
+.tooltip-text {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+.tooltip-example {
+    background: var(--bg-input);
+    padding: 0.5rem;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: var(--success);
+    margin-top: 0.25rem;
+}
+
+.tooltip-warning {
+    color: var(--warning);
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(251, 191, 36, 0.1);
+    border-radius: 8px;
+    border-left: 3px solid var(--warning);
+}
+
+.setting-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.setting-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    word-break: break-word;
+    flex: 1;
+    min-width: 0;
+}
+
+.setting-default {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.setting-description {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+    flex: 1;
+}
+
+/* Tooltip should not affect card layout flow */
+.setting-card .tooltip {
+    position: absolute;
+}
+
+.setting-input-container {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    width: 100%;
+    margin-top: auto;
+}
+
+.setting-input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    height: 36px;
+    box-sizing: border-box;
+}
+
+.setting-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+/* Hide native number input spinner arrows */
+.setting-input[type="number"]::-webkit-outer-spin-button,
+.setting-input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+
+.setting-input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+/* Custom number input with styled buttons */
+.number-input-wrapper {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    height: 36px;
+}
+
+.number-input-wrapper:focus-within {
+    border-color: var(--accent-primary);
+}
+
+.number-input-wrapper .setting-input {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    text-align: center;
+    height: 100%;
+}
+
+.number-input-wrapper .setting-input:focus {
+    border: none;
+}
+
+.number-btn {
+    width: 32px;
+    height: 100%;
+    background: var(--bg-input);
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+}
+
+.number-btn:hover {
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+}
+
+.number-btn:active {
+    background: var(--accent-secondary);
+}
+
+.number-btn.decrement {
+    border-right: 1px solid var(--border-color);
+}
+
+.number-btn.increment {
+    border-left: 1px solid var(--border-color);
+}
+
+.setting-input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--accent-primary);
+}
+
+.reset-btn {
+    padding: 0.5rem;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+/* Per-setting reset buttons: square, aligned right, matching input height */
+.setting-card .reset-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.reset-btn:hover {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: var(--text-primary);
+}
+
+/* Checkbox Container */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.checkbox-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 2rem;
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-color);
+}
+
+footer p {
+    margin-bottom: 0.5rem;
+}
+
+footer a {
+    color: var(--accent-primary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+footer a:hover {
+    color: var(--accent-secondary);
+    text-decoration: underline;
+}
+
+/* Back to Top */
+.back-to-top {
+    position: fixed;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid var(--accent-primary);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.25s ease;
+    z-index: 1200;
+}
+
+.back-to-top:hover {
+    background: var(--accent-primary);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    .tabs {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        gap: 0.5rem;
+    }
+
+    .tabs .tab-btn {
+        flex: 1;
+    }
+
+    .tab-btn.reset-btn {
+        width: 100%;
+    }
+
+    .actions-buttons,
+    .preset-buttons {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.5rem;
+        justify-content: stretch;
+    }
+
+    .preset-section,
+    .actions-section {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .preset-btn,
+    .action-btn {
+        min-width: 0;
+        width: 100%;
+        padding: 0.85rem 1rem;
+    }
+
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .header-content h1 {
+        font-size: 1.8rem;
+    }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-primary);
+}
+
+/* Hidden utility */
+.hidden {
+    display: none !important;
+}
+
+/* Preset active state retains success highlight */
+.preset-btn.active {
+    border-color: var(--success);
+    background: rgba(74, 222, 128, 0.1);
+    box-shadow: 0 0 15px rgba(74, 222, 128, 0.2);
+}
+
+.preset-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.preset-btn.active .preset-name {
+    color: var(--success);
+}
+
+.preset-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Toast notification */
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+    padding: 1.25rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 212, 255, 0.4);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 2000;
+    text-align: center;
+    max-width: 90%;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}

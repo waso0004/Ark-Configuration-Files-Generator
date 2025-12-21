@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARK: Survival Ascended - Server Config Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>🦖 ARK: Survival Ascended</h1>
+            <p>Server Configuration Generator</p>
+        </div>
+    </header>
+
+    <main>
+        <!-- Preset Section -->
+        <div class="preset-section">
+            <h3>📋 Official Server Rate Presets</h3>
+            <div class="preset-buttons">
+                <button class="preset-btn active" data-preset="1x">
+                    <span class="preset-name">1x Default</span>
+                    <span class="preset-desc">Official rates</span>
+                </button>
+                <button class="preset-btn" data-preset="2x">
+                    <span class="preset-name">2x Rates</span>
+                    <span class="preset-desc">Evolution Event</span>
+                </button>
+                <button class="preset-btn" data-preset="3x">
+                    <span class="preset-name">3x Rates</span>
+                    <span class="preset-desc">Boosted</span>
+                </button>
+                <button class="preset-btn" data-preset="4x">
+                    <span class="preset-name">4.5x / 4x</span>
+                    <span class="preset-desc">Smalltribes</span>
+                </button>
+                <button class="preset-btn" data-preset="5x">
+                    <span class="preset-name">5x Rates</span>
+                    <span class="preset-desc">Arkpocalypse</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Download & Copy Actions -->
+        <div class="actions-section">
+            <h3>📥 Export Configuration</h3>
+            <div class="actions-buttons">
+                <button class="action-btn accent" id="downloadBoth">
+                    <span class="action-icon">📦</span>
+                    <span class="action-name">Both Files</span>
+                    <span class="action-desc">Download ZIP</span>
+                </button>
+                <button class="action-btn" id="downloadGameUserSettings">
+                    <span class="action-icon">⬇️</span>
+                    <span class="action-name">GameUserSettings.ini</span>
+                    <span class="action-desc">Download</span>
+                </button>
+                <button class="action-btn" id="downloadGame">
+                    <span class="action-icon">⬇️</span>
+                    <span class="action-name">Game.ini</span>
+                    <span class="action-desc">Download</span>
+                </button>
+                <button class="action-btn" id="copyGameUserSettings">
+                    <span class="action-icon">📋</span>
+                    <span class="action-name">GameUserSettings.ini</span>
+                    <span class="action-desc">Copy</span>
+                </button>
+                <button class="action-btn" id="copyGame">
+                    <span class="action-icon">📋</span>
+                    <span class="action-name">Game.ini</span>
+                    <span class="action-desc">Copy</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Import Section -->
+        <div class="actions-section" id="importSection">
+            <h3>📤 Import Configuration</h3>
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-zone-content">
+                    <span class="drop-icon">📁</span>
+                    <span class="drop-text">Drag & drop your INI files here</span>
+                    <span class="drop-subtext">Drop both files at once, or a ZIP • Click to browse</span>
+                </div>
+            </div>
+            <div class="import-status" id="importStatus">
+                <div class="import-status-content"></div>
+                <button class="clear-import-btn" id="clearImport" title="Clear imported files">✕ Clear</button>
+            </div>
+            <div class="actions-buttons">
+                <label class="action-btn" id="uploadBothLabel">
+                    <span class="action-icon">📂</span>
+                    <span class="action-name">Upload ZIP</span>
+                    <span class="action-desc">Both Files</span>
+                    <input type="file" id="uploadBoth" accept=".zip" hidden>
+                </label>
+                <label class="action-btn" id="uploadGameUserSettingsLabel">
+                    <span class="action-icon">📄</span>
+                    <span class="action-name">GameUserSettings.ini</span>
+                    <span class="action-desc">Upload</span>
+                    <input type="file" id="uploadGameUserSettings" accept=".ini" hidden>
+                </label>
+                <label class="action-btn" id="uploadGameLabel">
+                    <span class="action-icon">📄</span>
+                    <span class="action-name">Game.ini</span>
+                    <span class="action-desc">Upload</span>
+                    <input type="file" id="uploadGame" accept=".ini" hidden>
+                </label>
+            </div>
+        </div>
+
+        <!-- Settings Panel (controls + search + all settings) -->
+        <div class="settings-panel">
+            <div class="controls">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="gameusersettings">GameUserSettings.ini</button>
+                    <button class="tab-btn" data-tab="game">Game.ini</button>
+                </div>
+                <button id="resetAll" class="tab-btn reset-btn">↺ Reset to Defaults</button>
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search settings..." />
+            </div>
+
+            <!-- GameUserSettings.ini Tab -->
+            <div id="gameusersettings" class="tab-content active">
+            <div class="settings-container">
+                <!-- Server Settings Section -->
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="server-general">
+                        <span>⚙️ General Server Settings</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="server-general" class="settings-grid">
+                        <!-- Settings will be populated by JavaScript -->
+                    </div>
+                </section>
+
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="server-rates">
+                        <span>📈 Rates & Multipliers</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="server-rates" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="server-player">
+                        <span>👤 Player Settings</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="server-player" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="server-dino">
+                        <span>🦕 Dinosaur Settings</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="server-dino" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="server-structure">
+                        <span>🏠 Structure Settings</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="server-structure" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="server-pvp">
+                        <span>⚔️ PvP/PvE Settings</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="server-pvp" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="server-breeding">
+                        <span>🥚 Breeding & Taming</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="server-breeding" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="server-environment">
+                        <span>🌍 Environment & World</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="server-environment" class="settings-grid"></div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Game.ini Tab -->
+        <div id="game" class="tab-content">
+            <div class="settings-container">
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="game-breeding">
+                        <span>🥚 Breeding Settings</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="game-breeding" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="game-stats">
+                        <span>📊 Stats Multipliers</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="game-stats" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="game-xp">
+                        <span>⭐ XP & Leveling</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="game-xp" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="game-spoiling">
+                        <span>🍖 Spoiling & Decomposition</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="game-spoiling" class="settings-grid"></div>
+                </section>
+            </div>
+        </div>
+        </div>
+    </main>
+
+    <button id="backToTop" class="back-to-top" aria-label="Back to top">▲</button>
+
+    <footer>
+        <p><a href="https://github.com/waso0004/Ark-Configuration-Files-Generator" target="_blank" rel="noopener">ARK: Survival Ascended Server Configuration Generator</a> by Krisada Wasoontarajaroen</p>
+        <p>Settings based on official ARK Wiki | Only ASA-supported settings are included</p>
+    </footer>
+
+    <script src="settings-data.js?v=3"></script>
+    <script src="app.js?v=3"></script>
+</body>
+</html>
