@@ -235,6 +235,7 @@ const gameUserSettings = {
         { name: 'NightTimeSpeedScale', default: '1.0', type: 'float', description: 'Nighttime duration multiplier.', effect: 'Lower values make nighttime last longer.' },
         { name: 'DisableWeatherFog', default: 'False', type: 'boolean', description: 'Disable fog weather.', effect: 'When enabled, removes fog weather effects from the map.' },
         { name: 'bDisableDynamicMusic', default: 'False', type: 'boolean', description: 'Disable dynamic music.', effect: 'When enabled, turns off context-sensitive music.' },
+        { name: 'GlobalSpoilingTimeMultiplier', default: '1.0', type: 'float', description: 'Item spoil time multiplier.', effect: 'Higher values make food and perishables last longer before spoiling.' },
         { name: 'GlobalItemDecompositionTimeMultiplier', default: '1.0', type: 'float', description: 'Dropped item decay time.', effect: 'Higher values mean dropped items last longer before disappearing.' },
         { name: 'GlobalCorpseDecompositionTimeMultiplier', default: '1.0', type: 'float', description: 'Corpse decay time.', effect: 'Higher values mean corpses last longer before disappearing.' },
         { name: 'ClampItemSpoilingTimes', default: 'False', type: 'boolean', description: 'Clamp spoil times.', effect: 'When enabled, prevents extreme spoil time modifications.' },
@@ -248,7 +249,6 @@ const gameUserSettings = {
         { name: 'TributeCharacterExpirationSeconds', default: '86400', type: 'integer', description: 'Tribute character expiration.', effect: 'Higher values mean characters stay in Obelisk/transmitter longer.' },
         { name: 'AdminLogging', default: 'False', type: 'boolean', description: 'Log admin commands.', effect: 'When enabled, logs all admin command usage to a file.' },
         { name: 'ShowCreativeMode', default: 'False', type: 'boolean', description: 'Show creative mode option.', effect: 'When enabled, displays creative mode in the game menu.' },
-        { name: 'PhotoModeRangeLimit', default: '3000', type: 'integer', description: 'Photo mode camera range.', effect: 'Higher values allow the photo mode camera to move further.' },
     ],
 };
 
@@ -270,6 +270,11 @@ const gameIniSettings = {
     // Tribe Tower Settings (Lost Colony)
     'game-tower': [
         { name: 'TribeTowerBonusMultiplier', default: '2.0', type: 'float', description: 'Tribe Tower bonus multiplier.', effect: 'Multiplies the bonus effects from Tribe Towers.' },
+    ],
+
+    // World & Camera Settings
+    'game-world': [
+        { name: 'PhotoModeRangeLimit', default: '3000', type: 'integer', description: 'Photo mode camera range.', effect: 'Higher values allow the photo mode camera to move further.' },
     ],
 
 
@@ -336,12 +341,6 @@ const gameIniSettings = {
         { name: 'SpecialXPMultiplier', default: '1.0', type: 'float', description: 'Special XP sources.', effect: 'Higher values give more experience from special events/actions.' },
     ],
 
-    // Spoiling & Decomposition
-    'game-spoiling': [
-        { name: 'GlobalSpoilingTimeMultiplier', default: '1.0', type: 'float', description: 'Item spoil time multiplier.', effect: 'Higher values make food and perishables last longer.' },
-        { name: 'GlobalItemDecompositionTimeMultiplier', default: '1.0', type: 'float', description: 'Dropped item despawn time.', effect: 'Higher values make dropped items last longer on the ground.' },
-        { name: 'GlobalCorpseDecompositionTimeMultiplier', default: '1.0', type: 'float', description: 'Corpse despawn time.', effect: 'Higher values make corpses last longer before disappearing.' },
-    ],
 };
 
 // Export for use in app.js
