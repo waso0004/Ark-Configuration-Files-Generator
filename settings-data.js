@@ -172,7 +172,6 @@ const gameUserSettings = {
         { name: 'AllowMultipleAttachedC4', default: 'False', type: 'boolean', description: 'Allows more than one C4 attached per creature.', effect: 'True allows; False blocks.' },
         { name: 'AllowHideDamageSourceFromLogs', default: 'True', type: 'boolean', description: 'Hides damage sources in tribe logs when enabled.', effect: 'False shows sources; True hides.' },
 
-        { name: 'EnableCryopodNerf', default: 'False', type: 'boolean', description: 'Disables Cryopod cooldown timer and unconsciousness.', effect: 'If True, there is no Cryopod cooldown timer and creatures do not become unconscious. CryopodNerfDamageMult and CryopodNerfIncomingDamageMultPercent must be set.' },
         { name: 'ForceAllStructureLocking', default: 'False', type: 'boolean', description: 'Defaults all structures to locked.', effect: 'True locks by default; False does not.' },
         { name: 'ServerForceNoHUD', default: 'False', type: 'boolean', description: 'HUD is always disabled for non-tribe owned NPCs.', effect: 'If True, hides the HUD for non-tribe owned NPCs.' },
         { name: 'PreventDownloadSurvivors', default: 'False', type: 'boolean', description: 'Prevents survivors download from ARK Data in Cross-ARK transfer.', effect: 'If True, players cannot download characters to this server.' },

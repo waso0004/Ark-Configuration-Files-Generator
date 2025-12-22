@@ -939,7 +939,25 @@ function createSettingCard(setting, fileType) {
 
     const defaultBadge = document.createElement('span');
     defaultBadge.className = 'setting-default';
-    defaultBadge.textContent = `Default: ${setting.default || '(empty)'}`;
+    const defaultText = setting.default || '(empty)';
+    
+    // Wrap text in span for truncation
+    const defaultTextSpan = document.createElement('span');
+    defaultTextSpan.textContent = `Default: ${defaultText}`;
+    defaultBadge.appendChild(defaultTextSpan);
+    
+    // Create tooltip for default value on hover
+    const defaultTooltip = document.createElement('div');
+    defaultTooltip.className = 'default-tooltip';
+    defaultTooltip.textContent = `Default: ${defaultText}`;
+    defaultBadge.appendChild(defaultTooltip);
+    
+    defaultBadge.addEventListener('mouseenter', () => {
+        defaultTooltip.classList.add('visible');
+    });
+    defaultBadge.addEventListener('mouseleave', () => {
+        defaultTooltip.classList.remove('visible');
+    });
 
     header.appendChild(name);
     header.appendChild(defaultBadge);
@@ -1046,7 +1064,7 @@ function createSettingCard(setting, fileType) {
         input = document.createElement('input');
         input.type = 'checkbox';
         input.className = 'setting-input';
-        input.id = `input-${setting.name}`;
+        input.id = `input-${fileType}-${setting.name}`;
         input.checked = initialValue === 'True';
         input.dataset.default = setting.default;
         input.dataset.settingName = setting.name;
@@ -1054,7 +1072,7 @@ function createSettingCard(setting, fileType) {
 
         const label = document.createElement('label');
         label.className = 'checkbox-label';
-        label.htmlFor = `input-${setting.name}`;
+        label.htmlFor = `input-${fileType}-${setting.name}`;
         label.textContent = input.checked ? 'Enabled' : 'Disabled';
 
         input.addEventListener('change', (e) => {
