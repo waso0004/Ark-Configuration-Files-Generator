@@ -2,6 +2,359 @@
 
 const STORAGE_KEY = 'arkConfigGenerator';
 
+const SOURCE_INFO = {
+    wiki: {
+        label: 'ARK Wiki',
+        url: 'https://ark.wiki.gg/wiki/Server_configuration'
+    },
+    patchNotes: {
+        label: 'ASA Patch Notes',
+        url: 'https://survivetheark.com/index.php?/forums/topic/708761-asa-pc-patch-notes-client-v7715-server-v7715-updated12202025/'
+    }
+};
+
+// Minimal reference audit list (from the user's pasted "Server Settings Reference").
+// Used to sanity-check that our metadata includes the setting and places it in the correct file/section.
+const REFERENCE_EXPECTED_PLACEMENTS = [
+    // GameUserSettings.ini
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'ActiveMods' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'ActiveMapMod' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'AdminLogging' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'AllowAnyoneBabyImprintCuddle' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'AllowCaveBuildingPvE' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'AllowCaveBuildingPvP' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'AllowCryoFridgeOnSaddle' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'AllowFlyerCarryPvE' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'AllowHideDamageSourceFromLogs' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'AllowHitMarkers' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'AllowIntegratedSPlusStructures' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'AllowMultipleAttachedC4' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'AllowRaidDinoFeeding' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'AllowTeslaCoilCaveBuildingPVP' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'AllowThirdPersonPlayer' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'AlwaysAllowStructurePickup' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'AlwaysNotifyPlayerLeft' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'ArmadoggoDeathCooldown' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'AutoDestroyDecayedDinos' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'AutoSavePeriodMinutes' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'BanListURL' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'bForceCanRideFliers' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'ClampItemSpoilingTimes' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'ClampResourceHarvestDamage' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'CosmeticWhitelistOverride' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'CosmoWeaponAmmoReloadAmount' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'CryoHospitalHoursToDrainTorpor' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'CryoHospitalHoursToRegenFood' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'CryoHospitalHoursToRegenHP' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'CryoHospitalMatingCooldownReduction' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'CryopodFridgeCooldowntime' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'DayCycleSpeedScale' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'DayTimeSpeedScale' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'DestroyTamesOverTheSoftTameLimit' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'DifficultyOffset' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'DisableCryopodEnemyCheck' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'DisableCryopodFridgeRequirement' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'DisableDinoDecayPvE' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'DisableImprintDinoBuff' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'DisableStructureDecayPvE' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'DisableWeatherFog' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'DontAlwaysNotifyPlayerJoined' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'EnableCryopodNerf' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'EnableExtraStructurePreventionVolumes' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'EnemyAccessBunkerHPThreshold' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'ForceAllStructureLocking' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'ForceExploitedTameDeletion' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'ForceGachaUnhappyInCaves' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'HarvestAmountMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'HarvestHealthMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'IgnoreLimitMaxStructuresInRangeTypeFlag' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'ItemStackSizeMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'KickIdlePlayersPeriod' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'LimitBunkersPerTribe' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'LimitBunkersPerTribeNum' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'MaxCosmoWeaponAmmo' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'MaxPersonalTamedDinos' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'MaxPlatformSaddleStructureLimit' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'MaxTamedDinos' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'MaxTamedDinos_SoftTameLimit' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'MaxTamedDinos_SoftTameLimit_Countdown' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'MaxTrainCars' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'MinDistanceBetweenBunkers' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'NightTimeSpeedScale' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'NonPermanentDiseases' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'OverrideOfficialDifficulty' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'OverrideStructurePlatformPrevention' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'OxygenSwimSpeedStatMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'PerPlatformMaxStructuresMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'PlatformSaddleBuildAreaBoundsMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'PlayerCharacterFoodDrainMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'PlayerCharacterHealthRecoveryMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'PlayerCharacterStaminaDrainMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'PlayerCharacterWaterDrainMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'PlayerDamageMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'PlayerResistanceMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'PreventDiseases' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'PreventMateBoost' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'PreventOfflinePvP' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'PreventOfflinePvPInterval' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'PreventSpawnAnimations' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'PreventTribeAlliances' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'ProximityChat' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'PvEAllowStructuresAtSupplyDrops' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'PvEDinoDecayPeriodMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'PvPDinoDecay' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'RaidDinoCharacterFoodDrainMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'RandomSupplyCratePoints' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'RCONEnabled' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'RCONPort' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'RCONServerGameLogBuffer' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'ResourcesRespawnPeriodMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'ServerAutoForceRespawnWildDinosInterval' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'ServerCrosshair' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'ServerForceNoHUD' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'ServerHardcore' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'ServerPassword' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'serverPVE' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'ShowFloatingDamageText' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'ShowMapPlayerLocation' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'StructurePickupHoldDuration' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'StructurePickupTimeAfterPlacement' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'StructurePreventResourceRadiusMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'StructureResistanceMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'TamingSpeedMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'TheMaxStructuresInRange' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'TribeLogDestroyedEnemyStructures' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'TribeNameChangeCooldown' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'UseCharacterTracker' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'WorldBossKingKaijuSpawnTime' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'XPMultiplier' },
+    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'YoungIceFoxDeathCooldown' },
+
+    { fileType: 'gameUserSettings', section: 'SessionSettings', key: 'Port' },
+    { fileType: 'gameUserSettings', section: 'SessionSettings', key: 'SessionName' },
+    { fileType: 'gameUserSettings', section: '/Script/Engine.GameSession', key: 'MaxPlayers' },
+    { fileType: 'gameUserSettings', section: 'MessageOfTheDay', key: 'Message' },
+    { fileType: 'gameUserSettings', section: 'MessageOfTheDay', key: 'Duration' },
+
+    // Game.ini (all under [/script/shootergame.shootergamemode])
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'AutoPvEStartTimeSeconds' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'AutoPvEStopTimeSeconds' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'BabyCuddleGracePeriodMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'BabyCuddleIntervalMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'BabyCuddleLoseImprintQualitySpeedMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'BabyFoodConsumptionSpeedMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'BabyImprintAmountMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'BabyImprintingStatScaleMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'BabyMatureSpeedMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bAllowFlyerSpeedLeveling' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bAllowSpeedLeveling' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bAllowUnlimitedRespecs' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bDisableFriendlyFire' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bDisablePhotoMode' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bDisableStructurePlacementCollision' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bIgnoreStructuresPreventionVolumes' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bPvEDisableFriendlyFire' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bShowCreativeMode' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bUseDinoLevelUpAnimations' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bUseSingleplayerSettings' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'CraftingSkillBonusMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'CraftXPMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'CropDecaySpeedMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'CropGrowthSpeedMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'CustomRecipeEffectivenessMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'CustomRecipeSkillMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'DestroyTamesOverLevelClamp' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'EggHatchSpeedMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'GenericXPMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'GlobalItemDecompositionTimeMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'GlobalSpoilingTimeMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'HarvestXPMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'KillXPMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'LayEggIntervalMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'MatingIntervalMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'MatingSpeedMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'MaxFallSpeedMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'MaxTribeLogs' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'MaxNumberOfPlayersInTribe' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'DinoHarvestingDamageMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'DinoTurretDamageMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'TamedDinoCharacterFoodDrainMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'TamedDinoTorporDrainMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'WildDinoCharacterFoodDrainMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'WildDinoTorporDrainMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'SupplyCrateLootQualityMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'FishingLootQualityMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bAllowPlatformSaddleMultiFloors' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'PassiveTameIntervalMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'PhotoModeRangeLimit' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'PlayerHarvestingDamageMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'PoopIntervalMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'ResourceNoReplenishRadiusPlayers' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'ResourceNoReplenishRadiusStructures' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'SpecialXPMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'TribeTowerBonusMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'ValgueroMemorialEntries' },
+
+    // Ragnarok-specific (GameUserSettings.ini [Ragnarok] section)
+    { fileType: 'gameUserSettings', section: 'Ragnarok', key: 'AllowMultipleTamedUnicorns' },
+    { fileType: 'gameUserSettings', section: 'Ragnarok', key: 'UnicornSpawnInterval' },
+    { fileType: 'gameUserSettings', section: 'Ragnarok', key: 'EnableVolcano' },
+    { fileType: 'gameUserSettings', section: 'Ragnarok', key: 'VolcanoIntensity' },
+    { fileType: 'gameUserSettings', section: 'Ragnarok', key: 'VolcanoInterval' },
+
+    // Additional GUS SessionSettings entries
+    { fileType: 'gameUserSettings', section: 'SessionSettings', key: 'QueryPort' },
+    { fileType: 'gameUserSettings', section: 'SessionSettings', key: 'MultiHome' },
+
+    // Additional Game.ini entries per reference
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bLimitTurretsInRange' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bHardLimitTurretsInRange' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'LimitTurretsNum' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'LimitTurretsRange' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'LimitGeneratorsNum' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'LimitGeneratorsRange' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'LimitNonPlayerDroppedItemsCount' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'LimitNonPlayerDroppedItemsRange' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'BaseHexagonRewardMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'HexagonCostMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bDisableGenesisMissions' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bDisableHexagonStore' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bGenesisUseStructuresPreventionVolumes' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bHexStoreAllowOnlyEngramTradeOption' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bDisableDefaultMapItemSets' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bDisableWorldBuffs' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bEnableWorldBuffScaling' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'WorldBuffScalingEfficacy' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'AdjustableMutagenSpawnDelayMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'TribeLogDestroyedEnemyStructures' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bAllowCustomRecipes' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bAllowUnclaimDinos' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bAutoPvETimer' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bAutoPvEUseSystemTime' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bAutoUnlockAllEngrams' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bDisableDinoBreeding' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bDisableDinoRiding' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bDisableDinoTaming' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bDisableLootCrates' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bUseCorpseLocator' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bUseTameLimitForStructuresOnly' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bPvEAllowTribeWar' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bPvEAllowTribeWarCancel' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bOnlyAllowSpecifiedEngrams' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bPassiveDefensesDamageRiderlessDinos' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bFlyerPlatformAllowUnalignedDinoBasing' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'bIncreasePvPRespawnInterval' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'TribeSlotReuseCooldown' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'UseCorpseLifeSpanMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'StructureDamageRepairCooldown' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'PvPZoneStructureDamageMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'PreventOfflinePvPConnectionInvincibleInterval' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'FastDecayInterval' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'IncreasePvPRespawnIntervalBaseAmount' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'IncreasePvPRespawnIntervalCheckPeriod' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'IncreasePvPRespawnIntervalMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'GlobalPoweredBatteryDurabilityDecreasePerSecond' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'FuelConsumptionIntervalMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'BaseTemperatureMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'HairGrowthSpeedMultiplier' },
+    { fileType: 'gameIni', section: '/script/shootergame.shootergamemode', key: 'GlobalCorpseDecompositionTimeMultiplier' },
+];
+
+function runReferencePlacementAudit() {
+    try {
+        const index = buildExpectedSettingIndex();
+        const missing = [];
+        const wrong = [];
+
+        for (const item of REFERENCE_EXPECTED_PLACEMENTS) {
+            const keyLower = String(item.key).toLowerCase();
+            const metas = index[item.fileType].get(keyLower);
+            if (!metas || metas.length === 0) {
+                missing.push({ fileType: item.fileType, section: item.section, key: item.key });
+                continue;
+            }
+
+            const expectedSectionLower = String(item.section).toLowerCase();
+            const ok = metas.some(m => m.expectedSectionLower === expectedSectionLower);
+            if (!ok) {
+                wrong.push({
+                    fileType: item.fileType,
+                    key: item.key,
+                    expectedSection: item.section,
+                    foundSections: Array.from(new Set(metas.map(m => m.expectedSection))).join(' OR ')
+                });
+            }
+        }
+
+        if (missing.length || wrong.length) {
+            console.groupCollapsed(`Reference placement audit: ${missing.length} missing, ${wrong.length} misplaced`);
+            if (missing.length) console.table(missing);
+            if (wrong.length) console.table(wrong);
+            console.groupEnd();
+        }
+    } catch (e) {
+        console.warn('Reference placement audit failed:', e);
+    }
+}
+
+function resolveSettingSource(setting) {
+    if (!setting) return null;
+
+    if (setting.source && SOURCE_INFO[setting.source]) {
+        const { label, url } = SOURCE_INFO[setting.source];
+        return {
+            label: setting.sourceLabel || label,
+            url: setting.sourceUrl || url
+        };
+    }
+
+    if (setting.sourceLabel || setting.sourceUrl) {
+        return {
+            label: setting.sourceLabel || 'Source',
+            url: setting.sourceUrl || ''
+        };
+    }
+
+    return null;
+}
+
+// Settings that were previously (incorrectly) treated as GameUserSettings.ini options
+// but actually belong in Game.ini per the ARK server configuration documentation.
+const MIGRATE_GUS_TO_GAMEINI_KEYS = [
+    'GlobalSpoilingTimeMultiplier',
+    'GlobalItemDecompositionTimeMultiplier',
+    'GlobalCorpseDecompositionTimeMultiplier',
+
+    // Breeding/crop/poop multipliers that belong in Game.ini
+    'MatingIntervalMultiplier',
+    'MatingSpeedMultiplier',
+    'EggHatchSpeedMultiplier',
+    'LayEggIntervalMultiplier',
+    'CropGrowthSpeedMultiplier',
+    'CropDecaySpeedMultiplier',
+    'PoopIntervalMultiplier',
+
+    // Additional Game.ini-only options from the reference table
+    'CraftingSkillBonusMultiplier',
+    'CustomRecipeEffectivenessMultiplier',
+    'CustomRecipeSkillMultiplier',
+    'ResourceNoReplenishRadiusPlayers',
+    'ResourceNoReplenishRadiusStructures',
+    'PlayerHarvestingDamageMultiplier',
+    'bUseSingleplayerSettings',
+    'MaxFallSpeedMultiplier'
+];
+
+// Renamed keys (historical -> current). Used to migrate localStorage values.
+const RENAMED_SETTING_KEYS = [
+    { from: 'MapPlayerLocation', to: 'ShowMapPlayerLocation', fileType: 'gameUserSettings' },
+    { from: 'ServerPVE', to: 'serverPVE', fileType: 'gameUserSettings' },
+    { from: 'proximityChat', to: 'ProximityChat', fileType: 'gameUserSettings' },
+    { from: 'bDisableStructureDecayPvE', to: 'DisableStructureDecayPvE', fileType: 'gameUserSettings' },
+    { from: 'bDisableDinoDecayPvE', to: 'DisableDinoDecayPvE', fileType: 'gameUserSettings' },
+    { from: 'MaxTamedDinos_SoftTameLimit_CountdownForDeletionDuration', to: 'MaxTamedDinos_SoftTameLimit_Countdown', fileType: 'gameUserSettings' }
+];
+
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize the application
     init();
@@ -19,6 +372,10 @@ let originalFiles = {
     gameIni: null
 };
 
+// Track settings that were seen in their correct place in imported files.
+// Used to avoid overwriting correct placements with misplaced duplicates.
+let importedCorrectPlacements = new Set();
+
 // Load saved state from localStorage
 function loadFromStorage() {
     try {
@@ -30,6 +387,135 @@ function loadFromStorage() {
         console.warn('Failed to load from localStorage:', e);
     }
     return null;
+}
+
+function stripKeysFromIniContent(iniContent, keysToStrip) {
+    if (!iniContent) return iniContent;
+    const keysLower = new Set(keysToStrip.map(k => k.toLowerCase()));
+    const lines = iniContent.split(/\r?\n/);
+    const result = [];
+
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith(';') || trimmed.startsWith('#') || trimmed.startsWith('[')) {
+            result.push(line);
+            continue;
+        }
+
+        const eqIndex = trimmed.indexOf('=');
+        if (eqIndex <= 0) {
+            result.push(line);
+            continue;
+        }
+
+        const key = trimmed.substring(0, eqIndex).trim().toLowerCase();
+        if (keysLower.has(key)) {
+            continue;
+        }
+
+        result.push(line);
+    }
+
+    return result.join('\n');
+}
+
+function migrateSavedState(savedState) {
+    if (!savedState) return savedState;
+
+    // Rename keys inside saved currentValues (to avoid losing user edits after metadata fixes).
+    if (savedState.currentValues) {
+        for (const rule of RENAMED_SETTING_KEYS) {
+            const bucket = savedState.currentValues?.[rule.fileType];
+            if (!bucket) continue;
+            if (bucket[rule.to] === undefined && bucket[rule.from] !== undefined) {
+                bucket[rule.to] = bucket[rule.from];
+            }
+            if (bucket[rule.from] !== undefined) {
+                delete bucket[rule.from];
+            }
+        }
+
+        // One-off cross-file rename: historically we exposed DisableStructurePlacementCollision in GUS,
+        // but the reference places bDisableStructurePlacementCollision in Game.ini.
+        const gus = savedState.currentValues.gameUserSettings;
+        const gameIni = savedState.currentValues.gameIni;
+        if (gus && gameIni) {
+            if (gameIni.bDisableStructurePlacementCollision === undefined && gus.DisableStructurePlacementCollision !== undefined) {
+                gameIni.bDisableStructurePlacementCollision = gus.DisableStructurePlacementCollision;
+            }
+            if (gus.DisableStructurePlacementCollision !== undefined) {
+                delete gus.DisableStructurePlacementCollision;
+            }
+        }
+    }
+
+    // Migrate stored currentValues
+    if (savedState.currentValues) {
+        const gus = savedState.currentValues.gameUserSettings || {};
+        const gameIni = savedState.currentValues.gameIni || {};
+
+        for (const key of MIGRATE_GUS_TO_GAMEINI_KEYS) {
+            if (gameIni[key] === undefined && gus[key] !== undefined) {
+                gameIni[key] = gus[key];
+                delete gus[key];
+            }
+        }
+
+        savedState.currentValues.gameUserSettings = gus;
+        savedState.currentValues.gameIni = gameIni;
+    }
+
+    // Strip migrated keys from any saved original GameUserSettings.ini so exports don't preserve them.
+    if (savedState.originalFiles?.gameUserSettings) {
+        savedState.originalFiles.gameUserSettings = stripKeysFromIniContent(
+            savedState.originalFiles.gameUserSettings,
+            MIGRATE_GUS_TO_GAMEINI_KEYS
+        );
+    }
+
+    return savedState;
+}
+
+function applyMigratedSettingsFromParsedIni(parsedSettings) {
+    // If Game.ini was imported, prefer its values.
+    if (originalFiles.gameIni) return;
+
+    const gameIniSettingsLookup = {};
+    for (const setting of Object.values(gameIniSettings).flat()) {
+        gameIniSettingsLookup[setting.name] = {
+            section: setting.section || '/script/shootergame.shootergamemode',
+            sectionKey: setting.sectionKey || setting.name
+        };
+    }
+
+    for (const name of MIGRATE_GUS_TO_GAMEINI_KEYS) {
+        const meta = gameIniSettingsLookup[name];
+        if (!meta) continue;
+
+        let value = parsedSettings[`${meta.section}:${meta.sectionKey}`];
+        if (value === undefined) {
+            value = parsedSettings[meta.sectionKey];
+        }
+
+        if (value === undefined) continue;
+
+        const input = document.querySelector(`input[data-setting-name="${name}"][data-file-type="gameIni"]`);
+        if (!input) continue;
+
+        if (input.type === 'checkbox') {
+            input.checked = value === 'True' || value === 'true' || value === '1';
+            const label = input.closest('.checkbox-container')?.querySelector('.checkbox-label');
+            if (label) label.textContent = input.checked ? 'Enabled' : 'Disabled';
+            updateValue(name, input.checked ? 'True' : 'False', 'gameIni');
+        } else {
+            input.value = value;
+            updateValue(name, value, 'gameIni');
+        }
+
+        const card = input.closest('.setting-card');
+        const defaultValue = input.dataset.default;
+        updateCardModifiedState(card, value !== defaultValue);
+    }
 }
 
 // Save state to localStorage
@@ -143,7 +629,7 @@ const presets = {
 
 function init() {
     // Load saved state first
-    const savedState = loadFromStorage();
+    const savedState = migrateSavedState(loadFromStorage());
     
     // Restore original files if they were saved
     if (savedState && savedState.originalFiles) {
@@ -170,6 +656,49 @@ function init() {
     
     // Update import status display
     updateImportStatus();
+
+    // Export UI should reflect whether there's anything to export.
+    updateExportSectionVisibility();
+
+    // Dev-only sanity check (logs to console if anything from the reference is missing/misplaced).
+    runReferencePlacementAudit();
+}
+
+function hasAnyCustomizedSettings() {
+    for (const settings of Object.values(gameUserSettings)) {
+        for (const setting of settings) {
+            const value = currentValues.gameUserSettings[setting.name];
+            if (isValueDifferentFromDefault(value, setting.default, setting.type)) {
+                return true;
+            }
+        }
+    }
+
+    for (const settings of Object.values(gameIniSettings)) {
+        for (const setting of settings) {
+            const value = currentValues.gameIni[setting.name];
+            if (isValueDifferentFromDefault(value, setting.default, setting.type)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+function updateExportSectionVisibility() {
+    const exportSection = document.getElementById('exportSection');
+    if (!exportSection) return;
+
+    const hasOriginals = Boolean(originalFiles.gameUserSettings || originalFiles.gameIni);
+    const hasChanges = hasAnyCustomizedSettings();
+
+    // Hide export when there's nothing new to export (no imports + no changes).
+    if (!hasOriginals && !hasChanges) {
+        exportSection.classList.add('hidden');
+    } else {
+        exportSection.classList.remove('hidden');
+    }
 }
 
 function restoreUIState(savedState) {
@@ -320,8 +849,88 @@ function createSettingCard(setting, fileType) {
     description.className = 'setting-description';
     description.textContent = setting.description;
 
+    const sourceMeta = resolveSettingSource(setting);
+    const sourceEl = document.createElement('div');
+    sourceEl.className = 'setting-source';
+    if (sourceMeta) {
+        const prefix = document.createElement('span');
+        prefix.className = 'setting-source-label';
+        prefix.textContent = 'Source: ';
+        sourceEl.appendChild(prefix);
+
+        if (sourceMeta.url) {
+            const link = document.createElement('a');
+            link.href = sourceMeta.url;
+            link.target = '_blank';
+            link.rel = 'noreferrer noopener';
+            link.textContent = sourceMeta.label;
+            sourceEl.appendChild(link);
+        } else {
+            const text = document.createElement('span');
+            text.textContent = sourceMeta.label;
+            sourceEl.appendChild(text);
+        }
+    }
+
     const inputContainer = document.createElement('div');
     inputContainer.className = 'setting-input-container';
+
+    const getTextInputConfig = (s) => {
+        const rawName = s?.name || '';
+        const name = rawName.toLowerCase();
+        const defaultValue = s?.default;
+
+        let type = 'text';
+        let placeholder = 'Enter a value...';
+
+        // Password-like settings
+        if (name.includes('password') || name === 'serverpassword' || name === 'serveradminpassword' || name === 'spectatorpassword') {
+            type = 'password';
+            placeholder = 'Enter a password...';
+        }
+
+        // URLs
+        if (name.endsWith('url') || name.includes('url') || name.includes('whitelist')) {
+            type = 'text';
+            placeholder = 'Enter a URL...';
+        }
+
+        // Times
+        if (name.includes('time') || (typeof defaultValue === 'string' && /^\d{1,2}:\d{2}:\d{2}$/.test(defaultValue))) {
+            type = 'text';
+            placeholder = 'Enter time (HH:MM:SS)...';
+        }
+
+        // IDs / Mod IDs
+        if (name.endsWith('id') || name.includes('mod') || name.includes('mapmod') || name.includes('totalconversion')) {
+            type = 'text';
+            placeholder = 'Enter an ID...';
+        }
+
+        // Names / messages
+        if (name === 'sessionname') {
+            type = 'text';
+            placeholder = 'Enter a server name...';
+        }
+        if (name.includes('message')) {
+            type = 'text';
+            placeholder = 'Enter a message...';
+        }
+        if (name.includes('entries') || name.includes('list')) {
+            type = 'text';
+            placeholder = 'Enter values...';
+        }
+
+        // Allow explicit per-setting overrides in data.
+        if (s?.placeholder) {
+            placeholder = s.placeholder;
+        }
+        if (s?.inputType) {
+            type = s.inputType;
+        }
+
+        return { type, placeholder };
+    };
 
     let input;
     const initialValue = setting.currentValue !== undefined ? setting.currentValue : setting.default;
@@ -360,7 +969,12 @@ function createSettingCard(setting, fileType) {
         inputContainer.appendChild(checkboxContainer);
     } else {
         input = document.createElement('input');
-        input.type = setting.type === 'integer' ? 'number' : (setting.type === 'float' ? 'number' : 'text');
+        if (setting.type === 'integer' || setting.type === 'float') {
+            input.type = 'number';
+        } else {
+            const config = getTextInputConfig(setting);
+            input.type = config.type;
+        }
         if (setting.type === 'float') {
             input.step = '0.01';
         }
@@ -369,7 +983,11 @@ function createSettingCard(setting, fileType) {
         input.dataset.default = setting.default;
         input.dataset.settingName = setting.name;
         input.dataset.fileType = fileType;
-        input.placeholder = `Enter ${setting.type}...`;
+        const textConfig = (setting.type === 'text' || setting.type === 'string') ? getTextInputConfig(setting) : null;
+        if (textConfig) {
+            input.type = (setting.type === 'integer' || setting.type === 'float') ? input.type : textConfig.type;
+            input.placeholder = textConfig.placeholder;
+        }
 
         input.addEventListener('input', (e) => {
             updateValue(setting.name, e.target.value, fileType);
@@ -415,6 +1033,29 @@ function createSettingCard(setting, fileType) {
             wrapper.appendChild(input);
             wrapper.appendChild(incrementBtn);
             inputContainer.appendChild(wrapper);
+        } else if (textConfig && textConfig.type === 'password') {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'password-input-wrapper';
+
+            const toggleBtn = document.createElement('button');
+            toggleBtn.type = 'button';
+            toggleBtn.className = 'password-toggle-btn';
+            toggleBtn.textContent = 'Show';
+            toggleBtn.title = 'Show password';
+            toggleBtn.setAttribute('aria-label', 'Show password');
+            toggleBtn.setAttribute('aria-pressed', 'false');
+            toggleBtn.addEventListener('click', () => {
+                const isHidden = input.type === 'password';
+                input.type = isHidden ? 'text' : 'password';
+                toggleBtn.textContent = isHidden ? 'Hide' : 'Show';
+                toggleBtn.title = isHidden ? 'Hide password' : 'Show password';
+                toggleBtn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+                toggleBtn.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+            });
+
+            wrapper.appendChild(input);
+            wrapper.appendChild(toggleBtn);
+            inputContainer.appendChild(wrapper);
         } else {
             inputContainer.appendChild(input);
         }
@@ -439,6 +1080,9 @@ function createSettingCard(setting, fileType) {
 
     card.appendChild(header);
     card.appendChild(description);
+    if (sourceMeta) {
+        card.appendChild(sourceEl);
+    }
     card.appendChild(tooltip);
     card.appendChild(inputContainer);
 
@@ -453,6 +1097,9 @@ function updateValue(name, value, fileType) {
     }
     // Save to localStorage on every change
     saveToStorage();
+
+    // Export section should appear once anything is customized.
+    updateExportSectionVisibility();
 }
 
 function updateCardModifiedState(card, isModified) {
@@ -601,7 +1248,9 @@ function setupUploadButtons() {
     document.getElementById('clearImport').addEventListener('click', () => {
         originalFiles.gameUserSettings = null;
         originalFiles.gameIni = null;
+        importedCorrectPlacements = new Set();
         updateImportStatus();
+        updateExportSectionVisibility();
         saveToStorage();
         showToast('Import cleared - will generate fresh files');
     });
@@ -701,12 +1350,25 @@ function updateImportStatus() {
 function readAndParseIniFile(file, fileType) {
     const reader = new FileReader();
     reader.onload = (e) => {
-        const content = e.target.result;
-        // Store original content
-        originalFiles[fileType] = content;
+        const rawContent = e.target.result;
         // Parse and apply settings
-        const parsedSettings = parseIniContent(content);
+        const parsedSettings = parseIniContent(rawContent);
         applyParsedSettings(parsedSettings, fileType);
+
+        // Validate and stage fixes for misplaced settings.
+        validateImportedIniPlacement(rawContent, fileType, file.name);
+        applyMisplacedImportedSettings(rawContent, fileType);
+
+        // If these keys were in a GameUserSettings.ini, migrate them to Game.ini.
+        if (fileType === 'gameUserSettings') {
+            applyMigratedSettingsFromParsedIni(parsedSettings);
+            // Store original content but strip migrated keys so exports won't preserve them in the wrong file.
+            originalFiles[fileType] = stripKeysFromIniContent(rawContent, MIGRATE_GUS_TO_GAMEINI_KEYS);
+        } else {
+            // Store original content as-is
+            originalFiles[fileType] = rawContent;
+        }
+
         updateImportStatus();
         showToast(`${file.name} imported successfully!`);
         saveToStorage();
@@ -726,14 +1388,24 @@ async function parseZipFile(file) {
         for (const [filename, content] of Object.entries(files)) {
             const lowerName = filename.toLowerCase();
             if (lowerName.includes('gameusersettings') && lowerName.endsWith('.ini')) {
-                originalFiles.gameUserSettings = content;
                 const parsedSettings = parseIniContent(content);
                 applyParsedSettings(parsedSettings, 'gameUserSettings');
+
+                validateImportedIniPlacement(content, 'gameUserSettings', filename);
+                applyMisplacedImportedSettings(content, 'gameUserSettings');
+
+                // Migrate and then store stripped original to prevent wrong-file preservation.
+                applyMigratedSettingsFromParsedIni(parsedSettings);
+                originalFiles.gameUserSettings = stripKeysFromIniContent(content, MIGRATE_GUS_TO_GAMEINI_KEYS);
+
                 foundFiles++;
             } else if (lowerName.includes('game') && lowerName.endsWith('.ini') && !lowerName.includes('gameusersettings')) {
                 originalFiles.gameIni = content;
                 const parsedSettings = parseIniContent(content);
                 applyParsedSettings(parsedSettings, 'gameIni');
+
+                validateImportedIniPlacement(content, 'gameIni', filename);
+                applyMisplacedImportedSettings(content, 'gameIni');
                 foundFiles++;
             }
         }
@@ -778,10 +1450,407 @@ function parseIniContent(content) {
             settings[key] = value;
             // Also store section-qualified key for special lookups
             settings[`${currentSection}:${key}`] = value;
+
+            // Case-insensitive aliases (INI keys are effectively case-insensitive in practice)
+            const keyLower = key.toLowerCase();
+            const sectionLower = String(currentSection || '').toLowerCase();
+            if (settings[keyLower] === undefined) {
+                settings[keyLower] = value;
+            }
+            if (settings[`${sectionLower}:${keyLower}`] === undefined) {
+                settings[`${sectionLower}:${keyLower}`] = value;
+            }
         }
     }
     
     return settings;
+}
+
+function parseIniOccurrences(content) {
+    const occurrences = [];
+    const lines = String(content || '').split(/\r?\n/);
+    let currentSection = '';
+
+    for (let i = 0; i < lines.length; i++) {
+        const rawLine = lines[i];
+        const trimmed = rawLine.trim();
+
+        if (!trimmed || trimmed.startsWith(';') || trimmed.startsWith('#')) {
+            continue;
+        }
+
+        if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+            currentSection = trimmed.slice(1, -1);
+            continue;
+        }
+
+        const eqIndex = trimmed.indexOf('=');
+        if (eqIndex <= 0) continue;
+
+        const key = trimmed.substring(0, eqIndex).trim();
+        const value = trimmed.substring(eqIndex + 1).trim();
+        occurrences.push({
+            section: currentSection,
+            key,
+            value,
+            line: i + 1
+        });
+    }
+
+    return occurrences;
+}
+
+function buildExpectedSettingIndex() {
+    const byFile = {
+        gameUserSettings: new Map(),
+        gameIni: new Map()
+    };
+
+    const add = (fileType, setting) => {
+        const section = (setting.section || (fileType === 'gameUserSettings' ? 'ServerSettings' : '/script/shootergame.shootergamemode'));
+        const key = (setting.sectionKey || setting.name);
+        const keyLower = String(key).toLowerCase();
+        const list = byFile[fileType].get(keyLower) || [];
+        list.push({
+            name: setting.name,
+            type: setting.type,
+            defaultValue: setting.default,
+            expectedSection: String(section),
+            expectedSectionLower: String(section).toLowerCase(),
+            key
+        });
+        byFile[fileType].set(keyLower, list);
+    };
+
+    for (const settings of Object.values(gameUserSettings)) {
+        for (const setting of settings) {
+            add('gameUserSettings', setting);
+        }
+    }
+
+    for (const settings of Object.values(gameIniSettings)) {
+        for (const setting of settings) {
+            add('gameIni', setting);
+        }
+    }
+
+    return byFile;
+}
+
+function resolveExpectedPlacementForOccurrence(sourceFileType, occ, expectedIndex) {
+    const keyLower = String(occ.key).toLowerCase();
+    const sectionLower = String(occ.section).toLowerCase();
+
+    const sameFile = expectedIndex[sourceFileType];
+    const metasSame = sameFile.get(keyLower);
+    if (metasSame && metasSame.length > 0) {
+        const meta = metasSame.find(m => m.expectedSectionLower === sectionLower) || metasSame[0];
+        return { fileType: sourceFileType, meta };
+    }
+
+    const otherFileType = sourceFileType === 'gameUserSettings' ? 'gameIni' : 'gameUserSettings';
+    const metasOther = expectedIndex[otherFileType].get(keyLower);
+    if (metasOther && metasOther.length > 0) {
+        return { fileType: otherFileType, meta: metasOther[0] };
+    }
+
+    return null;
+}
+
+function applyMisplacedImportedSettings(content, sourceFileType) {
+    const occurrences = parseIniOccurrences(content);
+    if (occurrences.length === 0) return;
+
+    const expectedIndex = buildExpectedSettingIndex();
+
+    // First pass: record settings found in their correct location in this imported file.
+    for (const occ of occurrences) {
+        const resolved = resolveExpectedPlacementForOccurrence(sourceFileType, occ, expectedIndex);
+        if (!resolved) continue;
+
+        const sectionLower = String(occ.section).toLowerCase();
+        if (resolved.fileType === sourceFileType && resolved.meta.expectedSectionLower === sectionLower) {
+            importedCorrectPlacements.add(`${resolved.fileType}:${resolved.meta.name}`);
+        }
+    }
+
+    // Second pass: apply misplaced known settings into their expected UI inputs,
+    // but do not overwrite a value we already saw correctly placed.
+    for (const occ of occurrences) {
+        const resolved = resolveExpectedPlacementForOccurrence(sourceFileType, occ, expectedIndex);
+        if (!resolved) continue;
+
+        const expectedFileType = resolved.fileType;
+        const meta = resolved.meta;
+
+        const sectionLower = String(occ.section).toLowerCase();
+        const isMisplaced = expectedFileType !== sourceFileType || meta.expectedSectionLower !== sectionLower;
+        if (!isMisplaced) continue;
+
+        if (importedCorrectPlacements.has(`${expectedFileType}:${meta.name}`)) {
+            continue;
+        }
+
+        const input = document.querySelector(`input[data-setting-name="${meta.name}"][data-file-type="${expectedFileType}"]`);
+        if (!input) continue;
+
+        const value = occ.value;
+        if (input.type === 'checkbox') {
+            input.checked = value === 'True' || value === 'true' || value === '1';
+            const label = input.closest('.checkbox-container')?.querySelector('.checkbox-label');
+            if (label) label.textContent = input.checked ? 'Enabled' : 'Disabled';
+            updateValue(meta.name, input.checked ? 'True' : 'False', expectedFileType);
+        } else {
+            input.value = value;
+            updateValue(meta.name, value, expectedFileType);
+        }
+
+        const card = input.closest('.setting-card');
+        const defaultValue = input.dataset.default;
+        updateCardModifiedState(card, String(value) !== String(defaultValue));
+    }
+}
+
+function validateImportedIniPlacement(content, fileType, displayName = '') {
+    try {
+        const occurrences = parseIniOccurrences(content);
+        if (occurrences.length === 0) return;
+
+        const index = buildExpectedSettingIndex();
+        const sameFile = index[fileType];
+        const otherFile = fileType === 'gameUserSettings' ? index.gameIni : index.gameUserSettings;
+        const otherFileLabel = fileType === 'gameUserSettings' ? 'Game.ini' : 'GameUserSettings.ini';
+
+        const issues = [];
+
+        for (const occ of occurrences) {
+            const keyLower = String(occ.key).toLowerCase();
+            const sectionLower = String(occ.section).toLowerCase();
+
+            const expectedSame = sameFile.get(keyLower);
+            if (expectedSame && expectedSame.length > 0) {
+                // Validate section placement (when a setting is known to this file)
+                // If multiple metas share a key, accept if any expected section matches.
+                const ok = expectedSame.some(m => m.expectedSectionLower === sectionLower);
+                if (!ok) {
+                    const expectedSections = Array.from(new Set(expectedSame.map(m => m.expectedSection)));
+                    issues.push({
+                        type: 'Wrong section',
+                        key: occ.key,
+                        foundSection: occ.section || '(no section)',
+                        expected: expectedSections.join(' OR '),
+                        line: occ.line
+                    });
+                }
+                continue;
+            }
+
+            const expectedOther = otherFile.get(keyLower);
+            if (expectedOther && expectedOther.length > 0) {
+                const expectedSections = Array.from(new Set(expectedOther.map(m => m.expectedSection)));
+                issues.push({
+                    type: 'Wrong file',
+                    key: occ.key,
+                    foundSection: occ.section || '(no section)',
+                    expected: `${otherFileLabel} (${expectedSections.join(' OR ')})`,
+                    line: occ.line
+                });
+            }
+        }
+
+        if (issues.length > 0) {
+            const label = displayName ? ` (${displayName})` : '';
+            console.groupCollapsed(`INI placement check${label}: ${issues.length} issue(s)`);
+            console.table(issues);
+            console.groupEnd();
+
+            // Keep the toast short; details go to console.
+            showToast(`Imported ${displayName || 'INI'} with ${issues.length} placement issue(s). Check console for details.`);
+        }
+    } catch (e) {
+        console.warn('INI placement validation failed:', e);
+    }
+}
+
+function computeImportPlacementRelocations() {
+    const expectedIndex = buildExpectedSettingIndex();
+
+    const makeRelocationBucket = () => ({ removals: new Map(), additions: [] });
+    const relocations = {
+        gameUserSettings: makeRelocationBucket(),
+        gameIni: makeRelocationBucket()
+    };
+
+    const addRemoval = (bucket, section, key) => {
+        const sectionLower = String(section || '').toLowerCase();
+        const keyLower = String(key).toLowerCase();
+        if (!bucket.removals.has(sectionLower)) {
+            bucket.removals.set(sectionLower, new Set());
+        }
+        bucket.removals.get(sectionLower).add(keyLower);
+    };
+
+    const addAddition = (bucket, section, key, value, settingName) => {
+        bucket.additions.push({ section, key, value, settingName });
+    };
+
+    const processFile = (content, sourceFileType) => {
+        if (!content) return;
+        const occurrences = parseIniOccurrences(content);
+        for (const occ of occurrences) {
+            const resolved = resolveExpectedPlacementForOccurrence(sourceFileType, occ, expectedIndex);
+            if (!resolved) continue;
+
+            const expectedFileType = resolved.fileType;
+            const meta = resolved.meta;
+            const foundSectionLower = String(occ.section).toLowerCase();
+            const expectedSectionLower = meta.expectedSectionLower;
+
+            const isMisplaced = expectedFileType !== sourceFileType || expectedSectionLower !== foundSectionLower;
+            if (!isMisplaced) continue;
+
+            // Remove the misplaced line from its current location.
+            addRemoval(relocations[sourceFileType], occ.section, occ.key);
+
+            // Add it to the correct location in the correct file.
+            const input = document.querySelector(`input[data-setting-name="${meta.name}"][data-file-type="${expectedFileType}"]`);
+            const value = input
+                ? (input.type === 'checkbox' ? (input.checked ? 'True' : 'False') : input.value)
+                : occ.value;
+            addAddition(relocations[expectedFileType], meta.expectedSection, meta.key, value, meta.name);
+        }
+    };
+
+    processFile(originalFiles.gameUserSettings, 'gameUserSettings');
+    processFile(originalFiles.gameIni, 'gameIni');
+
+    return relocations;
+}
+
+function applyRelocationsToIniLines(lines, relocationsForFile) {
+    if (!relocationsForFile) return lines;
+
+    const removals = relocationsForFile.removals;
+    const additions = relocationsForFile.additions;
+
+    const isSectionHeader = (trimmed) => trimmed.startsWith('[') && trimmed.endsWith(']');
+
+    // 1) Remove misplaced key=value lines
+    const cleaned = [];
+    let currentSection = '';
+
+    for (const line of lines) {
+        const trimmed = line.trim();
+
+        if (isSectionHeader(trimmed)) {
+            currentSection = trimmed.slice(1, -1);
+            cleaned.push(line);
+            continue;
+        }
+
+        if (!trimmed || trimmed.startsWith(';') || trimmed.startsWith('#')) {
+            cleaned.push(line);
+            continue;
+        }
+
+        const eqIndex = trimmed.indexOf('=');
+        if (eqIndex <= 0) {
+            cleaned.push(line);
+            continue;
+        }
+
+        const key = trimmed.substring(0, eqIndex).trim();
+        const keyLower = key.toLowerCase();
+        const sectionLower = String(currentSection || '').toLowerCase();
+        const sectionRemovals = removals.get(sectionLower);
+        if (sectionRemovals && sectionRemovals.has(keyLower)) {
+            continue;
+        }
+
+        cleaned.push(line);
+    }
+
+    if (!additions || additions.length === 0) {
+        return cleaned;
+    }
+
+    // 2) Insert (or replace) additions in their expected sections
+    const out = cleaned.slice();
+    const normalizeSection = (s) => String(s || '').toLowerCase();
+
+    const findSectionHeaderIndex = (section) => {
+        const header = `[${section}]`;
+        return out.findIndex(l => l.trim() === header);
+    };
+
+    const findSectionEndIndex = (headerIndex) => {
+        let idx = headerIndex + 1;
+        while (idx < out.length) {
+            const t = out[idx].trim();
+            if (t.startsWith('[') && t.endsWith(']')) break;
+            idx++;
+        }
+        return idx;
+    };
+
+    const upsertInSection = (section, key, value) => {
+        const headerIndex = findSectionHeaderIndex(section);
+        const headerLine = `[${section}]`;
+
+        let startIndex = headerIndex;
+        if (startIndex === -1) {
+            // Create section at end
+            if (out.length > 0 && out[out.length - 1].trim() !== '') {
+                out.push('');
+            }
+            out.push(headerLine);
+            out.push(`${key}=${value}`);
+            return;
+        }
+
+        const endIndex = findSectionEndIndex(startIndex);
+        const keyLower = String(key).toLowerCase();
+        let firstMatchIndex = -1;
+
+        // Scan section for existing key; replace first, remove duplicates.
+        for (let i = startIndex + 1; i < endIndex; i++) {
+            const trimmed = out[i].trim();
+            if (!trimmed || trimmed.startsWith(';') || trimmed.startsWith('#')) continue;
+            const eqIndex = trimmed.indexOf('=');
+            if (eqIndex <= 0) continue;
+            const existingKeyLower = trimmed.substring(0, eqIndex).trim().toLowerCase();
+            if (existingKeyLower === keyLower) {
+                if (firstMatchIndex === -1) {
+                    firstMatchIndex = i;
+                } else {
+                    out.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+
+        if (firstMatchIndex !== -1) {
+            out[firstMatchIndex] = `${key}=${value}`;
+        } else {
+            // Insert just before next section header
+            out.splice(endIndex, 0, `${key}=${value}`);
+        }
+    };
+
+    // De-dupe additions by (section,key) keeping last.
+    const seen = new Map();
+    for (const add of additions) {
+        const s = add.section;
+        const k = add.key;
+        const mapKey = `${normalizeSection(s)}:${String(k).toLowerCase()}`;
+        seen.set(mapKey, add);
+    }
+
+    for (const add of seen.values()) {
+        upsertInSection(add.section, add.key, add.value);
+    }
+
+    return out;
 }
 
 function applyParsedSettings(parsedSettings, fileType) {
@@ -801,11 +1870,22 @@ function applyParsedSettings(parsedSettings, fileType) {
     
     for (const setting of allSettings) {
         const { section, sectionKey } = settingsLookup[setting.name];
+
+        const sectionLower = String(section || '').toLowerCase();
+        const sectionKeyLower = String(sectionKey || '').toLowerCase();
         
         // Try section-qualified lookup first, then fallback to key only
         let value = parsedSettings[`${section}:${sectionKey}`];
         if (value === undefined) {
             value = parsedSettings[sectionKey];
+        }
+
+        // Case-insensitive fallbacks
+        if (value === undefined) {
+            value = parsedSettings[`${sectionLower}:${sectionKeyLower}`];
+        }
+        if (value === undefined) {
+            value = parsedSettings[sectionKeyLower];
         }
         
         if (value !== undefined) {
@@ -952,12 +2032,17 @@ function setupBackToTop() {
 }
 
 function generateGameUserSettingsIni() {
+    const relocations = computeImportPlacementRelocations();
+
     // Build a map of settings with their section info
     const settingsMeta = {};
     for (const [sectionId, settings] of Object.entries(gameUserSettings)) {
         settings.forEach(setting => {
+            const value = currentValues.gameUserSettings[setting.name];
             settingsMeta[setting.name] = {
-                value: currentValues.gameUserSettings[setting.name],
+                value,
+                defaultValue: setting.default,
+                type: setting.type,
                 section: setting.section || 'ServerSettings',
                 sectionKey: setting.sectionKey || setting.name
             };
@@ -966,16 +2051,35 @@ function generateGameUserSettingsIni() {
 
     // If we have an original file, preserve it and only update managed settings
     if (originalFiles.gameUserSettings) {
-        return mergeWithOriginalSectioned(originalFiles.gameUserSettings, settingsMeta);
+        const merged = mergeWithOriginalSectioned(originalFiles.gameUserSettings, settingsMeta, { appendMissing: false });
+        const fixedLines = applyRelocationsToIniLines(merged.split(/\r?\n/), relocations.gameUserSettings);
+        return normalizeIniSpacing(fixedLines.join('\n'));
     }
 
     // Generate fresh file - group by section
     const sections = {};
     for (const [name, meta] of Object.entries(settingsMeta)) {
+        if (!isValueDifferentFromDefault(meta.value, meta.defaultValue, meta.type)) {
+            continue;
+        }
         if (!sections[meta.section]) {
             sections[meta.section] = [];
         }
         sections[meta.section].push({ key: meta.sectionKey, value: meta.value });
+    }
+
+    // If we imported the other file and need to move settings into this file,
+    // include those moved settings even if they match defaults.
+    for (const add of relocations.gameUserSettings.additions) {
+        if (!sections[add.section]) sections[add.section] = [];
+        // Avoid duplicates: replace any existing entry for the same key.
+        sections[add.section] = sections[add.section].filter(s => String(s.key).toLowerCase() !== String(add.key).toLowerCase());
+        sections[add.section].push({ key: add.key, value: add.value });
+    }
+
+    // If the user didn't customize anything, generate nothing.
+    if (Object.keys(sections).length === 0) {
+        return '';
     }
 
     // Build content with proper section ordering
@@ -998,33 +2102,170 @@ function generateGameUserSettingsIni() {
         });
     }
 
-    return content;
+    return normalizeIniSpacing(content);
+}
+
+function normalizeIniSpacing(content) {
+    if (!content) return content;
+
+    const lines = content.split(/\r?\n/);
+
+    const isComment = (trimmed) => trimmed.startsWith(';') || trimmed.startsWith('#');
+    const isSectionHeader = (trimmed) => trimmed.startsWith('[') && trimmed.endsWith(']');
+    const isKeyValue = (trimmed) => {
+        if (!trimmed) return false;
+        if (isComment(trimmed) || isSectionHeader(trimmed)) return false;
+        const eqIndex = trimmed.indexOf('=');
+        return eqIndex > 0;
+    };
+
+    const getLastNonEmptyType = (out) => {
+        for (let i = out.length - 1; i >= 0; i--) {
+            const t = out[i].trim();
+            if (!t) continue;
+            if (isSectionHeader(t)) return 'section';
+            if (isComment(t)) return 'comment';
+            if (isKeyValue(t)) return 'key';
+            return 'other';
+        }
+        return 'none';
+    };
+
+    const peekNextNonEmptyType = (startIndex) => {
+        for (let j = startIndex; j < lines.length; j++) {
+            const t = lines[j].trim();
+            if (!t) continue;
+            if (isSectionHeader(t)) return 'section';
+            if (isComment(t)) return 'comment';
+            if (isKeyValue(t)) return 'key';
+            return 'other';
+        }
+        return 'none';
+    };
+
+    const out = [];
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const trimmed = line.trim();
+
+        if (isSectionHeader(trimmed)) {
+            // Add a single blank line before a new section if the previous non-empty line was a setting.
+            const prevType = getLastNonEmptyType(out);
+            if (prevType === 'key' && out.length > 0 && out[out.length - 1].trim() !== '') {
+                out.push('');
+            }
+            out.push(line);
+            continue;
+        }
+
+        if (!trimmed) {
+            const prevType = getLastNonEmptyType(out);
+            const nextType = peekNextNonEmptyType(i + 1);
+
+            // Remove blank lines that split continuous key/value blocks.
+            if (prevType === 'key' && nextType === 'key') {
+                continue;
+            }
+
+            // Collapse multiple blank lines.
+            if (out.length > 0 && out[out.length - 1].trim() === '') {
+                continue;
+            }
+
+            out.push('');
+            continue;
+        }
+
+        out.push(line);
+    }
+
+    // Trim trailing blank lines.
+    while (out.length > 0 && out[out.length - 1].trim() === '') {
+        out.pop();
+    }
+
+    return out.join('\n');
 }
 
 function generateGameIni() {
+    const relocations = computeImportPlacementRelocations();
+
     // Get all managed setting names
     const managedSettings = {};
     for (const [sectionId, settings] of Object.entries(gameIniSettings)) {
         settings.forEach(setting => {
-            managedSettings[setting.name] = currentValues.gameIni[setting.name];
+            const value = currentValues.gameIni[setting.name];
+            if (isValueDifferentFromDefault(value, setting.default, setting.type)) {
+                managedSettings[setting.name] = value;
+            }
         });
     }
 
     // If we have an original file, preserve it and only update managed settings
     if (originalFiles.gameIni) {
-        return mergeWithOriginal(originalFiles.gameIni, managedSettings);
+        const merged = mergeWithOriginal(originalFiles.gameIni, managedSettings, { appendMissing: false });
+        const fixedLines = applyRelocationsToIniLines(merged.split(/\r?\n/), relocations.gameIni);
+        return fixedLines.join('\n');
+    }
+
+    // If we imported the other file and need to move settings into this file,
+    // include those moved settings even if they match defaults.
+    for (const add of relocations.gameIni.additions) {
+        managedSettings[add.key] = add.value;
+    }
+
+    // If the user didn't customize anything, generate nothing.
+    const entries = Object.entries(managedSettings);
+    if (entries.length === 0) {
+        return '';
     }
 
     // Generate fresh file
     let content = '[/script/shootergame.shootergamemode]\n';
-    for (const [name, value] of Object.entries(managedSettings)) {
+    for (const [name, value] of entries) {
         content += `${name}=${value}\n`;
     }
 
     return content;
 }
 
-function mergeWithOriginal(originalContent, managedSettings) {
+function isValueDifferentFromDefault(value, defaultValue, type) {
+    // Treat undefined as "not set"; this generator initializes currentValues
+    // to defaults, but this keeps the helper safe.
+    if (value === undefined) return false;
+
+    // Booleans are stored as strings "True"/"False".
+    if (type === 'boolean') {
+        const v = String(value).trim().toLowerCase();
+        const d = String(defaultValue).trim().toLowerCase();
+        return v !== d;
+    }
+
+    if (type === 'integer') {
+        const v = Number.parseInt(String(value).trim(), 10);
+        const d = Number.parseInt(String(defaultValue).trim(), 10);
+        if (Number.isNaN(v) || Number.isNaN(d)) {
+            return String(value) !== String(defaultValue);
+        }
+        return v !== d;
+    }
+
+    if (type === 'float') {
+        const v = Number.parseFloat(String(value).trim());
+        const d = Number.parseFloat(String(defaultValue).trim());
+        if (Number.isNaN(v) || Number.isNaN(d)) {
+            return String(value) !== String(defaultValue);
+        }
+        return v !== d;
+    }
+
+    // Strings/text: keep exact compare (empty string counts as default).
+    return String(value) !== String(defaultValue);
+}
+
+function mergeWithOriginal(originalContent, managedSettings, options = {}) {
+    const { appendMissing = true } = options;
     const lines = originalContent.split(/\r?\n/);
     const updatedSettings = new Set(); // Track which settings we've updated
     const result = [];
@@ -1057,31 +2298,34 @@ function mergeWithOriginal(originalContent, managedSettings) {
         }
     }
     
-    // Add any managed settings that weren't in the original file
-    const missedSettings = Object.entries(managedSettings)
-        .filter(([key]) => !updatedSettings.has(key));
-    
-    if (missedSettings.length > 0) {
-        // Find the last section header to add settings under it
-        // Or add at the end if no section
-        let insertIndex = result.length;
-        for (let i = result.length - 1; i >= 0; i--) {
-            if (result[i].trim().startsWith('[')) {
-                insertIndex = i + 1;
-                break;
+    // Optionally add managed settings that weren't in the original file
+    if (appendMissing) {
+        const missedSettings = Object.entries(managedSettings)
+            .filter(([key]) => !updatedSettings.has(key));
+
+        if (missedSettings.length > 0) {
+            // Find the last section header to add settings under it
+            // Or add at the end if no section
+            let insertIndex = result.length;
+            for (let i = result.length - 1; i >= 0; i--) {
+                if (result[i].trim().startsWith('[')) {
+                    insertIndex = i + 1;
+                    break;
+                }
             }
-        }
-        
-        for (const [key, value] of missedSettings) {
-            result.splice(insertIndex, 0, `${key}=${value}`);
-            insertIndex++;
+
+            for (const [key, value] of missedSettings) {
+                result.splice(insertIndex, 0, `${key}=${value}`);
+                insertIndex++;
+            }
         }
     }
     
     return result.join('\n');
 }
 
-function mergeWithOriginalSectioned(originalContent, settingsMeta) {
+function mergeWithOriginalSectioned(originalContent, settingsMeta, options = {}) {
+    const { appendMissing = true } = options;
     const lines = originalContent.split(/\r?\n/);
     const updatedSettings = new Set();
     const result = [];
@@ -1133,44 +2377,46 @@ function mergeWithOriginalSectioned(originalContent, settingsMeta) {
         }
     }
     
-    // Add any managed settings that weren't in the original file
-    // Group by section
-    const missedBySection = {};
-    for (const [name, meta] of Object.entries(settingsMeta)) {
-        if (!updatedSettings.has(name)) {
-            if (!missedBySection[meta.section]) {
-                missedBySection[meta.section] = [];
-            }
-            missedBySection[meta.section].push({ key: meta.sectionKey, value: meta.value });
-        }
-    }
-    
-    // Find or create sections for missed settings
-    for (const [section, settings] of Object.entries(missedBySection)) {
-        // Check if section exists in result
-        const sectionHeader = `[${section}]`;
-        let sectionIndex = result.findIndex(line => line.trim() === sectionHeader);
-        
-        if (sectionIndex === -1) {
-            // Section doesn't exist, add it at the end
-            result.push('');
-            result.push(sectionHeader);
-            for (const s of settings) {
-                result.push(`${s.key}=${s.value}`);
-            }
-        } else {
-            // Section exists, find where to insert (after section header, before next section)
-            let insertIndex = sectionIndex + 1;
-            while (insertIndex < result.length) {
-                const line = result[insertIndex].trim();
-                if (line.startsWith('[') && line.endsWith(']')) {
-                    break;
+    // Optionally add managed settings that weren't in the original file
+    if (appendMissing) {
+        // Group by section
+        const missedBySection = {};
+        for (const [name, meta] of Object.entries(settingsMeta)) {
+            if (!updatedSettings.has(name)) {
+                if (!missedBySection[meta.section]) {
+                    missedBySection[meta.section] = [];
                 }
-                insertIndex++;
+                missedBySection[meta.section].push({ key: meta.sectionKey, value: meta.value });
             }
-            // Insert before the next section or at end of file
-            for (let i = settings.length - 1; i >= 0; i--) {
-                result.splice(insertIndex, 0, `${settings[i].key}=${settings[i].value}`);
+        }
+
+        // Find or create sections for missed settings
+        for (const [section, settings] of Object.entries(missedBySection)) {
+            // Check if section exists in result
+            const sectionHeader = `[${section}]`;
+            let sectionIndex = result.findIndex(line => line.trim() === sectionHeader);
+
+            if (sectionIndex === -1) {
+                // Section doesn't exist, add it at the end
+                result.push('');
+                result.push(sectionHeader);
+                for (const s of settings) {
+                    result.push(`${s.key}=${s.value}`);
+                }
+            } else {
+                // Section exists, find where to insert (after section header, before next section)
+                let insertIndex = sectionIndex + 1;
+                while (insertIndex < result.length) {
+                    const line = result[insertIndex].trim();
+                    if (line.startsWith('[') && line.endsWith(']')) {
+                        break;
+                    }
+                    insertIndex++;
+                }
+                // Insert before the next section or at end of file
+                for (let i = settings.length - 1; i >= 0; i--) {
+                    result.splice(insertIndex, 0, `${settings[i].key}=${settings[i].value}`);
+                }
             }
         }
     }

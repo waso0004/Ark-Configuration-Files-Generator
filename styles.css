@@ -542,6 +542,22 @@ main {
     flex: 1;
 }
 
+.setting-source {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: -0.4rem;
+    margin-bottom: 0.75rem;
+}
+
+.setting-source a {
+    color: var(--accent-primary);
+    text-decoration: none;
+}
+
+.setting-source a:hover {
+    text-decoration: underline;
+}
+
 /* Tooltip should not affect card layout flow */
 .setting-card .tooltip {
     position: absolute;
@@ -565,6 +581,11 @@ main {
     font-size: 0.9rem;
     height: 36px;
     box-sizing: border-box;
+}
+
+.setting-input::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
 }
 
 .setting-input:focus {
@@ -644,6 +665,59 @@ main {
 
 .number-btn.increment {
     border-left: 1px solid var(--border-color);
+}
+
+/* Password input with show/hide toggle */
+.password-input-wrapper {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    height: 36px;
+}
+
+.password-input-wrapper:focus-within {
+    border-color: var(--accent-primary);
+}
+
+.password-input-wrapper .setting-input {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    height: 100%;
+}
+
+.password-input-wrapper .setting-input:focus {
+    border: none;
+}
+
+.password-toggle-btn {
+    width: 56px;
+    height: 100%;
+    background: var(--bg-input);
+    border: none;
+    border-left: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.password-toggle-btn:hover {
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+}
+
+.password-toggle-btn:active {
+    background: var(--accent-secondary);
 }
 
 .setting-input[type="checkbox"] {

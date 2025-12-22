@@ -43,7 +43,7 @@
         </div>
 
         <!-- Download & Copy Actions -->
-        <div class="actions-section">
+        <div class="actions-section" id="exportSection">
             <h3>📤 Export Configuration</h3>
             <div class="actions-buttons">
                 <button class="action-btn accent" id="downloadBoth">
@@ -179,14 +179,6 @@
                 </section>
 
                 <section class="settings-section">
-                    <h2 class="section-title" data-toggle="server-breeding">
-                        <span>🥚 Breeding & Taming</span>
-                        <span class="toggle-icon">▼</span>
-                    </h2>
-                    <div id="server-breeding" class="settings-grid"></div>
-                </section>
-
-                <section class="settings-section">
                     <h2 class="section-title" data-toggle="server-bunker">
                         <span>🏰 Tek Bunker Settings</span>
                         <span class="toggle-icon">▼</span>
@@ -273,6 +265,14 @@
                     </h2>
                     <div id="server-environment" class="settings-grid"></div>
                 </section>
+
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="server-ragnarok">
+                        <span>🌋 Ragnarok-Specific</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="server-ragnarok" class="settings-grid"></div>
+                </section>
             </div>
         </div>
 
@@ -280,11 +280,27 @@
         <div id="game" class="tab-content">
             <div class="settings-container">
                 <section class="settings-section">
+                    <h2 class="section-title" data-toggle="game-general">
+                        <span>🎮 Game Mode &amp; Multipliers</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="game-general" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section">
                     <h2 class="section-title" data-toggle="game-breeding">
                         <span>🥚 Breeding Settings</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
                     <div id="game-breeding" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="game-spoiling">
+                        <span>🍖 Spoiling &amp; Decomposition</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="game-spoiling" class="settings-grid"></div>
                 </section>
 
                 <section class="settings-section">
