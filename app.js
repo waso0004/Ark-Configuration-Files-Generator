@@ -1,6 +1,16 @@
 // ARK Server Config Generator - Main Application
 
 const STORAGE_KEY = 'arkConfigGenerator';
+const STORAGE_VERSION = 2; // Increment when data structure changes
+
+// Debounce utility for optimized saving
+function debounce(fn, delay) {
+    let timeoutId;
+    return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn.apply(this, args), delay);
+    };
+}
 
 const SOURCE_INFO = {
     wiki: {
@@ -356,9 +366,41 @@ const RENAMED_SETTING_KEYS = [
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize the application
-    init();
+    // Show loading indicator if it exists
+    const loadingEl = document.getElementById('loadingIndicator');
+    if (loadingEl) loadingEl.style.display = 'block';
+    
+    // Use requestIdleCallback for non-critical initialization if available
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+            init();
+            if (loadingEl) loadingEl.style.display = 'none';
+        }, { timeout: 1000 });
+    } else {
+        // Fallback for browsers without requestIdleCallback
+        setTimeout(() => {
+            init();
+            if (loadingEl) loadingEl.style.display = 'none';
+        }, 0);
+    }
 });
+
+// DOM element cache for frequently accessed elements
+const domCache = {
+    _cache: new Map(),
+    get(selector) {
+        if (!this._cache.has(selector)) {
+            this._cache.set(selector, document.querySelector(selector));
+        }
+        return this._cache.get(selector);
+    },
+    getAll(selector) {
+        return document.querySelectorAll(selector);
+    },
+    clear() {
+        this._cache.clear();
+    }
+};
 
 // Store current values
 let currentValues = {
@@ -381,10 +423,17 @@ function loadFromStorage() {
     try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
-            return JSON.parse(saved);
+            const data = JSON.parse(saved);
+            // Check version compatibility
+            if (data.version && data.version !== STORAGE_VERSION) {
+                console.log('Storage version mismatch, migrating data...');
+            }
+            return data;
         }
     } catch (e) {
         console.warn('Failed to load from localStorage:', e);
+        // Clear corrupted data
+        try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
     }
     return null;
 }
@@ -518,10 +567,20 @@ function applyMigratedSettingsFromParsedIni(parsedSettings) {
     }
 }
 
-// Save state to localStorage
-function saveToStorage() {
+// Save state to localStorage (internal - use debouncedSave for frequent updates)
+function _saveToStorageImmediate() {
+    // Update save status indicator
+    const saveStatus = document.getElementById('saveStatus');
+    if (saveStatus) {
+        saveStatus.textContent = '💾 Saving...';
+        saveStatus.classList.add('saving');
+        saveStatus.classList.remove('saved');
+    }
+    
     try {
         const state = {
+            version: STORAGE_VERSION,
+            timestamp: Date.now(),
             currentValues: currentValues,
             originalFiles: originalFiles,
             activeTab: document.querySelector('.tab-btn.active')?.dataset.tab || 'gameusersettings',
@@ -529,9 +588,49 @@ function saveToStorage() {
             collapsedSections: Array.from(document.querySelectorAll('.section-title.collapsed')).map(el => el.dataset.toggle)
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        
+        // Show saved status
+        if (saveStatus) {
+            setTimeout(() => {
+                saveStatus.textContent = '✓ Saved';
+                saveStatus.classList.remove('saving');
+                saveStatus.classList.add('saved');
+                // Reset to default state after a moment
+                setTimeout(() => {
+                    saveStatus.textContent = '💾 Auto-saved';
+                    saveStatus.classList.remove('saved');
+                }, 2000);
+            }, 100);
+        }
     } catch (e) {
         console.warn('Failed to save to localStorage:', e);
+        // Show error status
+        if (saveStatus) {
+            saveStatus.textContent = '⚠️ Save failed';
+            saveStatus.classList.remove('saving', 'saved');
+        }
+        // If quota exceeded, try to clear old data
+        // If quota exceeded, try to clear old data
+        if (e.name === 'QuotaExceededError') {
+            try {
+                // Keep only essential data
+                const minimalState = {
+                    version: STORAGE_VERSION,
+                    timestamp: Date.now(),
+                    currentValues: currentValues
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(minimalState));
+            } catch (_) {}
+        }
     }
+}
+
+// Debounced save for frequent updates (like typing)
+const debouncedSave = debounce(_saveToStorageImmediate, 300);
+
+// Immediate save for important state changes
+function saveToStorage() {
+    _saveToStorageImmediate();
 }
 
 function getEffectText(setting) {
@@ -1095,8 +1194,8 @@ function updateValue(name, value, fileType) {
     } else {
         currentValues.gameIni[name] = value;
     }
-    // Save to localStorage on every change
-    saveToStorage();
+    // Debounced save to localStorage for better performance during typing
+    debouncedSave();
 
     // Export section should appear once anything is customized.
     updateExportSectionVisibility();
@@ -1147,39 +1246,46 @@ function setupSectionToggle() {
 
 function setupSearch() {
     const searchInput = document.getElementById('searchInput');
-    searchInput.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase().trim();
+    
+    // Cache all cards and their searchable text for faster filtering
+    let cardCache = null;
+    const buildCardCache = () => {
         const cards = document.querySelectorAll('.setting-card');
+        cardCache = Array.from(cards).map(card => ({
+            element: card,
+            searchText: (card.dataset.settingName + ' ' + 
+                        card.querySelector('.setting-description').textContent).toLowerCase()
+        }));
+    };
+    
+    // Build cache on first search
+    const performSearch = (query) => {
+        if (!cardCache) buildCardCache();
         
-        // Split query into individual words for flexible matching
         const queryWords = query.split(/\s+/).filter(word => word.length > 0);
         
-        cards.forEach(card => {
-            const settingName = card.dataset.settingName.toLowerCase();
-            const description = card.querySelector('.setting-description').textContent.toLowerCase();
-            const searchableText = settingName + ' ' + description;
-            
-            // Match if all query words are found somewhere in the text
-            const matches = query === '' || queryWords.every(word => searchableText.includes(word));
-            
-            if (matches) {
-                card.classList.remove('hidden');
-            } else {
-                card.classList.add('hidden');
-            }
-        });
+        // Use requestAnimationFrame for smoother UI updates
+        requestAnimationFrame(() => {
+            cardCache.forEach(({ element, searchText }) => {
+                const matches = query === '' || queryWords.every(word => searchText.includes(word));
+                element.classList.toggle('hidden', !matches);
+            });
 
-        // Show sections that have visible cards
-        document.querySelectorAll('.settings-grid').forEach(grid => {
-            const visibleCards = grid.querySelectorAll('.setting-card:not(.hidden)');
-            const section = grid.closest('.settings-section');
-            
-            if (visibleCards.length === 0) {
-                section.classList.add('hidden');
-            } else {
-                section.classList.remove('hidden');
-            }
+            // Show sections that have visible cards
+            document.querySelectorAll('.settings-grid').forEach(grid => {
+                const hasVisibleCards = grid.querySelector('.setting-card:not(.hidden)') !== null;
+                const section = grid.closest('.settings-section');
+                section.classList.toggle('hidden', !hasVisibleCards);
+            });
         });
+    };
+    
+    // Debounced search for better performance while typing
+    const debouncedSearch = debounce((query) => performSearch(query), 150);
+    
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        debouncedSearch(query);
     });
 }
 

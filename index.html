@@ -5,8 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARK: Survival Ascended - Server Config Generator</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Preload critical resources -->
+    <link rel="preload" href="settings-data.js" as="script">
+    <link rel="preload" href="app.js" as="script">
 </head>
 <body>
+    <!-- Loading indicator -->
+    <div id="loadingIndicator" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p>Loading settings...</p>
+    </div>
+
     <header>
         <div class="header-content">
             <h1>🦖 ARK: Survival Ascended</h1>
@@ -117,7 +126,10 @@
                     <button class="tab-btn active" data-tab="gameusersettings">GameUserSettings.ini</button>
                     <button class="tab-btn" data-tab="game">Game.ini</button>
                 </div>
-                <button id="resetAll" class="tab-btn reset-btn">↺ Reset to Defaults</button>
+                <div class="controls-right">
+                    <span id="saveStatus" class="save-status" title="Changes are automatically saved to your browser">💾 Auto-saved</span>
+                    <button id="resetAll" class="tab-btn reset-btn">↺ Reset to Defaults</button>
+                </div>
             </div>
 
             <div class="search-container">
