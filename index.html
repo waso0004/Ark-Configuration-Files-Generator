@@ -214,12 +214,13 @@
         <div class="settings-panel">
             <div class="controls">
                 <div class="tabs">
-                    <button class="tab-btn active" data-tab="gameusersettings">GameUserSettings.ini</button>
-                    <button class="tab-btn" data-tab="game">Game.ini</button>
+                    <button class="filter-btn active" data-filter="all">All Settings</button>
+                    <button class="filter-btn" data-filter="gameusersettings">GameUserSettings.ini</button>
+                    <button class="filter-btn" data-filter="game">Game.ini</button>
                 </div>
                 <div class="controls-right">
                     <span id="saveStatus" class="save-status" title="Changes are automatically saved to your browser">Auto-saved</span>
-                    <button id="resetAll" class="tab-btn reset-btn">↺ Reset to Defaults</button>
+                    <button id="resetAll" class="filter-btn reset-btn">↺ Reset to Defaults</button>
                 </div>
             </div>
 
@@ -227,18 +228,46 @@
                 <input type="text" id="searchInput" placeholder="Search settings..." />
             </div>
 
-            <!-- GameUserSettings.ini Tab -->
-            <div id="gameusersettings" class="tab-content active">
+            <!-- All Settings (unified view) -->
             <div class="settings-container">
-                <!-- Server Settings Section -->
+                <!-- GameUserSettings.ini Section Header -->
+                <div class="file-section-header" data-file="gameusersettings">
+                    <h2 class="file-header-title">📄 GameUserSettings.ini</h2>
+                    <span class="file-header-desc">Server settings, rates, gameplay options</span>
+                </div>
+                <!-- Basic Server Settings Section -->
                 <section class="settings-section">
-                    <h2 class="section-title" data-toggle="server-general">
-                        <span>⚙️ General Server Settings</span>
+                    <h2 class="section-title" data-toggle="server-basic">
+                        <span>🖥️ Basic Server Settings</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="server-general" class="settings-grid">
+                    <div id="server-basic" class="settings-grid">
                         <!-- Settings will be populated by JavaScript -->
                     </div>
+                </section>
+
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="server-admin">
+                        <span>🔐 Admin & Security</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="server-admin" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="server-chat">
+                        <span>💬 Chat & Communication</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="server-chat" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="server-gameplay">
+                        <span>🎮 Gameplay Options</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="server-gameplay" class="settings-grid"></div>
                 </section>
 
                 <section class="settings-section">
@@ -282,38 +311,6 @@
                 </section>
 
                 <section class="settings-section">
-                    <h2 class="section-title" data-toggle="server-bunker">
-                        <span>🏰 Tek Bunker Settings</span>
-                        <span class="toggle-icon">▼</span>
-                    </h2>
-                    <div id="server-bunker" class="settings-grid"></div>
-                </section>
-
-                <section class="settings-section">
-                    <h2 class="section-title" data-toggle="server-cryohospital">
-                        <span>❄️ CryoHospital Settings</span>
-                        <span class="toggle-icon">▼</span>
-                    </h2>
-                    <div id="server-cryohospital" class="settings-grid"></div>
-                </section>
-
-                <section class="settings-section">
-                    <h2 class="section-title" data-toggle="server-bloodforge">
-                        <span>🩸 Bloodforge Settings</span>
-                        <span class="toggle-icon">▼</span>
-                    </h2>
-                    <div id="server-bloodforge" class="settings-grid"></div>
-                </section>
-
-                <section class="settings-section">
-                    <h2 class="section-title" data-toggle="server-outpost">
-                        <span>🏕️ Outpost Settings</span>
-                        <span class="toggle-icon">▼</span>
-                    </h2>
-                    <div id="server-outpost" class="settings-grid"></div>
-                </section>
-
-                <section class="settings-section">
                     <h2 class="section-title" data-toggle="server-blueprints">
                         <span>📜 Blueprint & Quality Caps</span>
                         <span class="toggle-icon">▼</span>
@@ -335,14 +332,6 @@
                         <span class="toggle-icon">▼</span>
                     </h2>
                     <div id="server-tamelimit" class="settings-grid"></div>
-                </section>
-
-                <section class="settings-section">
-                    <h2 class="section-title" data-toggle="server-creatures">
-                        <span>🐾 Creature-Specific Settings</span>
-                        <span class="toggle-icon">▼</span>
-                    </h2>
-                    <div id="server-creatures" class="settings-grid"></div>
                 </section>
 
                 <section class="settings-section">
@@ -376,21 +365,191 @@
                     </h2>
                     <div id="server-ragnarok" class="settings-grid"></div>
                 </section>
-            </div>
-        </div>
 
-        <!-- Game.ini Tab -->
-        <div id="game" class="tab-content">
-            <div class="settings-container">
                 <section class="settings-section">
-                    <h2 class="section-title" data-toggle="game-general">
-                        <span>🎮 Game Mode &amp; Multipliers</span>
+                    <h2 class="section-title" data-toggle="server-valguero">
+                        <span>🏔️ Valguero-Specific</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="game-general" class="settings-grid"></div>
+                    <div id="server-valguero" class="settings-grid"></div>
                 </section>
 
                 <section class="settings-section">
+                    <h2 class="section-title" data-toggle="server-fjordur">
+                        <span>❄️ Fjordur-Specific</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="server-fjordur" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="server-genesis">
+                        <span>🌐 Genesis-Specific</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="server-genesis" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="server-aberration">
+                        <span>🌌 Aberration-Specific</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="server-aberration" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section">
+                    <h2 class="section-title" data-toggle="server-extinction">
+                        <span>🌍 Extinction-Specific</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="server-extinction" class="settings-grid"></div>
+                </section>
+
+                <!-- Lost Colony Map-Specific Section with Subsections -->
+                <section class="settings-section map-section">
+                    <h2 class="section-title" data-toggle="server-lostcolony">
+                        <span>🚀 Lost Colony-Specific</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="server-lostcolony" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="lostcolony-bunker">
+                                <span>🏰 Tek Bunker</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="lostcolony-bunker" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="lostcolony-cryohospital">
+                                <span>❄️ CryoHospital</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="lostcolony-cryohospital" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="lostcolony-bloodforge">
+                                <span>🩸 Bloodforge</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="lostcolony-bloodforge" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="lostcolony-outpost">
+                                <span>🏕️ Outpost</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="lostcolony-outpost" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="lostcolony-creatures">
+                                <span>🦎 Creatures</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="lostcolony-creatures" class="settings-grid"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Game.ini Section Header -->
+                <div class="file-section-header" data-file="game">
+                    <h2 class="file-header-title">📄 Game.ini</h2>
+                    <span class="file-header-desc">Advanced settings, breeding, stats multipliers</span>
+                </div>
+
+                <section class="settings-section" data-file="game">
+                    <h2 class="section-title" data-toggle="game-taming">
+                        <span>🦖 Taming Settings</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="game-taming" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section" data-file="game">
+                    <h2 class="section-title" data-toggle="game-player">
+                        <span>🧑 Player &amp; Leveling</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="game-player" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section" data-file="game">
+                    <h2 class="section-title" data-toggle="game-tribe">
+                        <span>👥 Tribe Settings</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="game-tribe" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section" data-file="game">
+                    <h2 class="section-title" data-toggle="game-crafting">
+                        <span>🔨 Crafting &amp; Engrams</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="game-crafting" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section" data-file="game">
+                    <h2 class="section-title" data-toggle="game-loot">
+                        <span>🎁 Loot &amp; Resources</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="game-loot" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section" data-file="game">
+                    <h2 class="section-title" data-toggle="game-structures">
+                        <span>🏠 Structures &amp; Building</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="game-structures" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section" data-file="game">
+                    <h2 class="section-title" data-toggle="game-turrets">
+                        <span>🔫 Turrets &amp; Generators</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="game-turrets" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section" data-file="game">
+                    <h2 class="section-title" data-toggle="game-pvp">
+                        <span>⚔️ PvP Settings</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="game-pvp" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section" data-file="game">
+                    <h2 class="section-title" data-toggle="game-genesis">
+                        <span>🌐 Genesis Specific</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="game-genesis" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section" data-file="game">
+                    <h2 class="section-title" data-toggle="game-environment">
+                        <span>🌡️ Environment &amp; World</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="game-environment" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section" data-file="game">
+                    <h2 class="section-title" data-toggle="game-advanced">
+                        <span>⚙️ Advanced Configuration</span>
+                        <span class="toggle-icon">▼</span>
+                    </h2>
+                    <div id="game-advanced" class="settings-grid"></div>
+                </section>
+
+                <section class="settings-section" data-file="game">
                     <h2 class="section-title" data-toggle="game-breeding">
                         <span>🥚 Breeding Settings</span>
                         <span class="toggle-icon">▼</span>
@@ -398,7 +557,7 @@
                     <div id="game-breeding" class="settings-grid"></div>
                 </section>
 
-                <section class="settings-section">
+                <section class="settings-section" data-file="game">
                     <h2 class="section-title" data-toggle="game-spoiling">
                         <span>🍖 Spoiling &amp; Decomposition</span>
                         <span class="toggle-icon">▼</span>
@@ -406,23 +565,7 @@
                     <div id="game-spoiling" class="settings-grid"></div>
                 </section>
 
-                <section class="settings-section">
-                    <h2 class="section-title" data-toggle="game-tower">
-                        <span>🗼 Tribe Tower Settings</span>
-                        <span class="toggle-icon">▼</span>
-                    </h2>
-                    <div id="game-tower" class="settings-grid"></div>
-                </section>
-
-                <section class="settings-section">
-                    <h2 class="section-title" data-toggle="game-memorial">
-                        <span>🏛️ Memorial Settings</span>
-                        <span class="toggle-icon">▼</span>
-                    </h2>
-                    <div id="game-memorial" class="settings-grid"></div>
-                </section>
-
-                <section class="settings-section">
+                <section class="settings-section" data-file="game">
                     <h2 class="section-title" data-toggle="game-stats">
                         <span>📊 Stats Multipliers</span>
                         <span class="toggle-icon">▼</span>
@@ -430,7 +573,7 @@
                     <div id="game-stats" class="settings-grid"></div>
                 </section>
 
-                <section class="settings-section">
+                <section class="settings-section" data-file="game">
                     <h2 class="section-title" data-toggle="game-xp">
                         <span>⭐ XP & Leveling</span>
                         <span class="toggle-icon">▼</span>
@@ -438,7 +581,7 @@
                     <div id="game-xp" class="settings-grid"></div>
                 </section>
 
-                <section class="settings-section">
+                <section class="settings-section" data-file="game">
                     <h2 class="section-title" data-toggle="game-world">
                         <span>📷 World & Camera</span>
                         <span class="toggle-icon">▼</span>
@@ -446,7 +589,6 @@
                     <div id="game-world" class="settings-grid"></div>
                 </section>
             </div>
-        </div>
         </div>
     </main>
 

@@ -638,9 +638,9 @@ function _saveToStorageImmediate() {
             timestamp: Date.now(),
             currentValues: currentValues,
             originalFiles: originalFiles,
-            activeTab: document.querySelector('.tab-btn.active')?.dataset.tab || 'gameusersettings',
+            activeFilter: document.querySelector('.filter-btn.active')?.dataset.filter || 'all',
             activePreset: document.querySelector('.preset-btn.active')?.dataset.preset || '1x',
-            collapsedSections: Array.from(document.querySelectorAll('.section-title.collapsed')).map(el => el.dataset.toggle)
+            collapsedSections: Array.from(document.querySelectorAll('.section-title.collapsed, .subsection-title.collapsed')).map(el => el.dataset.toggle)
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         
@@ -927,14 +927,13 @@ function updateExportSectionVisibility() {
 }
 
 function restoreUIState(savedState) {
-    // Restore active tab
-    if (savedState.activeTab) {
-        const tabBtn = document.querySelector(`.tab-btn[data-tab="${savedState.activeTab}"]`);
-        if (tabBtn) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            tabBtn.classList.add('active');
-            document.getElementById(savedState.activeTab)?.classList.add('active');
+    // Restore active filter
+    if (savedState.activeFilter) {
+        const filterBtn = document.querySelector(`.filter-btn[data-filter="${savedState.activeFilter}"]`);
+        if (filterBtn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            filterBtn.classList.add('active');
+            applyFileFilter(savedState.activeFilter);
         }
     }
     
@@ -945,10 +944,12 @@ function restoreUIState(savedState) {
         if (presetBtn) presetBtn.classList.add('active');
     }
     
-    // Restore collapsed sections
+    // Restore collapsed sections (including subsections)
     if (savedState.collapsedSections) {
         savedState.collapsedSections.forEach(sectionId => {
-            const title = document.querySelector(`.section-title[data-toggle="${sectionId}"]`);
+            // Try section-title first, then subsection-title
+            const title = document.querySelector(`.section-title[data-toggle="${sectionId}"]`) || 
+                         document.querySelector(`.subsection-title[data-toggle="${sectionId}"]`);
             const grid = document.getElementById(sectionId);
             if (title && grid) {
                 title.classList.add('collapsed');
@@ -1371,17 +1372,15 @@ function updateCardModifiedState(card, isModified) {
 }
 
 function setupTabSwitching() {
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    tabButtons.forEach(btn => {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    filterButtons.forEach(btn => {
         btn.addEventListener('click', () => {
-            // Remove active from all tabs
-            tabButtons.forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-            // Add active to clicked tab
+            // Remove active from all filter buttons
+            filterButtons.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            const tabId = btn.dataset.tab;
-            document.getElementById(tabId).classList.add('active');
+            
+            const filter = btn.dataset.filter;
+            applyFileFilter(filter);
             
             // Save state
             saveToStorage();
@@ -1389,9 +1388,67 @@ function setupTabSwitching() {
     });
 }
 
+function applyFileFilter(filter) {
+    const sections = document.querySelectorAll('.settings-section');
+    const fileHeaders = document.querySelectorAll('.file-section-header');
+    
+    if (filter === 'all') {
+        // Show all sections and headers
+        sections.forEach(section => section.classList.remove('filter-hidden'));
+        fileHeaders.forEach(header => header.classList.remove('hidden'));
+    } else {
+        // Filter sections based on data-file attribute
+        sections.forEach(section => {
+            const sectionId = section.querySelector('.section-title')?.dataset.toggle || '';
+            const isGameIni = sectionId.startsWith('game-');
+            const isGameUserSettings = !isGameIni;
+            
+            if (filter === 'game' && isGameIni) {
+                section.classList.remove('filter-hidden');
+            } else if (filter === 'gameusersettings' && isGameUserSettings) {
+                section.classList.remove('filter-hidden');
+            } else {
+                section.classList.add('filter-hidden');
+            }
+        });
+        
+        // Show/hide file headers
+        fileHeaders.forEach(header => {
+            const headerFile = header.dataset.file;
+            if (headerFile === filter) {
+                header.classList.remove('hidden');
+            } else {
+                header.classList.add('hidden');
+            }
+        });
+        
+        // Scroll to the first visible section
+        const firstVisible = document.querySelector('.file-section-header:not(.hidden)');
+        if (firstVisible) {
+            firstVisible.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+}
+
 function setupSectionToggle() {
+    // Handle main section titles
     const sectionTitles = document.querySelectorAll('.section-title');
     sectionTitles.forEach(title => {
+        title.addEventListener('click', () => {
+            const targetId = title.dataset.toggle;
+            const target = document.getElementById(targetId);
+            
+            title.classList.toggle('collapsed');
+            target.classList.toggle('collapsed');
+            
+            // Save state
+            saveToStorage();
+        });
+    });
+
+    // Handle subsection titles (for nested sections like Lost Colony)
+    const subsectionTitles = document.querySelectorAll('.subsection-title');
+    subsectionTitles.forEach(title => {
         title.addEventListener('click', () => {
             const targetId = title.dataset.toggle;
             const target = document.getElementById(targetId);
@@ -1432,11 +1489,34 @@ function setupSearch() {
                 element.classList.toggle('hidden', !matches);
             });
 
-            // Show sections that have visible cards
-            document.querySelectorAll('.settings-grid').forEach(grid => {
-                const hasVisibleCards = grid.querySelector('.setting-card:not(.hidden)') !== null;
-                const section = grid.closest('.settings-section');
-                section.classList.toggle('hidden', !hasVisibleCards);
+            // Show subsections that have visible cards
+            document.querySelectorAll('.subsection').forEach(subsection => {
+                const grid = subsection.querySelector('.settings-grid');
+                if (grid) {
+                    const hasVisibleCards = grid.querySelector('.setting-card:not(.hidden)') !== null;
+                    subsection.classList.toggle('hidden', !hasVisibleCards);
+                }
+            });
+
+            // Show sections that have visible cards (including checking nested subsections)
+            // But don't un-hide sections that are filter-hidden
+            document.querySelectorAll('.settings-section:not(.filter-hidden)').forEach(section => {
+                const directGrid = section.querySelector(':scope > .settings-grid');
+                const mapSubsections = section.querySelector('.map-subsections');
+                
+                let hasVisibleContent = false;
+                
+                // Check direct settings grid
+                if (directGrid) {
+                    hasVisibleContent = directGrid.querySelector('.setting-card:not(.hidden)') !== null;
+                }
+                
+                // Check nested subsections
+                if (mapSubsections) {
+                    hasVisibleContent = mapSubsections.querySelector('.subsection:not(.hidden)') !== null;
+                }
+                
+                section.classList.toggle('hidden', !hasVisibleContent);
             });
         });
     };

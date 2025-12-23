@@ -2,8 +2,8 @@
 // Only includes ASA-supported settings with their default values
 
 const gameUserSettings = {
-    // General Server Settings
-    'server-general': [
+    // Basic Server Settings (name, ports, passwords, RCON)
+    'server-basic': [
         { name: 'SessionName', default: 'ARK #123456', type: 'text', section: 'SessionSettings', description: 'Server name shown in browser.', effect: 'If no name is provided, default is ARK # + random 6 digits.' },
         { name: 'Port', default: '7777', type: 'integer', section: 'SessionSettings', description: 'Specifies the UDP Game Port.', effect: 'Port used for game connections (default 7777).' },
         { name: 'QueryPort', default: '27015', type: 'integer', section: 'SessionSettings', description: 'Specifies the UDP Steam Query Port.', effect: 'Port used for Steam server browser queries.' },
@@ -16,63 +16,66 @@ const gameUserSettings = {
         { name: 'MaxPlayers', default: '70', type: 'integer', section: '/Script/Engine.GameSession', description: 'Maximum number of players on the server.', effect: 'In ASA, use -WinLiveMaxPlayers command line argument instead.' },
         { name: 'MessageOfTheDay', default: 'Welcome to the server!', type: 'text', section: 'MessageOfTheDay', sectionKey: 'Message', description: 'Message displayed to players on login.', effect: 'Single line string shown when players connect. Use \\n for new lines.' },
         { name: 'MessageDuration', default: '20', type: 'integer', section: 'MessageOfTheDay', sectionKey: 'Duration', description: 'Duration of MOTD display in seconds.', effect: 'How long the message is shown on player login.' },
-        { name: 'AllowThirdPersonPlayer', default: 'True', type: 'boolean', description: 'Allows third-person camera view.', effect: 'If False, disables third-person camera on dedicated servers.' },
-        { name: 'ServerCrosshair', default: 'True', type: 'boolean', description: 'Enables the crosshair on the server.', effect: 'If False, disables the crosshair.' },
-        { name: 'ServerHardcore', default: 'False', type: 'boolean', description: 'Enables Hardcore (death resets to level 1).', effect: 'True enables; False disables.' },
-        { name: 'globalVoiceChat', default: 'False', type: 'boolean', description: 'Makes voice chat global.', effect: 'True makes global; False normal.' },
-        { name: 'ProximityChat', default: 'False', type: 'boolean', description: 'Limits chat visibility to nearby players when True.', effect: 'True enables proximity chat; False disables.' },
-        { name: 'noTributeDownloads', default: 'False', type: 'boolean', description: 'Prevents Cross-ARK data downloads when True.', effect: 'True blocks downloads; False allows.' },
-        { name: 'AllowAnyoneBabyImprintCuddle', default: 'False', type: 'boolean', description: 'Allows anyone to do baby care actions, not only the imprinter.', effect: 'True allows anyone; False restricts.' },
-        { name: 'EnableExtraStructurePreventionVolumes', default: 'False', type: 'boolean', description: 'Disables building in specific resource-rich areas when True.', effect: 'True enables extra prevention; False disables.' },
-        { name: 'AllowCrateSpawnsOnTopOfStructures', default: 'False', type: 'boolean', description: 'Lets supply crates spawn on top of structures.', effect: 'True allows; False prevents.' },
-        { name: 'AllowIntegratedSPlusStructures', default: 'True', type: 'boolean', description: 'Enables integrated S+ structures.', effect: 'False disables these structures; True enables.' },
-        { name: 'AllowSharedConnections', default: 'False', type: 'boolean', description: 'Allows family sharing players to connect.', effect: 'True allows; False blocks.' },
-        { name: 'ShowFloatingDamageText', default: 'False', type: 'boolean', description: 'Enables floating damage numbers.', effect: 'True shows; False hides.' },
-        { name: 'ShowMapPlayerLocation', default: 'True', type: 'boolean', description: 'Shows your precise location on your map.', effect: 'False hides; True shows.' },
-        { name: 'AlwaysNotifyPlayerLeft', default: 'False', type: 'boolean', description: 'Always shows a notification when someone leaves.', effect: 'True always notifies; False uses normal behavior.' },
-        { name: 'DontAlwaysNotifyPlayerJoined', default: 'False', type: 'boolean', description: 'Disables join notifications when True.', effect: 'True disables join notices; False allows.' },
         { name: 'AutoSavePeriodMinutes', default: '15.0', type: 'float', description: 'Sets interval (minutes) for automatic saves.', effect: '0 causes constant saving.' },
         { name: 'AutoRestartIntervalSeconds', default: '', type: 'float', description: 'Time in seconds before automatic server restart.', effect: 'When set, server auto-restarts after specified seconds.' },
-        { name: 'KickIdlePlayersPeriod', default: '3600.0', type: 'float', description: 'Time (seconds) before idle players are kicked (with -EnableIdlePlayerKick).', effect: 'Higher kicks later; lower kicks sooner.' },
-
         { name: 'ActiveMods', default: '', type: 'text', description: 'Sets which mods load and their order (comma-separated IDs).', effect: 'Changing order changes priority (left-most highest).', placeholder: 'Example: 123456789,987654321' },
         { name: 'ActiveMapMod', default: '', type: 'text', description: 'Sets which mod map is loaded (uses the map Mod ID).', effect: 'Changing mod ID changes which map loads.', placeholder: 'Enter Mod ID (e.g., 962796)' },
+        { name: 'CustomDynamicConfigUrl', default: '', type: 'text', description: 'Link to live dynamicconfig.ini for supported live changes.', effect: 'Changing URL changes live config source. Requires -UseDynamicConfig command line option.' },
+        { name: 'CustomLiveTuningUrl', default: '', type: 'text', description: 'Link to live tuning file.', effect: 'Changing URL changes live tuning source.' },
+    ],
+
+    // Admin & Security Settings
+    'server-admin': [
         { name: 'BanListURL', default: 'https://cdn2.arkdedicated.com/asa/BanList.txt', type: 'text', description: 'Sets the global ban list URL (fetched every 10 minutes).', effect: 'Changing URL changes the ban list source.', placeholder: 'https://cdn2.arkdedicated.com/asa/BanList.txt' },
         { name: 'AdminListURL', default: '', type: 'text', description: 'Alternative to AllowedCheaterAccountIDs.txt using a web resource.', effect: 'The interval at which the server queries is defined by UpdateAllowedCheatersInterval.' },
+        { name: 'UpdateAllowedCheatersInterval', default: '600.0', type: 'float', description: 'Interval (seconds) to query remote admin list updates.', effect: 'Values < 3.0 revert to 3.0.' },
+        { name: 'UseExclusiveList', default: 'False', type: 'boolean', description: 'Enables whitelist-only server access.', effect: 'If True, only players on the exclusive list can join (like -exclusivejoin).' },
+        { name: 'AllowSharedConnections', default: 'False', type: 'boolean', description: 'Allows family sharing players to connect.', effect: 'True allows; False blocks.' },
+        { name: 'KickIdlePlayersPeriod', default: '3600.0', type: 'float', description: 'Time (seconds) before idle players are kicked (with -EnableIdlePlayerKick).', effect: 'Higher kicks later; lower kicks sooner.' },
+        { name: 'EnableAFKKickPlayerCountPercent', default: '0.0', type: 'float', description: 'Enables idle timeout only when player count reaches this percentage of MaxPlayers.', effect: 'Value from 0.0-1.0 (1.0 = 100%). Official uses 0.89999998.' },
+        { name: 'DontRestoreBackup', default: 'False', type: 'boolean', description: 'Prevents automatic backup restoration on corruption.', effect: 'If True and -DisableDupeLogDeletes is present, server will not restore a backup on corrupted save.' },
+        { name: 'EnableMeshBitingProtection', default: 'True', type: 'boolean', description: 'Enables protection against mesh biting exploits.', effect: 'If False, disables the anti-mesh biting protection system.' },
+        { name: 'ServerEnableMeshChecking', default: 'False', type: 'boolean', description: 'Enables mesh checking for foliage repopulation.', effect: 'If True, involved in foliage repopulation. Does nothing if -forcedisablemeshchecking is used.' },
+        { name: 'UseCharacterTracker', default: 'False', type: 'boolean', description: 'Enables character tracking (also via command line).', effect: 'True enables; False disables.' },
+        { name: 'NPCNetworkStasisRangeScalePlayerCountStart', default: '0', type: 'integer', description: 'Min online players to enable NPC stasis range scaling override.', effect: '0 disables.' },
+        { name: 'NPCNetworkStasisRangeScalePlayerCountEnd', default: '0', type: 'integer', description: 'Online player count where PercentEnd is reached.', effect: '0 disables.' },
+        { name: 'NPCNetworkStasisRangeScalePercentEnd', default: '0.55000001', type: 'float', description: 'Maximum scale percentage when NPCNetworkStasisRangeScalePlayerCountEnd is reached.', effect: 'Used to override NPC Network Stasis Range Scale. Official uses 0.5.' },
+    ],
+
+    // Chat & Communication Settings
+    'server-chat': [
+        { name: 'globalVoiceChat', default: 'False', type: 'boolean', description: 'Makes voice chat global.', effect: 'True makes global; False normal.' },
+        { name: 'ProximityChat', default: 'False', type: 'boolean', description: 'Limits chat visibility to nearby players when True.', effect: 'True enables proximity chat; False disables.' },
         { name: 'bFilterCharacterNames', default: 'False', type: 'boolean', description: 'Filters character names using bad/good word lists.', effect: 'True filters; False does not.' },
         { name: 'bFilterChat', default: 'False', type: 'boolean', description: 'Filters chat based on bad/good word lists.', effect: 'True filters; False does not.' },
         { name: 'bFilterTribeNames', default: 'False', type: 'boolean', description: 'Filters tribe names using bad/good word lists.', effect: 'True filters; False does not.' },
+        { name: 'BadWordListURL', default: 'http://cdn2.arkdedicated.com/asa/badwords.txt', type: 'text', description: 'URL for bad words list.', effect: 'Changing URL changes filtered word list.', placeholder: 'http://cdn2.arkdedicated.com/asa/badwords.txt' },
+        { name: 'BadWordWhiteListURL', default: 'http://cdn2.arkdedicated.com/asa/goodwords.txt', type: 'text', description: 'URL for good words list.', effect: 'Changing URL changes allowed words list.', placeholder: 'http://cdn2.arkdedicated.com/asa/goodwords.txt' },
         { name: 'LogChatMessages', default: 'False', type: 'boolean', description: 'Enables advanced chat logging.', effect: 'If True, chat logs are saved in ShooterGame/Saved/Logs/ChatLogs/<SessionName>/ in JSON format.' },
         { name: 'ChatLogFileSplitIntervalSeconds', default: '86400', type: 'integer', description: 'Chat log file split interval (seconds).', effect: 'How often to split the chat log file. Minimum is 45 (lower values revert to 45). Set to 0 only in official.' },
         { name: 'ChatLogFlushIntervalSeconds', default: '86400', type: 'integer', description: 'Chat log flush interval (seconds).', effect: 'How often chat log is flushed to file. Minimum is 15 (lower values revert to 15). Set to 0 only in official.' },
         { name: 'ChatLogMaxAgeInDays', default: '5', type: 'integer', description: 'Controls how many days chat logs are kept.', effect: 'Set to a negative value for virtually infinite retention. Set to 0 only in official.' },
+        { name: 'AlwaysNotifyPlayerLeft', default: 'False', type: 'boolean', description: 'Always shows a notification when someone leaves.', effect: 'True always notifies; False uses normal behavior.' },
+        { name: 'DontAlwaysNotifyPlayerJoined', default: 'False', type: 'boolean', description: 'Disables join notifications when True.', effect: 'True disables join notices; False allows.' },
+    ],
 
-        { name: 'TribeNameChangeCooldown', default: '15.0', type: 'float', description: 'Cooldown (minutes) between tribe name changes.', effect: 'Higher increases cooldown; lower decreases.' },
-        // TribeLogDestroyedEnemyStructures removed - belongs in Game.ini only (see game-general section)
-        { name: 'UseCharacterTracker', default: 'False', type: 'boolean', description: 'Enables character tracking (also via command line).', effect: 'True enables; False disables.' },
-        { name: 'ServerAutoForceRespawnWildDinosInterval', default: '0.0', type: 'float', description: 'Forces wild respawn on restart after this many seconds; 0.0 disables.', effect: 'Higher forces more often; 0 disables.' },
-
-        // Additional Server Settings
+    // Gameplay Options
+    'server-gameplay': [
+        { name: 'AllowThirdPersonPlayer', default: 'True', type: 'boolean', description: 'Allows third-person camera view.', effect: 'If False, disables third-person camera on dedicated servers.' },
+        { name: 'ServerCrosshair', default: 'True', type: 'boolean', description: 'Enables the crosshair on the server.', effect: 'If False, disables the crosshair.' },
+        { name: 'ServerHardcore', default: 'False', type: 'boolean', description: 'Enables Hardcore (death resets to level 1).', effect: 'True enables; False disables.' },
+        { name: 'ShowFloatingDamageText', default: 'False', type: 'boolean', description: 'Enables floating damage numbers.', effect: 'True shows; False hides.' },
+        { name: 'ShowMapPlayerLocation', default: 'True', type: 'boolean', description: 'Shows your precise location on your map.', effect: 'False hides; True shows.' },
         { name: 'ImplantSuicideCD', default: '28800', type: 'float', description: 'Defines the time (in seconds) between uses of the implant Respawn feature.', effect: 'Default 28800 = 8 hours cooldown between implant suicide uses.' },
-        { name: 'EnableMeshBitingProtection', default: 'True', type: 'boolean', description: 'Enables protection against mesh biting exploits.', effect: 'If False, disables the anti-mesh biting protection system.' },
-        { name: 'ServerEnableMeshChecking', default: 'False', type: 'boolean', description: 'Enables mesh checking for foliage repopulation.', effect: 'If True, involved in foliage repopulation. Does nothing if -forcedisablemeshchecking is used.' },
-        { name: 'FreezeReaperPregnancy', default: 'False', type: 'boolean', description: 'Freezes Reaper King pregnancy progression.', effect: 'If True, stops the pregnancy timer and XP gains for Reaper King pregnancies.' },
-        { name: 'EnableAFKKickPlayerCountPercent', default: '0.0', type: 'float', description: 'Enables idle timeout only when player count reaches this percentage of MaxPlayers.', effect: 'Value from 0.0-1.0 (1.0 = 100%). Official uses 0.89999998.' },
-        { name: 'DontRestoreBackup', default: 'False', type: 'boolean', description: 'Prevents automatic backup restoration on corruption.', effect: 'If True and -DisableDupeLogDeletes is present, server will not restore a backup on corrupted save.' },
-        { name: 'UseExclusiveList', default: 'False', type: 'boolean', description: 'Enables whitelist-only server access.', effect: 'If True, only players on the exclusive list can join (like -exclusivejoin).' },
-        { name: 'UpdateAllowedCheatersInterval', default: '600.0', type: 'float', description: 'Interval (seconds) to query remote admin list updates.', effect: 'Values < 3.0 revert to 3.0.' },
+        { name: 'AllowCrateSpawnsOnTopOfStructures', default: 'False', type: 'boolean', description: 'Lets supply crates spawn on top of structures.', effect: 'True allows; False prevents.' },
+        { name: 'AllowIntegratedSPlusStructures', default: 'True', type: 'boolean', description: 'Enables integrated S+ structures.', effect: 'False disables these structures; True enables.' },
+        { name: 'EnableExtraStructurePreventionVolumes', default: 'False', type: 'boolean', description: 'Disables building in specific resource-rich areas when True.', effect: 'True enables extra prevention; False disables.' },
+        { name: 'noTributeDownloads', default: 'False', type: 'boolean', description: 'Prevents Cross-ARK data downloads when True.', effect: 'True blocks downloads; False allows.' },
+        { name: 'ServerAutoForceRespawnWildDinosInterval', default: '0.0', type: 'float', description: 'Forces wild respawn on restart after this many seconds; 0.0 disables.', effect: 'Higher forces more often; 0 disables.' },
         { name: 'PreventOutOfTribePinCodeUse', default: 'False', type: 'boolean', description: 'Prevents non-tribe players from using PINs on structures.', effect: 'True prevents; False allows.' },
-
-        // Network Stasis Settings
-        { name: 'NPCNetworkStasisRangeScalePlayerCountStart', default: '0', type: 'integer', description: 'Min online players to enable NPC stasis range scaling override.', effect: '0 disables.' },
-        { name: 'NPCNetworkStasisRangeScalePlayerCountEnd', default: '0', type: 'integer', description: 'Online player count where PercentEnd is reached.', effect: '0 disables.' },
-        { name: 'NPCNetworkStasisRangeScalePercentEnd', default: '0.55000001', type: 'float', description: 'Maximum scale percentage when NPCNetworkStasisRangeScalePlayerCountEnd is reached.', effect: 'Used to override NPC Network Stasis Range Scale. Official uses 0.5.' },
-
-        // URL Settings
-        { name: 'BadWordListURL', default: 'http://cdn2.arkdedicated.com/asa/badwords.txt', type: 'text', description: 'URL for bad words list.', effect: 'Changing URL changes filtered word list.', placeholder: 'http://cdn2.arkdedicated.com/asa/badwords.txt' },
-        { name: 'BadWordWhiteListURL', default: 'http://cdn2.arkdedicated.com/asa/goodwords.txt', type: 'text', description: 'URL for good words list.', effect: 'Changing URL changes allowed words list.', placeholder: 'http://cdn2.arkdedicated.com/asa/goodwords.txt' },
-        { name: 'CustomDynamicConfigUrl', default: '', type: 'text', description: 'Link to live dynamicconfig.ini for supported live changes.', effect: 'Changing URL changes live config source. Requires -UseDynamicConfig command line option.' },
-        { name: 'CustomLiveTuningUrl', default: '', type: 'text', description: 'Link to live tuning file.', effect: 'Changing URL changes live tuning source.' },
+        { name: 'TribeNameChangeCooldown', default: '15.0', type: 'float', description: 'Cooldown (minutes) between tribe name changes.', effect: 'Higher increases cooldown; lower decreases.' },
+        { name: 'FreezeReaperPregnancy', default: 'False', type: 'boolean', description: 'Freezes Reaper King pregnancy progression.', effect: 'If True, stops the pregnancy timer and XP gains for Reaper King pregnancies.' },
+        { name: 'AllowAnyoneBabyImprintCuddle', default: 'False', type: 'boolean', description: 'Allows anyone to do baby care actions, not only the imprinter.', effect: 'True allows anyone; False restricts.' },
     ],
 
     // Rates & Multipliers
@@ -150,7 +153,7 @@ const gameUserSettings = {
         { name: 'RadiusStructuresInSmallRadius', default: '0.0', type: 'float', description: 'Radius for small structure density check.', effect: 'Defines the area size for MaxStructuresInSmallRadius limit (0 = disabled).' },
         { name: 'MaxStructuresToProcess', default: '0', type: 'integer', description: 'Maximum structures processed per server tick.', effect: 'Limits the batch size for structure processing operations (0 = default).' },
         { name: 'UseOptimizedHarvestingHealth', default: 'False', type: 'boolean', description: 'Uses optimized harvesting health calculations.', effect: 'If True, enables optimized harvesting (may reduce rare resource drops).' },
-        { name: 'UseFjordurTraversalBuff', default: 'False', type: 'boolean', description: 'Enables Fjordur realm teleportation.', effect: 'If True, allows using the R key to teleport between realms on Fjordur.' },
+        { name: 'MaxTrainCars', default: '8', type: 'integer', description: 'Defines the maximum number of carts a train can have.', effect: 'Limits how many carts can be attached to a single train.' },
     ],
 
     // PvP/PvE Settings
@@ -180,9 +183,6 @@ const gameUserSettings = {
         { name: 'PreventUploadSurvivors', default: 'False', type: 'boolean', description: 'Prevents survivors upload to ARK Data in Cross-ARK transfer.', effect: 'If True, players cannot upload characters from this server.' },
         { name: 'PreventUploadItems', default: 'False', type: 'boolean', description: 'Prevents items upload to ARK Data in Cross-ARK transfer.', effect: 'If True, players cannot upload items from this server.' },
         { name: 'PreventUploadDinos', default: 'False', type: 'boolean', description: 'Prevents creatures upload to ARK Data in Cross-ARK transfer.', effect: 'If True, players cannot upload creatures from this server.' },
-        { name: 'CrossARKAllowForeignDinoDownloads', default: 'False', type: 'boolean', description: 'Enables non-native creatures tribute download on Aberration.', effect: 'If True, allows downloading non-native creatures.' },
-        { name: 'AllowTekSuitPowersInGenesis', default: 'False', type: 'boolean', description: 'Enables TEK suit powers in Genesis: Part 1.', effect: 'If True, Tek suit features work normally in Genesis Part 1.' },
-        { name: 'MaxHexagonsPerCharacter', default: '2000000000', type: 'integer', description: 'Sets max Hexagons a character can hold.', effect: 'Higher increases max; lower decreases.' },
         { name: 'MinimumDinoReuploadInterval', default: '0.0', type: 'float', description: 'Cooldown (seconds) between creature re-uploads.', effect: 'Higher increases wait; lower decreases.' },
         { name: 'TribeMergeAllowed', default: 'True', type: 'boolean', description: 'Allows tribes to merge.', effect: 'False prevents merging; True allows.' },
         { name: 'TribeMergeCooldown', default: '0.0', type: 'float', description: 'Tribe merge cooldown (seconds).', effect: 'Higher increases cooldown.' },
@@ -197,8 +197,38 @@ const gameUserSettings = {
         { name: 'VolcanoInterval', default: '0', type: 'integer', section: 'Ragnarok', description: 'Time between volcanic eruptions.', effect: '0 = random 5000-15000 seconds. Any number above 0 acts as a multiplier (minimum 0.1).' },
     ],
 
-    // Tek Bunker Settings (Lost Colony)
-    'server-bunker': [
+    // Valguero Settings
+    'server-valguero': [
+        { name: 'ValgueroMemorialEntries', default: '', type: 'string', description: 'Names displayed on the Valguero Memorial.', effect: 'Adds custom names to the interactive memorial on Valguero. Separate names with semicolons.', placeholder: 'Enter names separated by ;' },
+    ],
+
+    // Fjordur Settings
+    'server-fjordur': [
+        { name: 'UseFjordurTraversalBuff', default: 'False', type: 'boolean', description: 'Enables Fjordur realm teleportation.', effect: 'If True, allows using the R key to teleport between realms on Fjordur.' },
+    ],
+
+    // Genesis Settings
+    'server-genesis': [
+        { name: 'AllowTekSuitPowersInGenesis', default: 'False', type: 'boolean', description: 'Enables TEK suit powers in Genesis: Part 1.', effect: 'If True, TEK suit features like flight and dash work normally on Genesis Part 1.' },
+        { name: 'MaxHexagonsPerCharacter', default: '2000000000', type: 'integer', description: 'Sets maximum Hexagons a character can accumulate.', effect: 'Official servers use 2500000. Default is 2 billion.' },
+    ],
+
+    // Aberration Settings
+    'server-aberration': [
+        { name: 'CrossARKAllowForeignDinoDownloads', default: 'False', type: 'boolean', description: 'Enables non-native creatures tribute download on Aberration.', effect: 'If True, allows downloading non-native creatures on Aberration.' },
+        { name: 'MaxCosmoWeaponAmmo', default: '-1', type: 'float', description: 'Sets maximum ammo for the Cosmo webslinger.', effect: 'Default -1 enables scaling with Cosmo level. Any other value sets a fixed max.' },
+        { name: 'CosmoWeaponAmmoReloadAmount', default: '1', type: 'float', description: 'Determines how much ammo is given as the Cosmo webslinger reloads.', effect: 'Amount of ammo restored over time.' },
+    ],
+
+    // Extinction Settings
+    'server-extinction': [
+        { name: 'WorldBossKingKaijuSpawnTime', default: '19:00:00', type: 'string', description: 'Local time for King Titan spawn on Extinction.', effect: 'Sets the in-game time when King Titan spawns (HH:MM:SS format).' },
+        { name: 'ForceGachaUnhappyInCaves', default: 'True', type: 'boolean', description: 'Forces Gachas to become unhappy within caves.', effect: 'If True, Gachas will not produce resources when inside caves.' },
+        { name: 'ArmadoggoDeathCooldown', default: '3600', type: 'float', description: 'Overrides cooldown for Armadoggo to reappear after taking fatal damage.', effect: 'Default is 1 hour (3600 seconds). Must be greater than 0.' },
+    ],
+
+    // Lost Colony - Tek Bunker Settings
+    'lostcolony-bunker': [
         { name: 'LimitBunkersPerTribe', default: 'True', type: 'boolean', description: 'Limits the number of Tek Bunkers per tribe.', effect: 'If True, enforces the LimitBunkersPerTribeNum setting.' },
         { name: 'LimitBunkersPerTribeNum', default: '3', type: 'integer', description: 'Maximum number of Tek Bunkers allowed per tribe.', effect: 'Sets the cap for Tek Bunkers a tribe can own.' },
         { name: 'AllowBunkersInPreventionZones', default: 'False', type: 'boolean', description: 'Allows Tek Bunkers in building prevention zones.', effect: 'If True, bunkers can be placed in normally restricted areas (Lost Colony).' },
@@ -211,26 +241,31 @@ const gameUserSettings = {
         { name: 'BunkerUnderHPThresholdDmgMultiplier', default: '0.05', type: 'float', description: 'Damage multiplier when bunker is below HP threshold.', effect: 'Reduces damage taken when bunker HP is below the threshold (0.05 = 5% damage).' },
     ],
 
-    // CryoHospital Settings (Lost Colony)
-    'server-cryohospital': [
+    // Lost Colony - CryoHospital Settings
+    'lostcolony-cryohospital': [
         { name: 'CryoHospitalHoursToRegenHP', default: '1.0', type: 'float', description: 'Time to fully regenerate creature HP in CryoHospital.', effect: 'Hours for a creature to regain full health while in a CryoHospital.' },
         { name: 'CryoHospitalHoursToRegenFood', default: '24.0', type: 'float', description: 'Time to fully regenerate creature food in CryoHospital.', effect: 'Hours for a creature to regain full food while in a CryoHospital.' },
         { name: 'CryoHospitalHoursToDrainTorpor', default: '1.0', type: 'float', description: 'Time to fully drain creature torpor in CryoHospital.', effect: 'Hours for a creature to wake up (torpor reaches 0) in a CryoHospital.' },
         { name: 'CryoHospitalMatingCooldownReduction', default: '2.0', type: 'float', description: 'Mating cooldown reduction multiplier in CryoHospital.', effect: 'How much faster mating cooldown decreases in a CryoHospital (2.0 = 2x faster).' },
     ],
 
-    // Bloodforge Settings (Lost Colony)
-    'server-bloodforge': [
+    // Lost Colony - Bloodforge Settings
+    'lostcolony-bloodforge': [
         { name: 'BloodforgeReinforceExtraDurability', default: '0.3', type: 'float', description: 'Extra durability bonus from Bloodforge reinforcement.', effect: 'Percentage of durability added when reinforcing items (0.3 = 30% bonus).' },
         { name: 'BloodforgeReinforceResourceCostMultiplier', default: '3.0', type: 'float', description: 'Resource cost multiplier for Bloodforge reinforcement.', effect: 'Scales the resources required for reinforcing items (3.0 = 3x cost).' },
         { name: 'BloodforgeReinforceSpeedMultiplier', default: '0.1', type: 'float', description: 'Speed multiplier for Bloodforge reinforcement process.', effect: 'Scales the time to reinforce items (0.1 = 10% of normal speed).' },
     ],
 
-    // Outpost Settings (Lost Colony)
-    'server-outpost': [
+    // Lost Colony - Outpost Settings
+    'lostcolony-outpost': [
         { name: 'MaxActiveOutposts', default: '', type: 'text', description: 'Maximum number of active outposts on the map.', effect: 'Leaving blank disables the limit (Lost Colony).' },
         { name: 'MaxActiveResourceCaches', default: '', type: 'text', description: 'Maximum number of active resource caches on the map.', effect: 'Leaving blank disables the limit (Lost Colony).' },
         { name: 'MaxActiveCityOutposts', default: '', type: 'text', description: 'Maximum number of active city outposts on the map.', effect: 'Leaving blank disables the limit (Lost Colony).' },
+    ],
+
+    // Lost Colony - Creature Settings
+    'lostcolony-creatures': [
+        { name: 'YoungIceFoxDeathCooldown', default: '3600', type: 'float', description: 'Overrides cooldown for Veilwyn to reappear after taking fatal damage.', effect: 'Default is 1 hour (3600 seconds). Must be greater than 0.' },
     ],
 
     // Blueprint & Quality Caps
@@ -259,18 +294,6 @@ const gameUserSettings = {
         { name: 'DestroyTamesOverTheSoftTameLimit', default: 'False', type: 'boolean', description: 'Dinos above the Soft Tame Limit will be marked For Cryo with a timer.', effect: 'If True, excess tames are marked for deletion. Use MaxTamedDinos_SoftTameLimit to define the limit.' },
         { name: 'MaxTamedDinos_SoftTameLimit', default: '5000', type: 'integer', description: 'Defines the server-wide soft tame limit.', effect: 'See DestroyTamesOverTheSoftTameLimit for more info.' },
         { name: 'MaxTamedDinos_SoftTameLimit_Countdown', default: '604800', type: 'integer', description: 'Defines time (in seconds) before tame auto-destruction.', effect: 'See DestroyTamesOverTheSoftTameLimit for more info. Default 604800 = 7 days.' },
-    ],
-
-    // Creature-Specific Settings
-    'server-creatures': [
-        { name: 'ArmadoggoDeathCooldown', default: '3600', type: 'float', description: 'Overrides cooldown for Armadoggo to reappear after taking fatal damage.', effect: 'Default is 1 hour (3600 seconds). Must be greater than 0.' },
-        { name: 'YoungIceFoxDeathCooldown', default: '3600', type: 'float', description: 'Overrides cooldown for Veilwyn to reappear after taking fatal damage.', effect: 'Default is 1 hour (3600 seconds). Must be greater than 0.' },
-        { name: 'ForceGachaUnhappyInCaves', default: 'True', type: 'boolean', description: 'Forces Gachas to become unhappy within caves.', effect: 'If True, Gachas will not produce resources when inside caves.' },
-        { name: 'MaxCosmoWeaponAmmo', default: '-1', type: 'float', description: 'Sets maximum ammo for the Cosmo webslinger.', effect: 'Default -1 enables scaling with Cosmo level. Any other value sets a fixed max.' },
-        { name: 'CosmoWeaponAmmoReloadAmount', default: '1', type: 'float', description: 'Determines how much ammo is given as the Cosmo webslinger reloads.', effect: 'Amount of ammo restored over time.' },
-        { name: 'WorldBossKingKaijuSpawnTime', default: '19:00:00', type: 'string', description: 'Local time for King Titan spawn on Extinction.', effect: 'Sets the in-game time when King Titan spawns (HH:MM:SS format).' },
-
-        { name: 'MaxTrainCars', default: '8', type: 'integer', description: 'Defines the maximum amount of carts a train can have.', effect: 'Limits how many carts can be attached to a single train.' },
     ],
 
     // Cosmetics & Mods
@@ -309,89 +332,86 @@ const gameUserSettings = {
 };
 
 const gameIniSettings = {
-    // Game Mode & Multipliers
-    'game-general': [
-        { name: 'AutoPvEStartTimeSeconds', default: '0.0', type: 'float', description: 'States when PvE mode should start in a PvPvE server.', effect: 'Valid values 0-86400. Requires bAutoPvETimer, bAutoPvEUseSystemTime, and AutoPvEStopTimeSeconds.' },
-        { name: 'AutoPvEStopTimeSeconds', default: '0.0', type: 'float', description: 'States when PvE mode should end in a PvPvE server.', effect: 'Valid values 0-86400. Requires bAutoPvETimer, bAutoPvEUseSystemTime, and AutoPvEStartTimeSeconds.' },
+    // Taming Settings
+    'game-taming': [
+        { name: 'PassiveTameIntervalMultiplier', default: '1.0', type: 'float', description: 'Scales the interval between passive taming feedings.', effect: 'Higher values mean longer wait between feedings; lower values speed up passive taming.' },
+        { name: 'bDisableDinoTaming', default: 'False', type: 'boolean', description: 'Prevents players from taming wild creatures.', effect: 'If True, players cannot tame creatures.' },
+        { name: 'bDisableDinoRiding', default: 'False', type: 'boolean', description: 'Prevents players from riding tames.', effect: 'If True, players cannot ride tames.' },
+        { name: 'bAllowUnclaimDinos', default: 'True', type: 'boolean', description: 'Allows players to unclaim tame creatures.', effect: 'If False, prevents players from unclaiming tames.' },
+        { name: 'DestroyTamesOverLevelClamp', default: '0', type: 'integer', description: 'Tames exceeding this level will be deleted on server start.', effect: 'Official servers use 450. Value of 0 disables.' },
+        { name: 'bUseDinoLevelUpAnimations', default: 'True', type: 'boolean', description: 'Enables level-up animation for tame creatures.', effect: 'If False, tame creatures on level-up will not perform the related animation.' },
+        { name: 'WildDinoCharacterFoodDrainMultiplier', default: '1.0', type: 'float', description: 'Scales how fast wild creatures consume food.', effect: 'Higher values increase food consumption.' },
+        { name: 'WildDinoTorporDrainMultiplier', default: '1.0', type: 'float', description: 'Scales how fast wild creatures lose torpor.', effect: 'Higher values make torpor drop faster.' },
+        { name: 'TamedDinoCharacterFoodDrainMultiplier', default: '1.0', type: 'float', description: 'Scales how fast tame creatures consume food.', effect: 'Higher values increase food consumption.' },
+        { name: 'TamedDinoTorporDrainMultiplier', default: '1.0', type: 'float', description: 'Scales how fast tamed creatures lose torpor.', effect: 'Higher values make torpor drop faster.' },
+        { name: 'DinoHarvestingDamageMultiplier', default: '3.2', type: 'float', description: 'Scales tame damage vs harvestables (harvest speed).', effect: 'Higher increases harvesting speed; lower decreases.' },
+        { name: 'DinoTurretDamageMultiplier', default: '1.0', type: 'float', description: 'Scales damage done by Turrets towards a creature.', effect: 'Higher values increase (by percentage) turret damage to dinos.' },
+        { name: 'bDisableDinoBreeding', default: 'False', type: 'boolean', description: 'Prevents tames from being bred.', effect: 'If True, tames cannot breed.' },
+        { name: 'bUseTameLimitForStructuresOnly', default: 'False', type: 'boolean', description: 'Makes Tame Units only apply to Platforms with Structures and Rafts.', effect: 'If True, effectively disables Tame Units for tames without Platform Structures.' },
+    ],
 
+    // Player & Leveling Settings  
+    'game-player': [
         { name: 'bAllowSpeedLeveling', default: 'False', type: 'boolean', description: 'Allows players and non-flyers to level Movement Speed.', effect: 'If True, Movement Speed stat can be upgraded.' },
         { name: 'bAllowFlyerSpeedLeveling', default: 'False', type: 'boolean', description: 'Allows flyer creatures to level Movement Speed.', effect: 'In ASA, requires bAllowSpeedLeveling to also be True.' },
         { name: 'bAllowUnlimitedRespecs', default: 'False', type: 'boolean', description: 'Allows more than one Mindwipe Tonic use without 24h cooldown.', effect: 'If True, removes the cooldown between Mindwipe uses.' },
-        { name: 'bAllowCustomRecipes', default: 'True', type: 'boolean', description: 'Enables or disables custom Recipe/Cooking System.', effect: 'If False, disables custom RP-oriented recipes (including Skill-Based results).' },
-        { name: 'bAllowUnclaimDinos', default: 'True', type: 'boolean', description: 'Allows players to unclaim tame creatures.', effect: 'If False, prevents players from unclaiming tames.' },
-        { name: 'bAutoPvETimer', default: 'False', type: 'boolean', description: 'Enables PvE mode in a PvPvE server at pre-specified times.', effect: 'bAutoPvEUseSystemTime determines time type. AutoPvEStartTimeSeconds/AutoPvEStopTimeSeconds set begin/end.' },
-        { name: 'bAutoPvEUseSystemTime', default: 'False', type: 'boolean', description: 'PvE mode times refer to server system time instead of in-game world time.', effect: 'If True, relies on real-world server time. Requires bAutoPvETimer and start/stop times.' },
-        { name: 'bAutoUnlockAllEngrams', default: 'False', type: 'boolean', description: 'Unlocks all Engrams available.', effect: 'If True, ignores OverrideEngramEntries and OverrideNamedEngramEntries.' },
-        { name: 'bDisableDinoBreeding', default: 'False', type: 'boolean', description: 'Prevents tames from being bred.', effect: 'If True, tames cannot breed.' },
-        { name: 'bDisableDinoRiding', default: 'False', type: 'boolean', description: 'Prevents players from riding tames.', effect: 'If True, players cannot ride tames.' },
-        { name: 'bDisableDinoTaming', default: 'False', type: 'boolean', description: 'Prevents players from taming wild creatures.', effect: 'If True, players cannot tame creatures.' },
-        { name: 'bDisableLootCrates', default: 'False', type: 'boolean', description: 'Prevents spawning of Loot Crates.', effect: 'If True, Loot Crates do not spawn (artifact crates still spawn).' },
-        { name: 'bDisableFriendlyFire', default: 'False', type: 'boolean', description: 'Prevents Friendly-Fire among tribe mates/tames/structures.', effect: 'If True, tribe mates cannot damage each other.' },
-        { name: 'bPvEDisableFriendlyFire', default: 'False', type: 'boolean', description: 'Disables Friendly-Fire among tribe mates/tames/structures in PvE servers.', effect: 'If True, tribe mates cannot damage each other in PvE.' },
-        { name: 'bDisablePhotoMode', default: 'False', type: 'boolean', description: 'Defines if photo mode is allowed or not.', effect: 'If True, Photo Mode is disabled.' },
-        { name: 'bDisableStructurePlacementCollision', default: 'False', type: 'boolean', description: 'Allows structures to clip into terrain.', effect: 'If True, structures can be placed inside terrain.' },
-        { name: 'bIgnoreStructuresPreventionVolumes', default: 'False', type: 'boolean', description: 'Enables building where it is normally blocked (obelisks, portals, mission volumes).', effect: 'True allows building in those blocked areas; False keeps blocks. Genesis: Part 1 note.' },
-
-        { name: 'bShowCreativeMode', default: 'False', type: 'boolean', description: 'Adds a button to the pause menu to enable/disable creative mode.', effect: 'If True, shows Creative Mode toggle in pause menu.' },
-        { name: 'bUseCorpseLocator', default: 'True', type: 'boolean', description: 'Shows green light beam at dead body location.', effect: 'If False, prevents survivors from seeing the corpse locator beam.' },
-        { name: 'bUseDinoLevelUpAnimations', default: 'True', type: 'boolean', description: 'Enables level-up animation for tame creatures.', effect: 'If False, tame creatures on level-up will not perform the related animation.' },
-        { name: 'bUseSingleplayerSettings', default: 'False', type: 'boolean', description: 'All game settings will be balanced for individual player experience.', effect: 'If True, applies Single Player Settings (useful for small player counts).' },
-        { name: 'bUseTameLimitForStructuresOnly', default: 'False', type: 'boolean', description: 'Makes Tame Units only apply to Platforms with Structures and Rafts.', effect: 'If True, effectively disables Tame Units for tames without Platform Structures.' },
-        { name: 'bPvEAllowTribeWar', default: 'True', type: 'boolean', description: 'Allows Tribes to officially declare war on each other.', effect: 'If False, disables capability for mutually-agreed Tribe War.' },
-        { name: 'bPvEAllowTribeWarCancel', default: 'False', type: 'boolean', description: 'Allows cancellation of agreed-upon war before it starts.', effect: 'If True, allows wars to be cancelled before starting.' },
-        { name: 'bOnlyAllowSpecifiedEngrams', default: 'False', type: 'boolean', description: 'Engrams not in OverrideEngramEntries or OverrideNamedEngramEntries will be hidden.', effect: 'If True, items and blueprints based on hidden engrams will be removed.' },
-        { name: 'bPassiveDefensesDamageRiderlessDinos', default: 'False', type: 'boolean', description: 'Allows spike walls to damage wild/riderless creatures.', effect: 'If True, passive defenses damage wild and riderless creatures.' },
-        { name: 'bAllowPlatformSaddleMultiFloors', default: 'False', type: 'boolean', description: 'Allows multiple platform floors.', effect: 'If True, enables building multiple floors on platform saddles.' },
-        { name: 'bFlyerPlatformAllowUnalignedDinoBasing', default: 'False', type: 'boolean', description: 'Quetz platforms allow any non-allied tame to base on them while flying.', effect: 'If True, non-allied creatures can stand on flying platforms.' },
-        { name: 'bIncreasePvPRespawnInterval', default: 'True', type: 'boolean', description: 'Enables extra PvP respawn time scaling.', effect: 'False disables extra respawn scaling; True enables. Related: IncreasePvPRespawnIntervalBaseAmount, Multiplier, CheckPeriod.' },
-
-        { name: 'CraftingSkillBonusMultiplier', default: '1.0', type: 'float', description: 'Scales the bonus received from upgrading the Crafting Skill.', effect: 'Higher values increase the quality boost from crafting skill.' },
-        { name: 'CustomRecipeEffectivenessMultiplier', default: '1.0', type: 'float', description: 'Scales the effectiveness of custom recipes.', effect: 'Higher values increase (by percentage) their effectiveness.' },
-        { name: 'CustomRecipeSkillMultiplier', default: '1.0', type: 'float', description: 'Scales effect of players crafting speed level used as base for custom recipe formula.', effect: 'Higher values increase (by percentage) the effect.' },
-
-        { name: 'DestroyTamesOverLevelClamp', default: '0', type: 'integer', description: 'Tames exceeding this level will be deleted on server start.', effect: 'Official servers use 450. Value of 0 disables.' },
-
-        { name: 'ConfigAddNPCSpawnEntriesContainer', default: '', type: 'text', description: 'Add creatures to spawn containers (advanced).', effect: 'Structured config entry for adding creatures. See wiki for format.', placeholder: 'Advanced: see wiki format' },
-        { name: 'ConfigSubtractNPCSpawnEntriesContainer', default: '', type: 'text', description: 'Remove creatures from spawn containers (advanced).', effect: 'Structured config entry for removing creatures. See wiki for format.', placeholder: 'Advanced: see wiki format' },
-        { name: 'ExcludeItemIndices', default: '', type: 'text', description: 'Exclude items from supply crates by index (advanced).', effect: 'Structured config entry for item exclusion. See wiki for format.', placeholder: 'Advanced: see wiki format' },
-        { name: 'HarvestResourceItemAmountClassMultipliers', default: '', type: 'text', description: 'Scale harvest amounts for specific resources (advanced).', effect: 'Structured config entry for resource multipliers. See wiki for format.', placeholder: 'Advanced: see wiki format' },
-        { name: 'OverrideNamedEngramEntries', default: '', type: 'text', description: 'Override engram visibility, level, or cost (advanced).', effect: 'Structured config entry for engram modifications. See wiki for format.', placeholder: 'Advanced: see wiki format' },
-        { name: 'PassiveTameIntervalMultiplier', default: '1.0', type: 'float', description: 'Scales the interval between passive taming feedings.', effect: 'Higher values mean longer wait between feedings; lower values speed up passive taming.' },
-
-        { name: 'HairGrowthSpeedMultiplier', default: '0', type: 'float', description: 'Scales hair growth speed.', effect: 'Higher values increase speed of growth. ASE default is 1.0, ASA default is 0.' },
-
         { name: 'PlayerHarvestingDamageMultiplier', default: '1.0', type: 'float', description: 'Scales player harvesting damage (harvest speed).', effect: 'Higher increases speed; lower decreases.' },
         { name: 'MaxFallSpeedMultiplier', default: '1.0', type: 'float', description: 'Defines falling speed multiplier at which players start taking fall damage.', effect: 'Higher values = longer falls without damage. Does not affect gravity scale.' },
-        { name: 'ResourceNoReplenishRadiusPlayers', default: '1.0', type: 'float', description: 'Controls how close resources can regrow near players.', effect: 'Higher increases no-regrow distance; lower reduces.' },
-        { name: 'ResourceNoReplenishRadiusStructures', default: '1.0', type: 'float', description: 'Controls how close resources can regrow near structures.', effect: 'Higher increases no-regrow distance; lower reduces.' },
+        { name: 'HairGrowthSpeedMultiplier', default: '0', type: 'float', description: 'Scales hair growth speed.', effect: 'Higher values increase speed of growth. ASE default is 1.0, ASA default is 0.' },
+        { name: 'bUseCorpseLocator', default: 'True', type: 'boolean', description: 'Shows green light beam at dead body location.', effect: 'If False, prevents survivors from seeing the corpse locator beam.' },
+        { name: 'bShowCreativeMode', default: 'False', type: 'boolean', description: 'Adds a button to the pause menu to enable/disable creative mode.', effect: 'If True, shows Creative Mode toggle in pause menu.' },
+        { name: 'bUseSingleplayerSettings', default: 'False', type: 'boolean', description: 'All game settings will be balanced for individual player experience.', effect: 'If True, applies Single Player Settings (useful for small player counts).' },
+        { name: 'bDisablePhotoMode', default: 'False', type: 'boolean', description: 'Defines if photo mode is allowed or not.', effect: 'If True, Photo Mode is disabled.' },
+    ],
 
+    // Tribe Settings
+    'game-tribe': [
         { name: 'MaxTribeLogs', default: '400', type: 'integer', description: 'Maximum number of entries in the tribe log.', effect: 'Default is 400. Higher values allow more log history.' },
         { name: 'MaxNumberOfPlayersInTribe', default: '0', type: 'integer', description: 'Sets max survivors allowed in a tribe.', effect: '1 disables tribes; 0 means no limit.' },
         { name: 'TribeSlotReuseCooldown', default: '0.0', type: 'float', description: 'Locks a tribe slot for specified seconds.', effect: 'E.g., 3600 = if a survivor leaves, their slot cannot be taken or rejoined for 1 hour. Official Small Tribes use this.' },
+        { name: 'TribeLogDestroyedEnemyStructures', default: 'False', type: 'boolean', description: 'Logs enemy structure destruction in tribe logs.', effect: 'If True, logs when tribe members destroy enemy structures.' },
+        { name: 'bPvEAllowTribeWar', default: 'True', type: 'boolean', description: 'Allows Tribes to officially declare war on each other.', effect: 'If False, disables capability for mutually-agreed Tribe War.' },
+        { name: 'bPvEAllowTribeWarCancel', default: 'False', type: 'boolean', description: 'Allows cancellation of agreed-upon war before it starts.', effect: 'If True, allows wars to be cancelled before starting.' },
+        { name: 'bDisableFriendlyFire', default: 'False', type: 'boolean', description: 'Prevents Friendly-Fire among tribe mates/tames/structures.', effect: 'If True, tribe mates cannot damage each other.' },
+        { name: 'bPvEDisableFriendlyFire', default: 'False', type: 'boolean', description: 'Disables Friendly-Fire among tribe mates/tames/structures in PvE servers.', effect: 'If True, tribe mates cannot damage each other in PvE.' },
+    ],
 
-        { name: 'DinoHarvestingDamageMultiplier', default: '3.2', type: 'float', description: 'Scales tame damage vs harvestables (harvest speed).', effect: 'Higher increases harvesting speed; lower decreases.' },
-        { name: 'DinoTurretDamageMultiplier', default: '1.0', type: 'float', description: 'Scales damage done by Turrets towards a creature.', effect: 'Higher values increase (by percentage) turret damage to dinos.' },
-        { name: 'TamedDinoCharacterFoodDrainMultiplier', default: '1.0', type: 'float', description: 'Scales how fast tame creatures consume food.', effect: 'Higher values increase food consumption.' },
-        { name: 'TamedDinoTorporDrainMultiplier', default: '1.0', type: 'float', description: 'Scales how fast tamed creatures lose torpor.', effect: 'Higher values make torpor drop faster.' },
-        { name: 'WildDinoCharacterFoodDrainMultiplier', default: '1.0', type: 'float', description: 'Scales how fast wild creatures consume food.', effect: 'Higher values increase food consumption.' },
-        { name: 'WildDinoTorporDrainMultiplier', default: '1.0', type: 'float', description: 'Scales how fast wild creatures lose torpor.', effect: 'Higher values make torpor drop faster.' },
+    // Crafting & Engrams
+    'game-crafting': [
+        { name: 'CraftingSkillBonusMultiplier', default: '1.0', type: 'float', description: 'Scales the bonus received from upgrading the Crafting Skill.', effect: 'Higher values increase the quality boost from crafting skill.' },
+        { name: 'bAllowCustomRecipes', default: 'True', type: 'boolean', description: 'Enables or disables custom Recipe/Cooking System.', effect: 'If False, disables custom RP-oriented recipes (including Skill-Based results).' },
+        { name: 'CustomRecipeEffectivenessMultiplier', default: '1.0', type: 'float', description: 'Scales the effectiveness of custom recipes.', effect: 'Higher values increase (by percentage) their effectiveness.' },
+        { name: 'CustomRecipeSkillMultiplier', default: '1.0', type: 'float', description: 'Scales effect of players crafting speed level used as base for custom recipe formula.', effect: 'Higher values increase (by percentage) the effect.' },
+        { name: 'bAutoUnlockAllEngrams', default: 'False', type: 'boolean', description: 'Unlocks all Engrams available.', effect: 'If True, ignores OverrideEngramEntries and OverrideNamedEngramEntries.' },
+        { name: 'bOnlyAllowSpecifiedEngrams', default: 'False', type: 'boolean', description: 'Engrams not in OverrideEngramEntries or OverrideNamedEngramEntries will be hidden.', effect: 'If True, items and blueprints based on hidden engrams will be removed.' },
+        { name: 'OverrideNamedEngramEntries', default: '', type: 'text', description: 'Override engram visibility, level, or cost (advanced).', effect: 'Structured config entry for engram modifications. See wiki for format.', placeholder: 'Advanced: see wiki format' },
+    ],
 
+    // Loot & Resources
+    'game-loot': [
         { name: 'SupplyCrateLootQualityMultiplier', default: '1.0', type: 'float', description: 'Increases quality of items in supply crates.', effect: 'Valid values 1.0-5.0. Quality also depends on Difficulty Offset.' },
         { name: 'FishingLootQualityMultiplier', default: '1.0', type: 'float', description: 'Sets quality of items that have quality when fishing.', effect: 'Valid values 1.0-5.0.' },
+        { name: 'bDisableLootCrates', default: 'False', type: 'boolean', description: 'Prevents spawning of Loot Crates.', effect: 'If True, Loot Crates do not spawn (artifact crates still spawn).' },
+        { name: 'ResourceNoReplenishRadiusPlayers', default: '1.0', type: 'float', description: 'Controls how close resources can regrow near players.', effect: 'Higher increases no-regrow distance; lower reduces.' },
+        { name: 'ResourceNoReplenishRadiusStructures', default: '1.0', type: 'float', description: 'Controls how close resources can regrow near structures.', effect: 'Higher increases no-regrow distance; lower reduces.' },
+        { name: 'HarvestResourceItemAmountClassMultipliers', default: '', type: 'text', description: 'Scale harvest amounts for specific resources (advanced).', effect: 'Structured config entry for resource multipliers. See wiki for format.', placeholder: 'Advanced: see wiki format' },
+        { name: 'ExcludeItemIndices', default: '', type: 'text', description: 'Exclude items from supply crates by index (advanced).', effect: 'Structured config entry for item exclusion. See wiki for format.', placeholder: 'Advanced: see wiki format' },
+    ],
 
-        { name: 'UseCorpseLifeSpanMultiplier', default: '1.0', type: 'float', description: 'Modifies corpse and dropped box lifespan.', effect: 'Higher values make them last longer.' },
+    // Structures & Building
+    'game-structures': [
+        { name: 'bDisableStructurePlacementCollision', default: 'False', type: 'boolean', description: 'Allows structures to clip into terrain.', effect: 'If True, structures can be placed inside terrain.' },
+        { name: 'bIgnoreStructuresPreventionVolumes', default: 'False', type: 'boolean', description: 'Enables building where it is normally blocked (obelisks, portals, mission volumes).', effect: 'True allows building in those blocked areas; False keeps blocks. Genesis: Part 1 note.' },
+        { name: 'bAllowPlatformSaddleMultiFloors', default: 'False', type: 'boolean', description: 'Allows multiple platform floors.', effect: 'If True, enables building multiple floors on platform saddles.' },
+        { name: 'bFlyerPlatformAllowUnalignedDinoBasing', default: 'False', type: 'boolean', description: 'Quetz platforms allow any non-allied tame to base on them while flying.', effect: 'If True, non-allied creatures can stand on flying platforms.' },
+        { name: 'bPassiveDefensesDamageRiderlessDinos', default: 'False', type: 'boolean', description: 'Allows spike walls to damage wild/riderless creatures.', effect: 'If True, passive defenses damage wild and riderless creatures.' },
         { name: 'StructureDamageRepairCooldown', default: '180', type: 'integer', description: 'Cooldown period on structure repair from the last time damaged.', effect: 'Set to 180 seconds by default, 0 to disable.' },
         { name: 'PvPZoneStructureDamageMultiplier', default: '6.0', type: 'float', description: 'Scales structure damage taken within caves.', effect: 'Lower means less damage; higher means more.' },
-        { name: 'PreventOfflinePvPConnectionInvincibleInterval', default: '5.0', type: 'float', description: 'Time in seconds a player cannot take damage after logging in.', effect: 'Provides brief invincibility on connection.' },
         { name: 'FastDecayInterval', default: '43200', type: 'integer', description: 'Specifies decay period for Fast Decay structures (pillars, lone foundations).', effect: 'Value in seconds. FastDecayUnsnappedCoreStructures must be True.' },
-        { name: 'IncreasePvPRespawnIntervalBaseAmount', default: '60.0', type: 'float', description: 'Sets additional PvP respawn time in seconds.', effect: 'Scales with IncreasePvPRespawnIntervalMultiplier when killed by a team within IncreasePvPRespawnIntervalCheckPeriod.' },
-        { name: 'IncreasePvPRespawnIntervalCheckPeriod', default: '300.0', type: 'float', description: 'Amount of time in seconds within which a player respawn time increases.', effect: 'Used with IncreasePvPRespawnIntervalBaseAmount and IncreasePvPRespawnIntervalMultiplier.' },
-        { name: 'IncreasePvPRespawnIntervalMultiplier', default: '2.0', type: 'float', description: 'Multiplies the additional respawn penalty.', effect: 'Scales with IncreasePvPRespawnIntervalBaseAmount when killed by a team within IncreasePvPRespawnIntervalCheckPeriod.' },
-        { name: 'GlobalPoweredBatteryDurabilityDecreasePerSecond', default: '3.0', type: 'float', description: 'Rate of charge battery usage per second.', effect: 'Higher values drain batteries faster.' },
-        { name: 'FuelConsumptionIntervalMultiplier', default: '1.0', type: 'float', description: 'Scales the time between fuel consumption ticks.', effect: 'Higher values make fuel last longer.' },
-        { name: 'BaseTemperatureMultiplier', default: '1.0', type: 'float', description: 'Scales the base temperature of the map.', effect: 'Lower values make the map colder; higher values make it hotter.' },
+    ],
 
-        // Turret & Generator Limits (Game.ini per reference)
+    // Turrets & Generators
+    'game-turrets': [
         { name: 'bLimitTurretsInRange', default: 'True', type: 'boolean', description: 'Enables/Disables the turret limit in a specific range.', effect: 'If False, removes the turret limit radius check.' },
         { name: 'bHardLimitTurretsInRange', default: 'False', type: 'boolean', description: 'Enables retroactive turret hard limit (100 turrets within 10k unit radius).', effect: 'If True, turrets placed over this limit are subject to the retroactive removal behavior.' },
         { name: 'LimitTurretsNum', default: '100', type: 'integer', description: 'Max turrets allowed in the defined area.', effect: 'Higher allows more; lower allows fewer. Includes Plant Species X.' },
@@ -400,28 +420,51 @@ const gameIniSettings = {
         { name: 'LimitGeneratorsRange', default: '15000', type: 'integer', description: 'Sets the range for the generator limit check.', effect: 'Used with LimitGeneratorsNum. Default is 15000 units.' },
         { name: 'LimitNonPlayerDroppedItemsCount', default: '0', type: 'integer', description: 'Limits the number of dropped items in a range.', effect: 'Used with LimitNonPlayerDroppedItemsRange. 0 = disabled.' },
         { name: 'LimitNonPlayerDroppedItemsRange', default: '0', type: 'integer', description: 'Sets the range for the dropped item limit check.', effect: 'Used with LimitNonPlayerDroppedItemsCount. 0 = disabled.' },
+        { name: 'GlobalPoweredBatteryDurabilityDecreasePerSecond', default: '3.0', type: 'float', description: 'Rate of charge battery usage per second.', effect: 'Higher values drain batteries faster.' },
+        { name: 'FuelConsumptionIntervalMultiplier', default: '1.0', type: 'float', description: 'Scales the time between fuel consumption ticks.', effect: 'Higher values make fuel last longer.' },
+        { name: 'TribeTowerBonusMultiplier', default: '2.0', type: 'float', description: 'Scales the buff provided by Tribe Towers.', effect: 'Higher values increase the strength of Tribe Tower bonuses. Default 2.0 for PvP servers.' },
+    ],
 
-        // Hexagon Settings (Game.ini per reference)
-        { name: 'BaseHexagonRewardMultiplier', default: '1.0', type: 'float', description: 'Scales mission score hexagon rewards and Club Ark token rewards (ASA).', effect: 'Higher values grant more Hexagons/Club Ark Tokens.' },
-        { name: 'HexagonCostMultiplier', default: '1.0', type: 'float', description: 'Scales Hexagon store costs and Club Ark token costs (ASA).', effect: 'Higher values increase costs.' },
+    // PvP Settings
+    'game-pvp': [
+        { name: 'AutoPvEStartTimeSeconds', default: '0.0', type: 'float', description: 'States when PvE mode should start in a PvPvE server.', effect: 'Valid values 0-86400. Requires bAutoPvETimer, bAutoPvEUseSystemTime, and AutoPvEStopTimeSeconds.' },
+        { name: 'AutoPvEStopTimeSeconds', default: '0.0', type: 'float', description: 'States when PvE mode should end in a PvPvE server.', effect: 'Valid values 0-86400. Requires bAutoPvETimer, bAutoPvEUseSystemTime, and AutoPvEStartTimeSeconds.' },
+        { name: 'bAutoPvETimer', default: 'False', type: 'boolean', description: 'Enables PvE mode in a PvPvE server at pre-specified times.', effect: 'bAutoPvEUseSystemTime determines time type. AutoPvEStartTimeSeconds/AutoPvEStopTimeSeconds set begin/end.' },
+        { name: 'bAutoPvEUseSystemTime', default: 'False', type: 'boolean', description: 'PvE mode times refer to server system time instead of in-game world time.', effect: 'If True, relies on real-world server time. Requires bAutoPvETimer and start/stop times.' },
+        { name: 'bIncreasePvPRespawnInterval', default: 'True', type: 'boolean', description: 'Enables extra PvP respawn time scaling.', effect: 'False disables extra respawn scaling; True enables. Related: IncreasePvPRespawnIntervalBaseAmount, Multiplier, CheckPeriod.' },
+        { name: 'IncreasePvPRespawnIntervalBaseAmount', default: '60.0', type: 'float', description: 'Sets additional PvP respawn time in seconds.', effect: 'Scales with IncreasePvPRespawnIntervalMultiplier when killed by a team within IncreasePvPRespawnIntervalCheckPeriod.' },
+        { name: 'IncreasePvPRespawnIntervalCheckPeriod', default: '300.0', type: 'float', description: 'Amount of time in seconds within which a player respawn time increases.', effect: 'Used with IncreasePvPRespawnIntervalBaseAmount and IncreasePvPRespawnIntervalMultiplier.' },
+        { name: 'IncreasePvPRespawnIntervalMultiplier', default: '2.0', type: 'float', description: 'Multiplies the additional respawn penalty.', effect: 'Scales with IncreasePvPRespawnIntervalBaseAmount when killed by a team within IncreasePvPRespawnIntervalCheckPeriod.' },
+        { name: 'PreventOfflinePvPConnectionInvincibleInterval', default: '5.0', type: 'float', description: 'Time in seconds a player cannot take damage after logging in.', effect: 'Provides brief invincibility on connection.' },
+    ],
 
-        // Genesis Settings (Game.ini per reference)
+    // Genesis & Missions
+    'game-genesis': [
         { name: 'bDisableGenesisMissions', default: 'False', type: 'boolean', description: 'Disables Genesis missions.', effect: 'If True, missions are unavailable on Genesis maps.' },
         { name: 'bDisableHexagonStore', default: 'False', type: 'boolean', description: 'Disables the Hexagon/Club Ark store.', effect: 'If True, the store cannot be accessed.' },
+        { name: 'AllowTekSuitPowersInGenesis', default: 'False', type: 'boolean', description: 'Enables TEK suit powers in Genesis: Part 1.', effect: 'If True, Tek suit features work normally in Genesis Part 1.' },
+        { name: 'MaxHexagonsPerCharacter', default: '2000000000', type: 'integer', description: 'Sets max Hexagons a character can hold.', effect: 'Higher increases max; lower decreases.' },
         { name: 'bGenesisUseStructuresPreventionVolumes', default: 'False', type: 'boolean', description: 'Controls building restrictions in Genesis Part 1 mission areas.', effect: 'If True, disables building in mission areas.' },
         { name: 'bHexStoreAllowOnlyEngramTradeOption', default: 'False', type: 'boolean', description: 'Restricts Hexagon store to Engrams only.', effect: 'If True, only Engrams can be traded.' },
         { name: 'bDisableDefaultMapItemSets', default: 'False', type: 'boolean', description: 'Disables default spawn items (e.g., Tek Suit on Gen 2).', effect: 'If True, players do not spawn with map-specific default items.' },
         { name: 'bDisableWorldBuffs', default: 'False', type: 'boolean', description: 'Disables world effects from Genesis Part 2 missions.', effect: 'If True, mission world buffs are disabled.' },
         { name: 'bEnableWorldBuffScaling', default: 'False', type: 'boolean', description: 'Enables scaling of Genesis Part 2 mission world effects.', effect: 'If True, buffs scale based on WorldBuffScalingEfficacy.' },
         { name: 'WorldBuffScalingEfficacy', default: '1.0', type: 'float', description: 'Sets how effective mission world buff scaling is.', effect: '0.5 is 50% less; 100 is 100x more.' },
-
-        // Mutagen Settings
+        { name: 'BaseHexagonRewardMultiplier', default: '1.0', type: 'float', description: 'Scales mission score hexagon rewards and Club Ark token rewards (ASA).', effect: 'Higher values grant more Hexagons/Club Ark Tokens.' },
+        { name: 'HexagonCostMultiplier', default: '1.0', type: 'float', description: 'Scales Hexagon store costs and Club Ark token costs (ASA).', effect: 'Higher values increase costs.' },
         { name: 'AdjustableMutagenSpawnDelayMultiplier', default: '1.0', type: 'float', description: 'Scales Mutagen spawn delay.', effect: 'Higher increases respawn interval; lower decreases. Map-specific: Genesis.' },
+    ],
 
-        // Tribe Log Settings
-        { name: 'TribeLogDestroyedEnemyStructures', default: 'False', type: 'boolean', description: 'Logs enemy structure destruction in tribe logs.', effect: 'If True, logs when tribe members destroy enemy structures.' },
+    // Environment & World (Game.ini)
+    'game-environment': [
+        { name: 'UseCorpseLifeSpanMultiplier', default: '1.0', type: 'float', description: 'Modifies corpse and dropped box lifespan.', effect: 'Higher values make them last longer.' },
+        { name: 'BaseTemperatureMultiplier', default: '1.0', type: 'float', description: 'Scales the base temperature of the map.', effect: 'Lower values make the map colder; higher values make it hotter.' },
+    ],
 
-        // Teleport Locations (Advanced)
+    // Advanced Configuration
+    'game-advanced': [
+        { name: 'ConfigAddNPCSpawnEntriesContainer', default: '', type: 'text', description: 'Add creatures to spawn containers (advanced).', effect: 'Structured config entry for adding creatures. See wiki for format.', placeholder: 'Advanced: see wiki format' },
+        { name: 'ConfigSubtractNPCSpawnEntriesContainer', default: '', type: 'text', description: 'Remove creatures from spawn containers (advanced).', effect: 'Structured config entry for removing creatures. See wiki for format.', placeholder: 'Advanced: see wiki format' },
         { name: 'CheatTeleportLocations', default: '', type: 'text', description: 'Defines custom named teleport locations for admins.', effect: 'Adds locations for the cheat TP <Name> command.', placeholder: '(TeleportName="Name",TeleportLocation=(X=0,Y=0,Z=0))' },
     ],
 
@@ -452,21 +495,9 @@ const gameIniSettings = {
         { name: 'GlobalCorpseDecompositionTimeMultiplier', default: '1.0', type: 'float', description: 'Scales corpse decay time globally.', effect: 'Higher prolongs time; lower shortens.' },
     ],
 
-    // Tribe Tower Settings (Lost Colony)
-    'game-tower': [
-        { name: 'TribeTowerBonusMultiplier', default: '2.0', type: 'float', description: 'Scales the buff provided by Tribe Towers.', effect: 'Higher values increase the strength of Tribe Tower bonuses (Lost Colony feature).' },
-    ],
-
     // World & Camera Settings
     'game-world': [
         { name: 'PhotoModeRangeLimit', default: '3000', type: 'integer', description: 'Maximum distance for photo mode camera.', effect: 'Limits how far the camera can travel from the player in photo mode.' },
-    ],
-
-
-
-    // Memorial & Valguero Settings
-    'game-memorial': [
-        { name: 'ValgueroMemorialEntries', default: '', type: 'string', description: 'Names displayed on the Valguero Memorial.', effect: 'Adds custom names to the interactive memorial on Valguero. Separate names with semicolons.', placeholder: 'Enter names separated by ;' },
     ],
 
     // Stats Multipliers
