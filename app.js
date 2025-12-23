@@ -133,7 +133,7 @@ const REFERENCE_EXPECTED_PLACEMENTS = [
     { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'StructureResistanceMultiplier' },
     { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'TamingSpeedMultiplier' },
     { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'TheMaxStructuresInRange' },
-    { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'TribeLogDestroyedEnemyStructures' },
+    // TribeLogDestroyedEnemyStructures removed - belongs in Game.ini only (see gameIni entry at line ~239)
     { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'TribeNameChangeCooldown' },
     { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'UseCharacterTracker' },
     { fileType: 'gameUserSettings', section: 'ServerSettings', key: 'WorldBossKingKaijuSpawnTime' },
@@ -366,24 +366,79 @@ const RENAMED_SETTING_KEYS = [
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Show loading indicator if it exists
-    const loadingEl = document.getElementById('loadingIndicator');
-    if (loadingEl) loadingEl.style.display = 'block';
-    
     // Use requestIdleCallback for non-critical initialization if available
     if ('requestIdleCallback' in window) {
         requestIdleCallback(() => {
             init();
-            if (loadingEl) loadingEl.style.display = 'none';
+            // Hide initial loading screen
+            const initialLoading = document.getElementById('initialLoading');
+            if (initialLoading) initialLoading.style.display = 'none';
+            // Show guide card if not dismissed
+            initGuideCard();
         }, { timeout: 1000 });
     } else {
         // Fallback for browsers without requestIdleCallback
         setTimeout(() => {
             init();
-            if (loadingEl) loadingEl.style.display = 'none';
+            // Hide initial loading screen
+            const initialLoading = document.getElementById('initialLoading');
+            if (initialLoading) initialLoading.style.display = 'none';
+            // Show guide card if not dismissed
+            initGuideCard();
         }, 0);
     }
 });
+
+// Initialize the user guide card
+function initGuideCard() {
+    const guideOverlay = document.getElementById('guideOverlay');
+    const guideClose = document.getElementById('guideClose');
+    const guideDontShow = document.getElementById('guideDontShow');
+    
+    if (!guideOverlay || !guideClose) return;
+    
+    // Check if user has dismissed the guide before
+    const guideDismissed = localStorage.getItem('arkConfigGuideHidden');
+    
+    if (!guideDismissed) {
+        // Show the guide after a short delay for smooth appearance
+        setTimeout(() => {
+            guideOverlay.style.display = 'flex';
+            // Apply translations to guide card
+            if (typeof applyTranslations === 'function') {
+                applyTranslations();
+            }
+        }, 300);
+    }
+    
+    // Close button handler
+    guideClose.addEventListener('click', () => {
+        // Save preference if checkbox is checked
+        if (guideDontShow && guideDontShow.checked) {
+            localStorage.setItem('arkConfigGuideHidden', 'true');
+        }
+        // Hide with animation
+        guideOverlay.style.animation = 'fadeOut 0.3s ease forwards';
+        setTimeout(() => {
+            guideOverlay.style.display = 'none';
+            guideOverlay.style.animation = '';
+        }, 300);
+    });
+    
+    // Close when clicking overlay background
+    guideOverlay.addEventListener('click', (e) => {
+        if (e.target === guideOverlay) {
+            guideClose.click();
+        }
+    });
+    
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && guideOverlay.style.display === 'flex') {
+            guideClose.click();
+        }
+    });
+}
 
 // DOM element cache for frequently accessed elements
 const domCache = {
@@ -572,7 +627,7 @@ function _saveToStorageImmediate() {
     // Update save status indicator
     const saveStatus = document.getElementById('saveStatus');
     if (saveStatus) {
-        saveStatus.textContent = '💾 Saving...';
+        saveStatus.textContent = t('saving');
         saveStatus.classList.add('saving');
         saveStatus.classList.remove('saved');
     }
@@ -592,12 +647,12 @@ function _saveToStorageImmediate() {
         // Show saved status
         if (saveStatus) {
             setTimeout(() => {
-                saveStatus.textContent = '✓ Saved';
+                saveStatus.textContent = t('saved');
                 saveStatus.classList.remove('saving');
                 saveStatus.classList.add('saved');
                 // Reset to default state after a moment
                 setTimeout(() => {
-                    saveStatus.textContent = '💾 Auto-saved';
+                    saveStatus.textContent = t('autoSaved');
                     saveStatus.classList.remove('saved');
                 }, 2000);
             }, 100);
@@ -661,10 +716,14 @@ const presets = {
             'HarvestAmountMultiplier': '1.0',
             'XPMultiplier': '1.0',
             'MatingIntervalMultiplier': '1.0',
+            'MatingSpeedMultiplier': '1.0',
             'BabyMatureSpeedMultiplier': '1.0',
             'EggHatchSpeedMultiplier': '1.0',
             'BabyCuddleIntervalMultiplier': '1.0',
             'BabyImprintAmountMultiplier': '1.0',
+            'PassiveTameIntervalMultiplier': '1.0',
+            'LayEggIntervalMultiplier': '1.0',
+            'CropGrowthSpeedMultiplier': '1.0',
             'HexagonRewardMultiplier': '1.0'
         }
     },
@@ -675,10 +734,14 @@ const presets = {
             'HarvestAmountMultiplier': '2.0',
             'XPMultiplier': '2.0',
             'MatingIntervalMultiplier': '0.5',
+            'MatingSpeedMultiplier': '2.0',
             'BabyMatureSpeedMultiplier': '2.0',
             'EggHatchSpeedMultiplier': '2.0',
-            'BabyCuddleIntervalMultiplier': '0.6',
+            'BabyCuddleIntervalMultiplier': '0.5',
             'BabyImprintAmountMultiplier': '2.0',
+            'PassiveTameIntervalMultiplier': '0.5',
+            'LayEggIntervalMultiplier': '0.5',
+            'CropGrowthSpeedMultiplier': '2.0',
             'HexagonRewardMultiplier': '1.0'
         }
     },
@@ -688,11 +751,15 @@ const presets = {
             'TamingSpeedMultiplier': '3.0',
             'HarvestAmountMultiplier': '3.0',
             'XPMultiplier': '3.0',
-            'MatingIntervalMultiplier': '0.5',
+            'MatingIntervalMultiplier': '0.333',
+            'MatingSpeedMultiplier': '3.0',
             'BabyMatureSpeedMultiplier': '3.0',
             'EggHatchSpeedMultiplier': '3.0',
-            'BabyCuddleIntervalMultiplier': '0.6',
+            'BabyCuddleIntervalMultiplier': '0.333',
             'BabyImprintAmountMultiplier': '3.0',
+            'PassiveTameIntervalMultiplier': '0.333',
+            'LayEggIntervalMultiplier': '0.333',
+            'CropGrowthSpeedMultiplier': '3.0',
             'HexagonRewardMultiplier': '1.0'
         }
     },
@@ -702,11 +769,15 @@ const presets = {
             'TamingSpeedMultiplier': '4.5',
             'HarvestAmountMultiplier': '4.5',
             'XPMultiplier': '4.5',
-            'MatingIntervalMultiplier': '0.5',
+            'MatingIntervalMultiplier': '0.25',
+            'MatingSpeedMultiplier': '4.0',
             'BabyMatureSpeedMultiplier': '4.0',
             'EggHatchSpeedMultiplier': '4.0',
-            'BabyCuddleIntervalMultiplier': '0.6',
+            'BabyCuddleIntervalMultiplier': '0.25',
             'BabyImprintAmountMultiplier': '4.0',
+            'PassiveTameIntervalMultiplier': '0.25',
+            'LayEggIntervalMultiplier': '0.25',
+            'CropGrowthSpeedMultiplier': '4.0',
             'HexagonRewardMultiplier': '1.0'
         }
     },
@@ -716,17 +787,25 @@ const presets = {
             'TamingSpeedMultiplier': '5.0',
             'HarvestAmountMultiplier': '5.0',
             'XPMultiplier': '5.0',
-            'MatingIntervalMultiplier': '0.5',
+            'MatingIntervalMultiplier': '0.2',
+            'MatingSpeedMultiplier': '5.0',
             'BabyMatureSpeedMultiplier': '5.0',
             'EggHatchSpeedMultiplier': '5.0',
-            'BabyCuddleIntervalMultiplier': '0.6',
+            'BabyCuddleIntervalMultiplier': '0.2',
             'BabyImprintAmountMultiplier': '5.0',
+            'PassiveTameIntervalMultiplier': '0.2',
+            'LayEggIntervalMultiplier': '0.2',
+            'CropGrowthSpeedMultiplier': '5.0',
             'HexagonRewardMultiplier': '1.0'
         }
     }
 };
 
 function init() {
+    // Initialize language system first
+    initLanguage();
+    setupLanguageSelector();
+    
     // Load saved state first
     const savedState = migrateSavedState(loadFromStorage());
     
@@ -758,9 +837,56 @@ function init() {
 
     // Export UI should reflect whether there's anything to export.
     updateExportSectionVisibility();
+    
+    // Apply translations after everything is set up
+    applyTranslations();
 
     // Dev-only sanity check (logs to console if anything from the reference is missing/misplaced).
     runReferencePlacementAudit();
+}
+
+// Setup language selector dropdown
+function setupLanguageSelector() {
+    const langSelector = document.getElementById('languageSelector');
+    const langToggle = document.getElementById('langToggle');
+    const langDropdown = document.getElementById('langDropdown');
+    
+    if (!langSelector || !langToggle || !langDropdown) return;
+    
+    // Populate language options
+    langDropdown.innerHTML = '';
+    for (const [code, name] of Object.entries(availableLanguages)) {
+        const option = document.createElement('button');
+        option.className = 'lang-option' + (code === currentLanguage ? ' active' : '');
+        option.textContent = name;
+        option.dataset.lang = code;
+        option.addEventListener('click', () => {
+            setLanguage(code);
+            // Update active state
+            langDropdown.querySelectorAll('.lang-option').forEach(opt => {
+                opt.classList.toggle('active', opt.dataset.lang === code);
+            });
+            // Update button text
+            const btnText = langToggle.querySelector('.lang-btn-text');
+            if (btnText) btnText.textContent = name;
+            // Close dropdown
+            langSelector.classList.remove('open');
+        });
+        langDropdown.appendChild(option);
+    }
+    
+    // Toggle dropdown
+    langToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        langSelector.classList.toggle('open');
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!langSelector.contains(e.target)) {
+            langSelector.classList.remove('open');
+        }
+    });
 }
 
 function hasAnyCustomizedSettings() {
@@ -876,6 +1002,10 @@ function createSettingCard(setting, fileType) {
     card.dataset.settingName = setting.name.toLowerCase();
     card.dataset.fileType = fileType;
 
+    // Get translated description and effect if available
+    const translatedDescription = getSettingTranslation(setting.name, 'description') || setting.description;
+    const translatedEffect = getSettingTranslation(setting.name, 'effect') || getEffectText(setting);
+
     // Build tooltip content
     const tooltip = document.createElement('div');
     tooltip.className = 'tooltip';
@@ -889,10 +1019,13 @@ function createSettingCard(setting, fileType) {
     descSection.className = 'tooltip-section';
     const descLabel = document.createElement('div');
     descLabel.className = 'tooltip-label';
-    descLabel.textContent = 'What it does';
+    descLabel.dataset.translate = 'tooltipDescription';
+    descLabel.textContent = t('tooltipDescription') || 'What it does';
     const descText = document.createElement('div');
     descText.className = 'tooltip-text';
-    descText.textContent = setting.description;
+    descText.dataset.settingName = setting.name;
+    descText.dataset.field = 'description';
+    descText.textContent = translatedDescription;
     descSection.appendChild(descLabel);
     descSection.appendChild(descText);
     tooltip.appendChild(descSection);
@@ -901,10 +1034,13 @@ function createSettingCard(setting, fileType) {
     effectSection.className = 'tooltip-section';
     const effectLabel = document.createElement('div');
     effectLabel.className = 'tooltip-label';
-    effectLabel.textContent = 'Effect of changing value';
+    effectLabel.dataset.translate = 'tooltipEffect';
+    effectLabel.textContent = t('tooltipEffect') || 'Effect of changing value';
     const effectText = document.createElement('div');
     effectText.className = 'tooltip-text';
-    effectText.textContent = getEffectText(setting);
+    effectText.dataset.settingName = setting.name;
+    effectText.dataset.field = 'effect';
+    effectText.textContent = translatedEffect;
     effectSection.appendChild(effectLabel);
     effectSection.appendChild(effectText);
     tooltip.appendChild(effectSection);
@@ -914,7 +1050,8 @@ function createSettingCard(setting, fileType) {
         exampleSection.className = 'tooltip-section';
         const exampleLabel = document.createElement('div');
         exampleLabel.className = 'tooltip-label';
-        exampleLabel.textContent = 'Example';
+        exampleLabel.dataset.translate = 'tooltipExample';
+        exampleLabel.textContent = t('tooltipExample') || 'Example';
         const exampleText = document.createElement('div');
         exampleText.className = 'tooltip-example';
         exampleText.textContent = setting.example;
@@ -943,13 +1080,17 @@ function createSettingCard(setting, fileType) {
     
     // Wrap text in span for truncation
     const defaultTextSpan = document.createElement('span');
-    defaultTextSpan.textContent = `Default: ${defaultText}`;
+    const defaultLabelSpan = document.createElement('span');
+    defaultLabelSpan.className = 'setting-default-label';
+    defaultLabelSpan.textContent = t('defaultLabel') + ' ';
+    defaultTextSpan.appendChild(defaultLabelSpan);
+    defaultTextSpan.appendChild(document.createTextNode(defaultText));
     defaultBadge.appendChild(defaultTextSpan);
     
     // Create tooltip for default value on hover
     const defaultTooltip = document.createElement('div');
     defaultTooltip.className = 'default-tooltip';
-    defaultTooltip.textContent = `Default: ${defaultText}`;
+    defaultTooltip.textContent = t('defaultLabel') + ' ' + defaultText;
     defaultBadge.appendChild(defaultTooltip);
     
     defaultBadge.addEventListener('mouseenter', () => {
@@ -964,7 +1105,9 @@ function createSettingCard(setting, fileType) {
 
     const description = document.createElement('p');
     description.className = 'setting-description';
-    description.textContent = setting.description;
+    description.dataset.settingName = setting.name;
+    description.dataset.field = 'description';
+    description.textContent = translatedDescription;
 
     const sourceMeta = resolveSettingSource(setting);
     const sourceEl = document.createElement('div');
@@ -1073,10 +1216,10 @@ function createSettingCard(setting, fileType) {
         const label = document.createElement('label');
         label.className = 'checkbox-label';
         label.htmlFor = `input-${fileType}-${setting.name}`;
-        label.textContent = input.checked ? 'Enabled' : 'Disabled';
+        label.textContent = input.checked ? t('enabled') : t('disabled');
 
         input.addEventListener('change', (e) => {
-            label.textContent = e.target.checked ? 'Enabled' : 'Disabled';
+            label.textContent = e.target.checked ? t('enabled') : t('disabled');
             updateValue(setting.name, e.target.checked ? 'True' : 'False', fileType);
             updateCardModifiedState(card, e.target.checked.toString() !== (setting.default === 'True').toString());
         });
@@ -1477,6 +1620,7 @@ function readAndParseIniFile(file, fileType) {
         const rawContent = e.target.result;
         // Parse and apply settings
         const parsedSettings = parseIniContent(rawContent);
+        console.log(`Parsed ${Object.keys(parsedSettings).length} keys from ${file.name}:`, Object.keys(parsedSettings).slice(0, 20));
         applyParsedSettings(parsedSettings, fileType);
 
         // Validate and stage fixes for misplaced settings.
@@ -1990,7 +2134,14 @@ function applyParsedSettings(parsedSettings, fileType) {
         settingsLookup[setting.name] = { section, sectionKey };
     }
     
+    // Build a lowercase map of all parsed keys for case-insensitive matching
+    const parsedLowerMap = {};
+    for (const key of Object.keys(parsedSettings)) {
+        parsedLowerMap[key.toLowerCase()] = parsedSettings[key];
+    }
+    
     let appliedCount = 0;
+    let resetToDefaultCount = 0;
     
     for (const setting of allSettings) {
         const { section, sectionKey } = settingsLookup[setting.name];
@@ -2004,37 +2155,43 @@ function applyParsedSettings(parsedSettings, fileType) {
             value = parsedSettings[sectionKey];
         }
 
-        // Case-insensitive fallbacks
+        // Case-insensitive fallbacks using lowercase map
         if (value === undefined) {
-            value = parsedSettings[`${sectionLower}:${sectionKeyLower}`];
+            value = parsedLowerMap[`${sectionLower}:${sectionKeyLower}`];
         }
         if (value === undefined) {
-            value = parsedSettings[sectionKeyLower];
+            value = parsedLowerMap[sectionKeyLower];
         }
         
-        if (value !== undefined) {
-            const input = document.querySelector(`input[data-setting-name="${setting.name}"][data-file-type="${fileType}"]`);
-            if (input) {
-                if (input.type === 'checkbox') {
-                    input.checked = value === 'True' || value === 'true' || value === '1';
-                    const label = input.closest('.checkbox-container')?.querySelector('.checkbox-label');
-                    if (label) label.textContent = input.checked ? 'Enabled' : 'Disabled';
-                    updateValue(setting.name, input.checked ? 'True' : 'False', fileType);
-                } else {
-                    input.value = value;
-                    updateValue(setting.name, value, fileType);
-                }
-                
-                // Update modified state
-                const card = input.closest('.setting-card');
-                const defaultValue = input.dataset.default;
-                updateCardModifiedState(card, value !== defaultValue);
-                appliedCount++;
-            }
+        const input = document.querySelector(`input[data-setting-name="${setting.name}"][data-file-type="${fileType}"]`);
+        if (!input) continue;
+        
+        // If setting was found in the file, use that value; otherwise reset to default
+        const finalValue = value !== undefined ? value : setting.default;
+        const isFromFile = value !== undefined;
+        
+        if (input.type === 'checkbox') {
+            input.checked = finalValue === 'True' || finalValue === 'true' || finalValue === '1';
+            const label = input.closest('.checkbox-container')?.querySelector('.checkbox-label');
+            if (label) label.textContent = input.checked ? 'Enabled' : 'Disabled';
+            updateValue(setting.name, input.checked ? 'True' : 'False', fileType);
+        } else {
+            input.value = finalValue;
+            updateValue(setting.name, finalValue, fileType);
+        }
+        
+        // Update modified state - only modified if value differs from default
+        const card = input.closest('.setting-card');
+        updateCardModifiedState(card, finalValue !== setting.default);
+        
+        if (isFromFile) {
+            appliedCount++;
+        } else {
+            resetToDefaultCount++;
         }
     }
     
-    console.log(`Applied ${appliedCount} managed settings from ${fileType}`);
+    console.log(`Applied ${appliedCount} settings from ${fileType}, reset ${resetToDefaultCount} to defaults`);
 }
 
 // Simple unzip for reading uploaded ZIPs (store-only, no compression)
@@ -2175,7 +2332,7 @@ function generateGameUserSettingsIni() {
 
     // If we have an original file, preserve it and only update managed settings
     if (originalFiles.gameUserSettings) {
-        const merged = mergeWithOriginalSectioned(originalFiles.gameUserSettings, settingsMeta, { appendMissing: false });
+        const merged = mergeWithOriginalSectioned(originalFiles.gameUserSettings, settingsMeta, { appendMissing: true });
         const fixedLines = applyRelocationsToIniLines(merged.split(/\r?\n/), relocations.gameUserSettings);
         return normalizeIniSpacing(fixedLines.join('\n'));
     }
@@ -2328,7 +2485,7 @@ function generateGameIni() {
 
     // If we have an original file, preserve it and only update managed settings
     if (originalFiles.gameIni) {
-        const merged = mergeWithOriginal(originalFiles.gameIni, managedSettings, { appendMissing: false });
+        const merged = mergeWithOriginal(originalFiles.gameIni, managedSettings, { appendMissing: true });
         const fixedLines = applyRelocationsToIniLines(merged.split(/\r?\n/), relocations.gameIni);
         return fixedLines.join('\n');
     }

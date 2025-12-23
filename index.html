@@ -4,22 +4,113 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARK: Survival Ascended - Server Config Generator</title>
-    <link rel="stylesheet" href="styles.css?v=11">
+    <link rel="stylesheet" href="styles.css?v=13">
     <!-- Preload critical resources -->
-    <link rel="preload" href="settings-data.js?v=7" as="script">
-    <link rel="preload" href="app.js?v=7" as="script">
+    <link rel="preload" href="translations.js?v=4" as="script">
+    <link rel="preload" href="settings-translations.js?v=1" as="script">
+    <link rel="preload" href="settings-data.js?v=8" as="script">
+    <link rel="preload" href="app.js?v=14" as="script">
+    <!-- Initial loading styles (inline for immediate display) -->
+    <style>
+        #initialLoading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 22, 40, 0.85);
+            backdrop-filter: blur(4px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            gap: 1rem;
+        }
+        #initialLoading .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #1e3a5f;
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: initialSpin 1s linear infinite;
+        }
+        #initialLoading p {
+            color: #a0b4c8;
+            font-size: 1.1rem;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        @keyframes initialSpin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <!-- Loading indicator -->
-    <div id="loadingIndicator" class="loading-overlay" style="display: none;">
-        <div class="loading-spinner"></div>
-        <p>Loading settings...</p>
+    <!-- Initial loading screen (shown immediately, hidden when app loads) -->
+    <div id="initialLoading">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <!-- User Guide Card -->
+    <div id="guideOverlay" class="guide-overlay" style="display: none;">
+        <div class="guide-card">
+            <h2 data-i18n="guideTitle">📖 How to Use This Tool</h2>
+            
+            <div class="guide-steps">
+                <div class="guide-step">
+                    <h3 data-i18n="guideStep1Title">1. Configure Your Settings</h3>
+                    <p data-i18n="guideStep1Text">Browse through the sections below and adjust the settings you want to change. Use the search bar to quickly find specific settings. Hover over any setting to see a detailed explanation.</p>
+                </div>
+                
+                <div class="guide-step">
+                    <h3 data-i18n="guideStep2Title">2. Use Presets (Optional)</h3>
+                    <p data-i18n="guideStep2Text">Click the preset buttons above to quickly apply official server rates like Evolution Event (2x) or Smalltribes (4x). You can then customize individual settings further.</p>
+                </div>
+                
+                <div class="guide-step">
+                    <h3 data-i18n="guideStep3Title">3. Export Your Config</h3>
+                    <p data-i18n="guideStep3Text">When you're done, use the export buttons to download your configuration files. You can download both files as a ZIP or copy them directly to your clipboard.</p>
+                </div>
+                
+                <div class="guide-step">
+                    <h3 data-i18n="guideStep4Title">4. Apply to Your Server</h3>
+                    <p data-i18n="guideStep4Text">Place the downloaded files in your server's configuration folder. For Nitrado or other hosting, paste the settings into your server settings panel.</p>
+                </div>
+            </div>
+            
+            <div class="guide-tip">
+                <p data-i18n="guideTip">💡 Tip: Your settings auto-save to your browser. You can also import existing INI files to edit them.</p>
+                <div class="guide-paths">
+                    <p><strong data-i18n="guidePathSinglePlayer">📁 Single Player:</strong> <code>C:\Program Files (x86)\Steam\steamapps\common\ARK Survival Ascended\ShooterGame\Saved\Config\Windows</code></p>
+                    <p><strong data-i18n="guidePathDedicated">📁 Dedicated Server:</strong> <code>C:\SteamCMD\steamapps\common\ARK Survival Ascended Dedicated Server\ShooterGame\Saved\Config\WindowsServer</code></p>
+                </div>
+            </div>
+            
+            <div class="guide-actions">
+                <label class="guide-checkbox">
+                    <input type="checkbox" id="guideDontShow">
+                    <span data-i18n="guideDontShow">Don't show this again</span>
+                </label>
+                <button id="guideClose" class="guide-close-btn" data-i18n="guideClose">Got it!</button>
+            </div>
+        </div>
     </div>
 
     <header>
         <div class="header-content">
             <h1>🦖 ARK: Survival Ascended</h1>
             <p>Server Configuration Generator</p>
+        </div>
+        <div id="languageSelector" class="language-selector">
+            <button class="lang-btn" id="langToggle">
+                <span class="lang-icon">🌐</span>
+                <span class="lang-btn-text">English</span>
+                <span class="lang-arrow">▼</span>
+            </button>
+            <div class="lang-dropdown" id="langDropdown">
+                <!-- Language options populated by JavaScript -->
+            </div>
         </div>
     </header>
 
@@ -41,7 +132,7 @@
                     <span class="preset-desc">Boosted</span>
                 </button>
                 <button class="preset-btn" data-preset="4x">
-                    <span class="preset-name">4.5x / 4x</span>
+                    <span class="preset-name">4.5x / 4x Rates</span>
                     <span class="preset-desc">Smalltribes</span>
                 </button>
                 <button class="preset-btn" data-preset="5x">
@@ -127,7 +218,7 @@
                     <button class="tab-btn" data-tab="game">Game.ini</button>
                 </div>
                 <div class="controls-right">
-                    <span id="saveStatus" class="save-status" title="Changes are automatically saved to your browser">💾 Auto-saved</span>
+                    <span id="saveStatus" class="save-status" title="Changes are automatically saved to your browser">Auto-saved</span>
                     <button id="resetAll" class="tab-btn reset-btn">↺ Reset to Defaults</button>
                 </div>
             </div>
@@ -366,7 +457,9 @@
         <p>Settings sourced from <a href="https://ark.wiki.gg/wiki/Server_configuration" target="_blank" rel="noopener">ARK Official Community Wiki</a> and <a href="https://survivetheark.com/index.php?/forums/topic/708761-asa-pc-patch-notes-client-v7715-server-v7715-updated12202025/" target="_blank" rel="noopener">Official ASA Patch Notes</a></p>
     </footer>
 
-    <script src="settings-data.js?v=7"></script>
-    <script src="app.js?v=7"></script>
+    <script src="translations.js?v=4"></script>
+    <script src="settings-translations.js?v=1"></script>
+    <script src="settings-data.js?v=8"></script>
+    <script src="app.js?v=14"></script>
 </body>
 </html>

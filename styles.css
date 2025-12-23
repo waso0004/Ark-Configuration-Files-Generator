@@ -44,12 +44,98 @@ header {
     text-align: center;
     border-bottom: 2px solid var(--accent-primary);
     box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+    position: relative;
 }
 
 .header-content h1 {
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
     text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+    color: var(--accent-primary);
+}
+
+/* Language Selector */
+.language-selector {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+.lang-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.lang-btn:hover {
+    border-color: var(--accent-primary);
+    background: var(--bg-secondary);
+}
+
+.lang-icon {
+    font-size: 1.1rem;
+}
+
+.lang-arrow {
+    font-size: 0.7rem;
+    transition: transform 0.3s ease;
+}
+
+.language-selector.open .lang-arrow {
+    transform: rotate(180deg);
+}
+
+.lang-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    min-width: 150px;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.language-selector.open .lang-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.lang-option {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s ease;
+}
+
+.lang-option:hover {
+    background: var(--bg-secondary);
+}
+
+.lang-option.active {
+    background: rgba(0, 212, 255, 0.1);
     color: var(--accent-primary);
 }
 
@@ -907,6 +993,20 @@ footer a:hover {
 
 /* Responsive - Half screen */
 @media (max-width: 1000px) {
+    .language-selector {
+        top: 0.5rem;
+        right: 0.5rem;
+    }
+
+    .lang-btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .lang-btn-text {
+        display: none;
+    }
+
     main {
         padding: 0.5rem;
     }
@@ -1189,3 +1289,266 @@ footer a:hover {
     opacity: 1;
 }
 
+/* ===== User Guide Card ===== */
+.guide-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 22, 40, 0.9);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 1rem;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+.guide-card {
+    background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+    border: 2px solid var(--accent-primary);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 700px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: 0 0 40px rgba(0, 212, 255, 0.3), 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.4s ease;
+}
+
+/* Custom scrollbar for guide card */
+.guide-card::-webkit-scrollbar {
+    width: 8px;
+}
+
+.guide-card::-webkit-scrollbar-track {
+    background: var(--bg-input);
+    border-radius: 0 14px 14px 0;
+}
+
+.guide-card::-webkit-scrollbar-thumb {
+    background: var(--accent-primary);
+    border-radius: 4px;
+}
+
+.guide-card::-webkit-scrollbar-thumb:hover {
+    background: #00a8cc;
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.guide-card h2 {
+    font-size: 1.8rem;
+    color: var(--accent-primary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    text-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+}
+
+.guide-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.guide-step {
+    background: var(--bg-input);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.guide-step:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 20px rgba(0, 212, 255, 0.15);
+}
+
+.guide-step h3 {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.guide-step p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.guide-tip {
+    background: linear-gradient(135deg, rgba(212, 168, 85, 0.15) 0%, rgba(212, 168, 85, 0.05) 100%);
+    border: 1px solid var(--accent-gold);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.guide-tip > p {
+    color: var(--accent-gold);
+    font-size: 0.9rem;
+    margin: 0 0 0.75rem 0;
+}
+
+.guide-paths {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(212, 168, 85, 0.3);
+}
+
+.guide-paths p {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin: 0.5rem 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.guide-paths strong {
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.guide-paths code {
+    background: var(--bg-input);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: var(--accent-primary);
+    word-break: break-all;
+    user-select: all;
+}
+
+.guide-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.guide-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+}
+
+.guide-checkbox:hover {
+    color: var(--text-secondary);
+}
+
+.guide-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent-primary);
+    cursor: pointer;
+}
+
+.guide-close-btn {
+    background: linear-gradient(135deg, var(--accent-primary) 0%, #00a8cc 100%);
+    color: var(--bg-primary);
+    border: none;
+    padding: 0.85rem 2rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+}
+
+.guide-close-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 212, 255, 0.5);
+}
+
+.guide-close-btn:active {
+    transform: translateY(0);
+}
+
+/* Responsive guide card */
+@media (max-width: 600px) {
+    .guide-overlay {
+        padding: 0.5rem;
+    }
+    
+    .guide-card {
+        padding: 1.25rem;
+        border-radius: 12px;
+        max-height: 85vh;
+    }
+    
+    .guide-card::-webkit-scrollbar {
+        width: 12px;
+    }
+    
+    .guide-card::-webkit-scrollbar-track {
+        background: transparent;
+        margin: 12px 0;
+    }
+    
+    .guide-card::-webkit-scrollbar-thumb {
+        background: var(--accent-primary);
+        border-radius: 10px;
+        border: 4px solid transparent;
+        background-clip: padding-box;
+    }
+    
+    .guide-card h2 {
+        font-size: 1.4rem;
+    }
+    
+    .guide-step {
+        padding: 1rem;
+    }
+    
+    .guide-step h3 {
+        font-size: 1rem;
+    }
+    
+    .guide-step p {
+        font-size: 0.9rem;
+    }
+    
+    .guide-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .guide-checkbox {
+        justify-content: center;
+    }
+    
+    .guide-close-btn {
+        width: 100%;
+    }
+}

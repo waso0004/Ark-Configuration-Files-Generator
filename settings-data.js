@@ -7,7 +7,7 @@ const gameUserSettings = {
         { name: 'SessionName', default: 'ARK #123456', type: 'text', section: 'SessionSettings', description: 'Server name shown in browser.', effect: 'If no name is provided, default is ARK # + random 6 digits.' },
         { name: 'Port', default: '7777', type: 'integer', section: 'SessionSettings', description: 'Specifies the UDP Game Port.', effect: 'Port used for game connections (default 7777).' },
         { name: 'QueryPort', default: '27015', type: 'integer', section: 'SessionSettings', description: 'Specifies the UDP Steam Query Port.', effect: 'Port used for Steam server browser queries.' },
-        { name: 'MultiHome', default: '', type: 'text', section: 'MultiHome', description: 'Sets MultiHome IP address.', effect: 'Leave empty if not using multihoming.' },
+        { name: 'MultiHome', default: '', type: 'text', section: 'SessionSettings', description: 'Sets MultiHome IP address.', effect: 'Leave empty if not using multihoming.' },
         { name: 'ServerPassword', default: '', type: 'text', description: 'Password required to join the server.', effect: 'If specified, players must provide this password to join.' },
         { name: 'ServerAdminPassword', default: '', type: 'text', description: 'Password for administrator commands on the server.', effect: 'Required for admin commands and RCON connections.' },
         { name: 'RCONEnabled', default: 'False', type: 'boolean', description: 'Enables RCON for remote server management.', effect: 'If True, enables RCON. Requires RCONPort and ServerAdminPassword.' },
@@ -48,7 +48,7 @@ const gameUserSettings = {
         { name: 'ChatLogMaxAgeInDays', default: '5', type: 'integer', description: 'Controls how many days chat logs are kept.', effect: 'Set to a negative value for virtually infinite retention. Set to 0 only in official.' },
 
         { name: 'TribeNameChangeCooldown', default: '15.0', type: 'float', description: 'Cooldown (minutes) between tribe name changes.', effect: 'Higher increases cooldown; lower decreases.' },
-        { name: 'TribeLogDestroyedEnemyStructures', default: 'False', type: 'boolean', description: 'Shows enemy structure destruction in tribe logs when True.', effect: 'True shows; False hides.' },
+        // TribeLogDestroyedEnemyStructures removed - belongs in Game.ini only (see game-general section)
         { name: 'UseCharacterTracker', default: 'False', type: 'boolean', description: 'Enables character tracking (also via command line).', effect: 'True enables; False disables.' },
         { name: 'ServerAutoForceRespawnWildDinosInterval', default: '0.0', type: 'float', description: 'Forces wild respawn on restart after this many seconds; 0.0 disables.', effect: 'Higher forces more often; 0 disables.' },
 
@@ -115,7 +115,7 @@ const gameUserSettings = {
         { name: 'MaxPersonalTamedDinos', default: '0', type: 'integer', description: 'Sets a per-tribe creature tame limit.', effect: 'Official PvE uses 500, PvP uses 300. Default 0 disables the limit.' },
         { name: 'AutoDestroyDecayedDinos', default: 'False', type: 'boolean', description: 'Auto-destroys claimable decayed tames on load.', effect: 'If True, decayed tames are deleted rather than remaining claimable.' },
         { name: 'AllowFlyerCarryPvE', default: 'False', type: 'boolean', description: 'Allows flying creatures to pick up wild creatures in PvE.', effect: 'If True, flyers can carry wild creatures in PvE mode.' },
-        { name: 'bForceCanRideFliers', default: '', type: 'boolean', description: 'Allows flyers on maps where normally disabled.', effect: 'If True, allows flyers. If False, disables flyers on any map.' },
+        { name: 'bForceCanRideFliers', default: 'False', type: 'boolean', description: 'Allows flyers on maps where normally disabled.', effect: 'If True, allows flyers. If False, uses map default. Only exported when enabled.' },
         { name: 'AllowRaidDinoFeeding', default: 'False', type: 'boolean', description: 'Allows Titanosaurs to be permanently tamed.', effect: 'If True, allows Titanosaurs to be fed. Note: The Island only spawns max 3 Titanosaurs.' },
         { name: 'DisableImprintDinoBuff', default: 'False', type: 'boolean', description: 'Disables creature imprinting player Stat Bonus.', effect: 'If True, whomever imprinted on the creature does not get the extra Damage/Resistance buff.' },
         { name: 'PreventMateBoost', default: 'False', type: 'boolean', description: 'Disables creature mate boosting.', effect: 'If True, creatures near a mate will not receive the mate boost buff.' },
@@ -258,7 +258,7 @@ const gameUserSettings = {
     'server-tamelimit': [
         { name: 'DestroyTamesOverTheSoftTameLimit', default: 'False', type: 'boolean', description: 'Dinos above the Soft Tame Limit will be marked For Cryo with a timer.', effect: 'If True, excess tames are marked for deletion. Use MaxTamedDinos_SoftTameLimit to define the limit.' },
         { name: 'MaxTamedDinos_SoftTameLimit', default: '5000', type: 'integer', description: 'Defines the server-wide soft tame limit.', effect: 'See DestroyTamesOverTheSoftTameLimit for more info.' },
-        { name: 'MaxTamedDinos_SoftTameLimit_CountdownForDeletionDuration', default: '604800', type: 'integer', description: 'Defines time (in seconds) before tame auto-destruction.', effect: 'See DestroyTamesOverTheSoftTameLimit for more info. Default 604800 = 7 days.' },
+        { name: 'MaxTamedDinos_SoftTameLimit_Countdown', default: '604800', type: 'integer', description: 'Defines time (in seconds) before tame auto-destruction.', effect: 'See DestroyTamesOverTheSoftTameLimit for more info. Default 604800 = 7 days.' },
     ],
 
     // Creature-Specific Settings
