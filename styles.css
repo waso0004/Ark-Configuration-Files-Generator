@@ -450,8 +450,7 @@ main {
     border: 2px solid var(--accent-primary);
     border-radius: 12px;
     padding: 1rem 1.5rem;
-    margin-top: 1.5rem;
-    margin-bottom: 0.5rem;
+    margin: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
