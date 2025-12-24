@@ -1,32 +1,47 @@
 # ARK: Survival Ascended Server Configuration Generator
 
-This is a simple web tool that helps you generate ARK: Survival Ascended server config files without manually editing INI files.
+A web-based tool for generating ARK: Survival Ascended server configuration files.
 
-It focuses on the two files:
+## Features
 
-- `GameUserSettings.ini`
-- `Game.ini`
+- Visual interface for browsing and editing server settings
+- Search to quickly find specific settings
+- Presets for official server rates (Default, Evolution Event, Smalltribes, Arkpocalypse)
+- Import existing INI files for editing
+- Auto-saves settings to browser storage
+- Multi-language support (English, Spanish, French, German, Portuguese, Russian, Chinese, Japanese, Korean)
+- Export as ZIP or copy to clipboard
 
-## What it does
+## Output Files
 
-- Shows server settings in an organized UI
-- Lets you change values and then export your config
-- Can import existing INI files so you can tweak your current setup
-- Saves your changes in your browser so you can come back later
+| File | Purpose |
+|------|---------|
+| `GameUserSettings.ini` | General server settings, rates, and multipliers |
+| `Game.ini` | Advanced gameplay tweaks and per-level overrides |
 
-## Where the settings come from
+## Installation Paths
 
-The setting names and placement are based on:
+**Single Player:**
+```
+C:\Program Files (x86)\Steam\steamapps\common\ARK Survival Ascended\ShooterGame\Saved\Config\Windows
+```
 
-- ARK Official Community Wiki (Server configuration):
-	https://ark.wiki.gg/wiki/Server_configuration
-- Official ASA patch notes (for settings that are not listed on the wiki yet):
-	https://survivetheark.com/index.php?/forums/topic/708761-asa-pc-patch-notes-client-v7715-server-v7715-updated12202025/
+**Dedicated Server:**
+```
+C:\SteamCMD\steamapps\common\ARK Survival Ascended Dedicated Server\ShooterGame\Saved\Config\WindowsServer
+```
 
-## Notes
+**Hosting Providers:**
+Copy and paste settings into your provider's web configuration panel.
 
-- This project is not affiliated with Studio Wildcard.
-- Some settings are newer and may only be documented in patch notes.
+## Data Sources
+
+- [ARK Official Wiki — Server Configuration](https://ark.wiki.gg/wiki/Server_configuration)
+- [Official ASA Patch Notes](https://survivetheark.com/index.php?/forums/topic/708761-asa-pc-patch-notes-client-v7715-server-v7715-updated12202025/)
+
+## Disclaimer
+
+This tool is not affiliated with Studio Wildcard.
 
 ## Author
 
