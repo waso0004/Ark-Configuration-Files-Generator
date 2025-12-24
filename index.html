@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARK: Survival Ascended - Server Config Generator</title>
-    <link rel="stylesheet" href="styles.css?v=14">
-    <!-- Preload critical resources -->
-    <link rel="preload" href="translations.js?v=5" as="script">
-    <link rel="preload" href="settings-translations.js?v=1" as="script">
-    <link rel="preload" href="settings-data.js?v=9" as="script">
-    <link rel="preload" href="app.js?v=15" as="script">
+    <link rel="stylesheet" href="styles.css?v=15">
+    <!-- Preload critical resources with priority hints -->
+    <link rel="preload" href="translations.js?v=6" as="script" fetchpriority="high">
+    <link rel="preload" href="settings-data.js?v=10" as="script" fetchpriority="high">
+    <link rel="preload" href="app.js?v=16" as="script" fetchpriority="high">
+    <!-- Settings translations is large, load after core -->
+    <link rel="preload" href="settings-translations.js?v=2" as="script" fetchpriority="low">
     <!-- Initial loading styles (inline for immediate display) -->
     <style>
         #initialLoading {
@@ -1197,9 +1198,9 @@
         <p>Settings sourced from <a href="https://ark.wiki.gg/wiki/Server_configuration" target="_blank" rel="noopener">ARK Official Community Wiki</a> and <a href="https://survivetheark.com/index.php?/forums/topic/708761-asa-pc-patch-notes-client-v7715-server-v7715-updated12202025/" target="_blank" rel="noopener">Official ASA Patch Notes</a></p>
     </footer>
 
-    <script src="translations.js?v=5"></script>
-    <script src="settings-translations.js?v=1"></script>
-    <script src="settings-data.js?v=9"></script>
-    <script src="app.js?v=15"></script>
+    <script src="translations.js?v=6" defer></script>
+    <script src="settings-translations.js?v=2" defer></script>
+    <script src="settings-data.js?v=10" defer></script>
+    <script src="app.js?v=16" defer></script>
 </body>
 </html>

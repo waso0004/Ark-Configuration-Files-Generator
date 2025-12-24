@@ -974,35 +974,39 @@ function populateSettings(savedState) {
     const savedGameUserSettings = savedState?.currentValues?.gameUserSettings || {};
     const savedGameIni = savedState?.currentValues?.gameIni || {};
     
-    // Populate GameUserSettings.ini sections
+    // Populate GameUserSettings.ini sections using document fragments for batch DOM insertion
     for (const [sectionId, settings] of Object.entries(gameUserSettings)) {
         const container = document.getElementById(sectionId);
         if (container) {
+            const fragment = document.createDocumentFragment();
             settings.forEach(setting => {
                 // Use saved value or default
                 const savedValue = savedGameUserSettings[setting.name];
                 const settingWithValue = savedValue !== undefined 
                     ? { ...setting, currentValue: savedValue }
                     : setting;
-                container.appendChild(createSettingCard(settingWithValue, 'gameUserSettings'));
+                fragment.appendChild(createSettingCard(settingWithValue, 'gameUserSettings'));
                 currentValues.gameUserSettings[setting.name] = savedValue !== undefined ? savedValue : setting.default;
             });
+            container.appendChild(fragment);
         }
     }
 
-    // Populate Game.ini sections
+    // Populate Game.ini sections using document fragments for batch DOM insertion
     for (const [sectionId, settings] of Object.entries(gameIniSettings)) {
         const container = document.getElementById(sectionId);
         if (container) {
+            const fragment = document.createDocumentFragment();
             settings.forEach(setting => {
                 // Use saved value or default
                 const savedValue = savedGameIni[setting.name];
                 const settingWithValue = savedValue !== undefined 
                     ? { ...setting, currentValue: savedValue }
                     : setting;
-                container.appendChild(createSettingCard(settingWithValue, 'gameIni'));
+                fragment.appendChild(createSettingCard(settingWithValue, 'gameIni'));
                 currentValues.gameIni[setting.name] = savedValue !== undefined ? savedValue : setting.default;
             });
+            container.appendChild(fragment);
         }
     }
 }
