@@ -666,6 +666,10 @@ main {
     visibility: visible;
 }
 
+.setting-card:hover {
+    z-index: 20;
+}
+
 .tooltip::after {
     content: '';
     position: absolute;

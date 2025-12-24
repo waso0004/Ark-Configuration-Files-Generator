@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARK: Survival Ascended - Server Config Generator</title>
-    <link rel="stylesheet" href="styles.css?v=13">
+    <link rel="stylesheet" href="styles.css?v=14">
     <!-- Preload critical resources -->
-    <link rel="preload" href="translations.js?v=4" as="script">
+    <link rel="preload" href="translations.js?v=5" as="script">
     <link rel="preload" href="settings-translations.js?v=1" as="script">
-    <link rel="preload" href="settings-data.js?v=8" as="script">
-    <link rel="preload" href="app.js?v=14" as="script">
+    <link rel="preload" href="settings-data.js?v=9" as="script">
+    <link rel="preload" href="app.js?v=15" as="script">
     <!-- Initial loading styles (inline for immediate display) -->
     <style>
         #initialLoading {
@@ -55,35 +55,35 @@
     <!-- User Guide Card -->
     <div id="guideOverlay" class="guide-overlay" style="display: none;">
         <div class="guide-card">
-            <h2 data-i18n="guideTitle">📖 How to Use This Tool</h2>
+            <h2 data-i18n="guideTitle">📖 Welcome! Here's How to Get Started</h2>
             
             <div class="guide-steps">
                 <div class="guide-step">
-                    <h3 data-i18n="guideStep1Title">1. Configure Your Settings</h3>
-                    <p data-i18n="guideStep1Text">Browse through the sections below and adjust the settings you want to change. Use the search bar to quickly find specific settings. Hover over any setting to see a detailed explanation.</p>
+                    <h3 data-i18n="guideStep1Title">1. Find and Customize Your Settings</h3>
+                    <p data-i18n="guideStep1Text">Scroll through the organized sections below to find the settings you want to tweak. Looking for something specific? Use the search bar at the top - it's super fast! When you hover over any setting, you'll see a helpful tooltip explaining exactly what it does and how different values affect your game.</p>
                 </div>
                 
                 <div class="guide-step">
-                    <h3 data-i18n="guideStep2Title">2. Use Presets (Optional)</h3>
-                    <p data-i18n="guideStep2Text">Click the preset buttons above to quickly apply official server rates like Evolution Event (2x) or Smalltribes (4x). You can then customize individual settings further.</p>
+                    <h3 data-i18n="guideStep2Title">2. Try Quick Presets (Optional)</h3>
+                    <p data-i18n="guideStep2Text">Want to quickly match official server rates? Click one of the preset buttons above! Choose from Default (1x), Evolution Event (2x), Smalltribes (4.5x/4x), or Arkpocalypse (5x) rates. These give you a great starting point, and you can still fine-tune any individual settings afterward.</p>
                 </div>
                 
                 <div class="guide-step">
-                    <h3 data-i18n="guideStep3Title">3. Export Your Config</h3>
-                    <p data-i18n="guideStep3Text">When you're done, use the export buttons to download your configuration files. You can download both files as a ZIP or copy them directly to your clipboard.</p>
+                    <h3 data-i18n="guideStep3Title">3. Export Your Configuration Files</h3>
+                    <p data-i18n="guideStep3Text">Once you're happy with your settings, it's time to save them! Hit the "Download ZIP" button to get both GameUserSettings.ini and Game.ini in one package. Prefer to copy-paste? Use the individual copy buttons to grab each file's contents directly.</p>
                 </div>
                 
                 <div class="guide-step">
-                    <h3 data-i18n="guideStep4Title">4. Apply to Your Server</h3>
-                    <p data-i18n="guideStep4Text">Place the downloaded files in your server's configuration folder. For Nitrado or other hosting, paste the settings into your server settings panel.</p>
+                    <h3 data-i18n="guideStep4Title">4. Install on Your Server</h3>
+                    <p data-i18n="guideStep4Text">For self-hosted servers, drop the downloaded files into your server's config folder (paths shown below). Using Nitrado, G-Portal, or another hosting provider? Simply copy and paste the settings into their web-based configuration panel - it's that easy!</p>
                 </div>
             </div>
             
             <div class="guide-tip">
-                <p data-i18n="guideTip">💡 Tip: Your settings auto-save to your browser. You can also import existing INI files to edit them.</p>
+                <p data-i18n="guideTip">💡 Pro Tip: Don't worry about losing your work - all your settings are automatically saved in your browser! You can close this page and come back later. Already have config files? Use the Import feature to load them and make quick edits.</p>
                 <div class="guide-paths">
-                    <p><strong data-i18n="guidePathSinglePlayer">📁 Single Player:</strong> <code>C:\Program Files (x86)\Steam\steamapps\common\ARK Survival Ascended\ShooterGame\Saved\Config\Windows</code></p>
-                    <p><strong data-i18n="guidePathDedicated">📁 Dedicated Server:</strong> <code>C:\SteamCMD\steamapps\common\ARK Survival Ascended Dedicated Server\ShooterGame\Saved\Config\WindowsServer</code></p>
+                    <p><strong data-i18n="guidePathSinglePlayer">📁 Single Player Path:</strong> <code>C:\Program Files (x86)\Steam\steamapps\common\ARK Survival Ascended\ShooterGame\Saved\Config\Windows</code></p>
+                    <p><strong data-i18n="guidePathDedicated">📁 Dedicated Server Path:</strong> <code>C:\SteamCMD\steamapps\common\ARK Survival Ascended Dedicated Server\ShooterGame\Saved\Config\WindowsServer</code></p>
                 </div>
             </div>
             
@@ -92,7 +92,7 @@
                     <input type="checkbox" id="guideDontShow">
                     <span data-i18n="guideDontShow">Don't show this again</span>
                 </label>
-                <button id="guideClose" class="guide-close-btn" data-i18n="guideClose">Got it!</button>
+                <button id="guideClose" class="guide-close-btn" data-i18n="guideClose">Let's Go!</button>
             </div>
         </div>
     </div>
@@ -236,78 +236,364 @@
                     <span class="file-header-desc">Server settings, rates, gameplay options</span>
                 </div>
                 <!-- Basic Server Settings Section -->
-                <section class="settings-section">
+                <section class="settings-section map-section">
                     <h2 class="section-title" data-toggle="server-basic">
                         <span>🖥️ Basic Server Settings</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="server-basic" class="settings-grid">
-                        <!-- Settings will be populated by JavaScript -->
+                    <div id="server-basic" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="server-identity">
+                                <span>🏷️ Server Identity</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="server-identity" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="server-ports">
+                                <span>🔌 Ports & RCON</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="server-ports" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="server-messages">
+                                <span>💾 Messages & Saving</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="server-messages" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="server-mods">
+                                <span>🧩 Mods & Config</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="server-mods" class="settings-grid"></div>
+                        </div>
                     </div>
                 </section>
 
-                <section class="settings-section">
+                <section class="settings-section map-section">
                     <h2 class="section-title" data-toggle="server-admin">
                         <span>🔐 Admin & Security</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="server-admin" class="settings-grid"></div>
+                    <div id="server-admin" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="admin-lists">
+                                <span>📋 Access Lists</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="admin-lists" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="admin-security">
+                                <span>🛡️ Security & Kicking</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="admin-security" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="admin-performance">
+                                <span>⚡ Performance</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="admin-performance" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
-                <section class="settings-section">
+                <section class="settings-section map-section">
                     <h2 class="section-title" data-toggle="server-chat">
                         <span>💬 Chat & Communication</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="server-chat" class="settings-grid"></div>
+                    <div id="server-chat" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="chat-voice">
+                                <span>🔊 Voice & Notifications</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="chat-voice" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="chat-filtering">
+                                <span>🔇 Chat Filtering</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="chat-filtering" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="chat-logging">
+                                <span>📝 Chat Logging</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="chat-logging" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
-                <section class="settings-section">
+                <section class="settings-section map-section">
                     <h2 class="section-title" data-toggle="server-gameplay">
                         <span>🎮 Gameplay Options</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="server-gameplay" class="settings-grid"></div>
+                    <div id="server-gameplay" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="gameplay-camera">
+                                <span>📷 Camera & UI</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="gameplay-camera" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="gameplay-rules">
+                                <span>📜 Game Rules</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="gameplay-rules" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="gameplay-transfers">
+                                <span>🔄 Transfers & Other</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="gameplay-transfers" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
-                <section class="settings-section">
+                <section class="settings-section map-section">
                     <h2 class="section-title" data-toggle="server-rates">
                         <span>📈 Rates & Multipliers</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="server-rates" class="settings-grid"></div>
+                    <div id="server-rates" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="rates-difficulty">
+                                <span>⚙️ Difficulty & Max Level</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="rates-difficulty" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="rates-taming">
+                                <span>🦖 Taming Rates</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="rates-taming" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="rates-harvesting">
+                                <span>⛏️ Harvesting Rates</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="rates-harvesting" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="rates-stacking">
+                                <span>📦 Stack & Resource Settings</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="rates-stacking" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
-                <section class="settings-section">
+                <section class="settings-section map-section">
                     <h2 class="section-title" data-toggle="server-player">
                         <span>👤 Player Settings</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="server-player" class="settings-grid"></div>
+                    <div id="server-player" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="player-damage">
+                                <span>💥 Damage & Resistance</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="player-damage" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="player-survival">
+                                <span>🍖 Food & Water Drain</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="player-survival" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="player-recovery">
+                                <span>💚 Health & Stamina Recovery</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="player-recovery" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="player-disease">
+                                <span>🦠 Disease & Hazards</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="player-disease" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
-                <section class="settings-section">
+                <section class="settings-section map-section">
                     <h2 class="section-title" data-toggle="server-dino">
                         <span>🦕 Dinosaur Settings</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="server-dino" class="settings-grid"></div>
+                    <div id="server-dino" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="dino-damage">
+                                <span>💥 Damage & Resistance</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="dino-damage" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="dino-food-stamina">
+                                <span>🍖 Food & Stamina</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="dino-food-stamina" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="dino-spawns">
+                                <span>🥚 Spawns & Limits</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="dino-spawns" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="dino-special">
+                                <span>🦅 Flying & Special</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="dino-special" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
-                <section class="settings-section">
+                <section class="settings-section map-section">
                     <h2 class="section-title" data-toggle="server-structure">
                         <span>🏠 Structure Settings</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="server-structure" class="settings-grid"></div>
+                    <div id="server-structure" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="structure-pickup">
+                                <span>✋ Pickup Settings</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="structure-pickup" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="structure-damage">
+                                <span>🔨 Damage & Resources</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="structure-damage" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="structure-decay">
+                                <span>⏳ Decay Settings</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="structure-decay" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="structure-platforms">
+                                <span>🎪 Platform Saddles</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="structure-platforms" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="structure-density">
+                                <span>📊 Density & Limits</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="structure-density" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
-                <section class="settings-section">
+                <section class="settings-section map-section">
                     <h2 class="section-title" data-toggle="server-pvp">
                         <span>⚔️ PvP/PvE Settings</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="server-pvp" class="settings-grid"></div>
+                    <div id="server-pvp" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="pvp-modes">
+                                <span>🎯 Game Modes</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="pvp-modes" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="pvp-offline">
+                                <span>🛏️ Offline Protection</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="pvp-offline" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="pvp-decay">
+                                <span>🕐 Decay Settings</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="pvp-decay" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="pvp-combat">
+                                <span>🗡️ Combat Options</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="pvp-combat" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="pvp-transfers">
+                                <span>🌐 Cross-ARK Transfers</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="pvp-transfers" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="pvp-tribes">
+                                <span>👥 Tribe Settings</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="pvp-tribes" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
                 <section class="settings-section">
@@ -318,12 +604,36 @@
                     <div id="server-blueprints" class="settings-grid"></div>
                 </section>
 
-                <section class="settings-section">
+                <section class="settings-section map-section">
                     <h2 class="section-title" data-toggle="server-cryopod">
                         <span>🧊 Cryopod Settings</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="server-cryopod" class="settings-grid"></div>
+                    <div id="server-cryopod" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="cryopod-deployment">
+                                <span>📤 Deployment & Release</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="cryopod-deployment" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="cryopod-sickness">
+                                <span>🤢 Cryo Sickness</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="cryopod-sickness" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="cryopod-nerf">
+                                <span>⚠️ Limitations & Nerfs</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="cryopod-nerf" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
                 <section class="settings-section">
@@ -350,12 +660,52 @@
                     <div id="server-pvp-specific" class="settings-grid"></div>
                 </section>
 
-                <section class="settings-section">
+                <section class="settings-section map-section">
                     <h2 class="section-title" data-toggle="server-environment">
                         <span>🌍 Environment & World</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="server-environment" class="settings-grid"></div>
+                    <div id="server-environment" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="environment-daynight">
+                                <span>🌅 Day/Night Cycle</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="environment-daynight" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="environment-weather">
+                                <span>🌤️ Weather & Events</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="environment-weather" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="environment-items">
+                                <span>📦 Items & Spoiling</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="environment-items" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="environment-transfers">
+                                <span>🔄 Cross-ARK Transfers</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="environment-transfers" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="environment-admin">
+                                <span>🛡️ Admin & Spawning</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="environment-admin" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
                 <section class="settings-section">
@@ -461,76 +811,244 @@
                     <span class="file-header-desc">Advanced settings, breeding, stats multipliers</span>
                 </div>
 
-                <section class="settings-section" data-file="game">
+                <section class="settings-section map-section" data-file="game">
                     <h2 class="section-title" data-toggle="game-taming">
                         <span>🦖 Taming Settings</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="game-taming" class="settings-grid"></div>
+                    <div id="game-taming" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="taming-basics">
+                                <span>⚙️ Core Settings</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="taming-basics" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="taming-food-torpor">
+                                <span>🍖 Food &amp; Torpor</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="taming-food-torpor" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="taming-damage-limits">
+                                <span>⚔️ Damage &amp; Limits</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="taming-damage-limits" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
-                <section class="settings-section" data-file="game">
+                <section class="settings-section map-section" data-file="game">
                     <h2 class="section-title" data-toggle="game-player">
                         <span>🧑 Player &amp; Leveling</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="game-player" class="settings-grid"></div>
+                    <div id="game-player" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="player-leveling">
+                                <span>📈 Leveling &amp; Stats</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="player-leveling" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="player-features">
+                                <span>🎮 Gameplay Features</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="player-features" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
-                <section class="settings-section" data-file="game">
+                <section class="settings-section map-section" data-file="game">
                     <h2 class="section-title" data-toggle="game-tribe">
                         <span>👥 Tribe Settings</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="game-tribe" class="settings-grid"></div>
+                    <div id="game-tribe" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="tribe-management">
+                                <span>📋 Management &amp; Limits</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="tribe-management" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="tribe-warfare">
+                                <span>⚔️ Warfare &amp; Friendly Fire</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="tribe-warfare" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
-                <section class="settings-section" data-file="game">
+                <section class="settings-section map-section" data-file="game">
                     <h2 class="section-title" data-toggle="game-crafting">
                         <span>🔨 Crafting &amp; Engrams</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="game-crafting" class="settings-grid"></div>
+                    <div id="game-crafting" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="crafting-skills">
+                                <span>🎯 Crafting Skills</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="crafting-skills" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="crafting-engrams">
+                                <span>📜 Engram Settings</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="crafting-engrams" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
-                <section class="settings-section" data-file="game">
+                <section class="settings-section map-section" data-file="game">
                     <h2 class="section-title" data-toggle="game-loot">
                         <span>🎁 Loot &amp; Resources</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="game-loot" class="settings-grid"></div>
+                    <div id="game-loot" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="loot-quality">
+                                <span>💎 Loot Quality</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="loot-quality" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="loot-resources">
+                                <span>🌲 Resource Respawns</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="loot-resources" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
-                <section class="settings-section" data-file="game">
+                <section class="settings-section map-section" data-file="game">
                     <h2 class="section-title" data-toggle="game-structures">
                         <span>🏠 Structures &amp; Building</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="game-structures" class="settings-grid"></div>
+                    <div id="game-structures" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="structures-placement">
+                                <span>📐 Placement Rules</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="structures-placement" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="structures-damage-decay">
+                                <span>🔨 Damage &amp; Decay</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="structures-damage-decay" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
-                <section class="settings-section" data-file="game">
+                <section class="settings-section map-section" data-file="game">
                     <h2 class="section-title" data-toggle="game-turrets">
                         <span>🔫 Turrets &amp; Generators</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="game-turrets" class="settings-grid"></div>
+                    <div id="game-turrets" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="turrets-limits">
+                                <span>🎯 Turret Limits</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="turrets-limits" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="turrets-generators">
+                                <span>⚡ Generator Limits</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="turrets-generators" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="turrets-power">
+                                <span>🔋 Power &amp; Fuel</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="turrets-power" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
-                <section class="settings-section" data-file="game">
+                <section class="settings-section map-section" data-file="game">
                     <h2 class="section-title" data-toggle="game-pvp">
                         <span>⚔️ PvP Settings</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="game-pvp" class="settings-grid"></div>
+                    <div id="game-pvp" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="pvp-timers">
+                                <span>⏰ PvE/PvP Timers</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="pvp-timers" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="pvp-respawn">
+                                <span>🔄 Respawn Penalties</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="pvp-respawn" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
-                <section class="settings-section" data-file="game">
+                <section class="settings-section map-section" data-file="game">
                     <h2 class="section-title" data-toggle="game-genesis">
                         <span>🌐 Genesis Specific</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="game-genesis" class="settings-grid"></div>
+                    <div id="game-genesis" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="genesis-missions">
+                                <span>🎯 Missions &amp; Tek</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="genesis-missions" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="genesis-store">
+                                <span>💎 Hexagon Store</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="genesis-store" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="genesis-world">
+                                <span>🌍 World Effects</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="genesis-world" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
                 <section class="settings-section" data-file="game">
@@ -549,12 +1067,52 @@
                     <div id="game-advanced" class="settings-grid"></div>
                 </section>
 
-                <section class="settings-section" data-file="game">
+                <section class="settings-section map-section" data-file="game">
                     <h2 class="section-title" data-toggle="game-breeding">
                         <span>🥚 Breeding Settings</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="game-breeding" class="settings-grid"></div>
+                    <div id="game-breeding" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="breeding-mating">
+                                <span>💕 Mating</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="breeding-mating" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="breeding-eggs">
+                                <span>🥚 Eggs &amp; Hatching</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="breeding-eggs" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="breeding-farming">
+                                <span>🌾 Crops &amp; Farming</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="breeding-farming" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="breeding-babies">
+                                <span>🍼 Baby Maturation</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="breeding-babies" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="breeding-imprinting">
+                                <span>🤗 Imprinting</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="breeding-imprinting" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
                 <section class="settings-section" data-file="game">
@@ -565,12 +1123,52 @@
                     <div id="game-spoiling" class="settings-grid"></div>
                 </section>
 
-                <section class="settings-section" data-file="game">
+                <section class="settings-section map-section" data-file="game">
                     <h2 class="section-title" data-toggle="game-stats">
                         <span>📊 Stats Multipliers</span>
                         <span class="toggle-icon">▼</span>
                     </h2>
-                    <div id="game-stats" class="settings-grid"></div>
+                    <div id="game-stats" class="map-subsections">
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="stats-player">
+                                <span>🧑 Player Stats</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="stats-player" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="stats-tamed">
+                                <span>🦖 Tamed Dino (Per Level)</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="stats-tamed" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="stats-tamed-add">
+                                <span>✨ Tamed Dino (Post-Tame Bonus)</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="stats-tamed-add" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="stats-tamed-affinity">
+                                <span>💯 Tamed Dino (Taming Effectiveness)</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="stats-tamed-affinity" class="settings-grid"></div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title" data-toggle="stats-wild">
+                                <span>🌿 Wild Dino Stats</span>
+                                <span class="toggle-icon">▼</span>
+                            </h3>
+                            <div id="stats-wild" class="settings-grid"></div>
+                        </div>
+                    </div>
                 </section>
 
                 <section class="settings-section" data-file="game">
@@ -599,9 +1197,9 @@
         <p>Settings sourced from <a href="https://ark.wiki.gg/wiki/Server_configuration" target="_blank" rel="noopener">ARK Official Community Wiki</a> and <a href="https://survivetheark.com/index.php?/forums/topic/708761-asa-pc-patch-notes-client-v7715-server-v7715-updated12202025/" target="_blank" rel="noopener">Official ASA Patch Notes</a></p>
     </footer>
 
-    <script src="translations.js?v=4"></script>
+    <script src="translations.js?v=5"></script>
     <script src="settings-translations.js?v=1"></script>
-    <script src="settings-data.js?v=8"></script>
-    <script src="app.js?v=14"></script>
+    <script src="settings-data.js?v=9"></script>
+    <script src="app.js?v=15"></script>
 </body>
 </html>

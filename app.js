@@ -715,6 +715,8 @@ const presets = {
             'TamingSpeedMultiplier': '1.0',
             'HarvestAmountMultiplier': '1.0',
             'XPMultiplier': '1.0',
+            'PlayerHarvestingDamageMultiplier': '1.0',
+            'DinoHarvestingDamageMultiplier': '3.2',
             'MatingIntervalMultiplier': '1.0',
             'MatingSpeedMultiplier': '1.0',
             'BabyMatureSpeedMultiplier': '1.0',
@@ -724,7 +726,7 @@ const presets = {
             'PassiveTameIntervalMultiplier': '1.0',
             'LayEggIntervalMultiplier': '1.0',
             'CropGrowthSpeedMultiplier': '1.0',
-            'HexagonRewardMultiplier': '1.0'
+            'BaseHexagonRewardMultiplier': '1.0'
         }
     },
     '2x': {
@@ -733,6 +735,8 @@ const presets = {
             'TamingSpeedMultiplier': '2.0',
             'HarvestAmountMultiplier': '2.0',
             'XPMultiplier': '2.0',
+            'PlayerHarvestingDamageMultiplier': '2.0',
+            'DinoHarvestingDamageMultiplier': '6.4',
             'MatingIntervalMultiplier': '0.5',
             'MatingSpeedMultiplier': '2.0',
             'BabyMatureSpeedMultiplier': '2.0',
@@ -742,7 +746,7 @@ const presets = {
             'PassiveTameIntervalMultiplier': '0.5',
             'LayEggIntervalMultiplier': '0.5',
             'CropGrowthSpeedMultiplier': '2.0',
-            'HexagonRewardMultiplier': '1.0'
+            'BaseHexagonRewardMultiplier': '1.0'
         }
     },
     '3x': {
@@ -751,6 +755,8 @@ const presets = {
             'TamingSpeedMultiplier': '3.0',
             'HarvestAmountMultiplier': '3.0',
             'XPMultiplier': '3.0',
+            'PlayerHarvestingDamageMultiplier': '3.0',
+            'DinoHarvestingDamageMultiplier': '9.6',
             'MatingIntervalMultiplier': '0.333',
             'MatingSpeedMultiplier': '3.0',
             'BabyMatureSpeedMultiplier': '3.0',
@@ -760,7 +766,7 @@ const presets = {
             'PassiveTameIntervalMultiplier': '0.333',
             'LayEggIntervalMultiplier': '0.333',
             'CropGrowthSpeedMultiplier': '3.0',
-            'HexagonRewardMultiplier': '1.0'
+            'BaseHexagonRewardMultiplier': '1.0'
         }
     },
     '4x': {
@@ -769,6 +775,8 @@ const presets = {
             'TamingSpeedMultiplier': '4.5',
             'HarvestAmountMultiplier': '4.5',
             'XPMultiplier': '4.5',
+            'PlayerHarvestingDamageMultiplier': '4.5',
+            'DinoHarvestingDamageMultiplier': '14.4',
             'MatingIntervalMultiplier': '0.25',
             'MatingSpeedMultiplier': '4.0',
             'BabyMatureSpeedMultiplier': '4.0',
@@ -778,7 +786,7 @@ const presets = {
             'PassiveTameIntervalMultiplier': '0.25',
             'LayEggIntervalMultiplier': '0.25',
             'CropGrowthSpeedMultiplier': '4.0',
-            'HexagonRewardMultiplier': '1.0'
+            'BaseHexagonRewardMultiplier': '1.0'
         }
     },
     '5x': {
@@ -787,6 +795,8 @@ const presets = {
             'TamingSpeedMultiplier': '5.0',
             'HarvestAmountMultiplier': '5.0',
             'XPMultiplier': '5.0',
+            'PlayerHarvestingDamageMultiplier': '5.0',
+            'DinoHarvestingDamageMultiplier': '16.0',
             'MatingIntervalMultiplier': '0.2',
             'MatingSpeedMultiplier': '5.0',
             'BabyMatureSpeedMultiplier': '5.0',
@@ -796,7 +806,7 @@ const presets = {
             'PassiveTameIntervalMultiplier': '0.2',
             'LayEggIntervalMultiplier': '0.2',
             'CropGrowthSpeedMultiplier': '5.0',
-            'HexagonRewardMultiplier': '1.0'
+            'BaseHexagonRewardMultiplier': '1.0'
         }
     }
 };
