@@ -36,7 +36,7 @@ Copy and paste settings into your provider's web configuration panel.
 
 ## Data Sources
 
-- [ARK Official Wiki — Server Configuration](https://ark.wiki.gg/wiki/Server_configuration)
+- [ARK Official Wiki - Server Configuration](https://ark.wiki.gg/wiki/Server_configuration)
 - [Official ASA Patch Notes](https://survivetheark.com/index.php?/forums/topic/708761-asa-pc-patch-notes-client-v7715-server-v7715-updated12202025/)
 
 ## Disclaimer
