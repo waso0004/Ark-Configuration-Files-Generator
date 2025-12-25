@@ -12,6 +12,42 @@ function debounce(fn, delay) {
     };
 }
 
+// Check if a value is different from default, with type-aware comparison
+function isModifiedFromDefault(value, defaultValue, type) {
+    if (value === undefined || value === null) return false;
+    
+    const v = String(value).trim();
+    const d = String(defaultValue).trim();
+    
+    // Empty values match empty defaults
+    if (v === '' && d === '') return false;
+    
+    if (type === 'boolean') {
+        return v.toLowerCase() !== d.toLowerCase();
+    }
+    
+    if (type === 'integer') {
+        const vNum = Number.parseInt(v, 10);
+        const dNum = Number.parseInt(d, 10);
+        if (!Number.isNaN(vNum) && !Number.isNaN(dNum)) {
+            return vNum !== dNum;
+        }
+        // If either can't be parsed, fall through to string comparison
+    }
+    
+    if (type === 'float') {
+        const vNum = Number.parseFloat(v);
+        const dNum = Number.parseFloat(d);
+        if (!Number.isNaN(vNum) && !Number.isNaN(dNum)) {
+            return vNum !== dNum;
+        }
+        // If either can't be parsed, fall through to string comparison
+    }
+    
+    // String/text comparison
+    return v !== d;
+}
+
 const SOURCE_INFO = {
     wiki: {
         label: 'ARK Wiki',
@@ -618,7 +654,8 @@ function applyMigratedSettingsFromParsedIni(parsedSettings) {
 
         const card = input.closest('.setting-card');
         const defaultValue = input.dataset.default;
-        updateCardModifiedState(card, value !== defaultValue);
+        const settingType = input.dataset.settingType || 'text';
+        updateCardModifiedState(card, isModifiedFromDefault(value, defaultValue, settingType));
     }
 }
 
@@ -1209,7 +1246,7 @@ function createSettingCard(setting, fileType) {
 
     let input;
     const initialValue = setting.currentValue !== undefined ? setting.currentValue : setting.default;
-    const isModified = setting.currentValue !== undefined && setting.currentValue !== setting.default;
+    const isModified = setting.currentValue !== undefined && isModifiedFromDefault(setting.currentValue, setting.default, setting.type);
     
     if (isModified) {
         card.classList.add('modified');
@@ -1227,6 +1264,7 @@ function createSettingCard(setting, fileType) {
         input.dataset.default = setting.default;
         input.dataset.settingName = setting.name;
         input.dataset.fileType = fileType;
+        input.dataset.settingType = setting.type;
 
         const label = document.createElement('label');
         label.className = 'checkbox-label';
@@ -1236,7 +1274,7 @@ function createSettingCard(setting, fileType) {
         input.addEventListener('change', (e) => {
             label.textContent = e.target.checked ? t('enabled') : t('disabled');
             updateValue(setting.name, e.target.checked ? 'True' : 'False', fileType);
-            updateCardModifiedState(card, e.target.checked.toString() !== (setting.default === 'True').toString());
+            updateCardModifiedState(card, isModifiedFromDefault(e.target.checked ? 'True' : 'False', setting.default, 'boolean'));
         });
 
         checkboxContainer.appendChild(input);
@@ -1258,6 +1296,7 @@ function createSettingCard(setting, fileType) {
         input.dataset.default = setting.default;
         input.dataset.settingName = setting.name;
         input.dataset.fileType = fileType;
+        input.dataset.settingType = setting.type;
         const textConfig = (setting.type === 'text' || setting.type === 'string') ? getTextInputConfig(setting) : null;
         if (textConfig) {
             input.type = (setting.type === 'integer' || setting.type === 'float') ? input.type : textConfig.type;
@@ -1266,7 +1305,7 @@ function createSettingCard(setting, fileType) {
 
         input.addEventListener('input', (e) => {
             updateValue(setting.name, e.target.value, fileType);
-            updateCardModifiedState(card, e.target.value !== setting.default);
+            updateCardModifiedState(card, isModifiedFromDefault(e.target.value, setting.default, setting.type));
         });
 
         // Wrap number inputs with custom styled buttons
@@ -1969,7 +2008,8 @@ function applyMisplacedImportedSettings(content, sourceFileType) {
 
         const card = input.closest('.setting-card');
         const defaultValue = input.dataset.default;
-        updateCardModifiedState(card, String(value) !== String(defaultValue));
+        const settingType = input.dataset.settingType || 'text';
+        updateCardModifiedState(card, isModifiedFromDefault(value, defaultValue, settingType));
     }
 }
 
@@ -2276,7 +2316,7 @@ function applyParsedSettings(parsedSettings, fileType) {
         
         // Update modified state - only modified if value differs from default
         const card = input.closest('.setting-card');
-        updateCardModifiedState(card, finalValue !== setting.default);
+        updateCardModifiedState(card, isModifiedFromDefault(finalValue, setting.default, setting.type));
         
         if (isFromFile) {
             appliedCount++;
@@ -2379,7 +2419,8 @@ function applyPreset(presetKey) {
             // Update card modified state
             const card = input.closest('.setting-card');
             const defaultValue = input.dataset.default;
-            updateCardModifiedState(card, value !== defaultValue);
+            const settingType = input.dataset.settingType || 'text';
+            updateCardModifiedState(card, isModifiedFromDefault(value, defaultValue, settingType));
         }
     }
 
@@ -2566,11 +2607,17 @@ function normalizeIniSpacing(content) {
 function generateGameIni() {
     const relocations = computeImportPlacementRelocations();
 
-    // Get all managed setting names
+    // Get all managed settings with their metadata
     const managedSettings = {};
+    const settingsMeta = {};
     for (const [sectionId, settings] of Object.entries(gameIniSettings)) {
         settings.forEach(setting => {
             const value = currentValues.gameIni[setting.name];
+            settingsMeta[setting.name] = {
+                value,
+                defaultValue: setting.default,
+                type: setting.type
+            };
             if (isValueDifferentFromDefault(value, setting.default, setting.type)) {
                 managedSettings[setting.name] = value;
             }
@@ -2579,7 +2626,7 @@ function generateGameIni() {
 
     // If we have an original file, preserve it and only update managed settings
     if (originalFiles.gameIni) {
-        const merged = mergeWithOriginal(originalFiles.gameIni, managedSettings, { appendMissing: true });
+        const merged = mergeWithOriginal(originalFiles.gameIni, managedSettings, settingsMeta, { appendMissing: true });
         const fixedLines = applyRelocationsToIniLines(merged.split(/\r?\n/), relocations.gameIni);
         return fixedLines.join('\n');
     }
@@ -2639,11 +2686,24 @@ function isValueDifferentFromDefault(value, defaultValue, type) {
     return String(value) !== String(defaultValue);
 }
 
-function mergeWithOriginal(originalContent, managedSettings, options = {}) {
+function mergeWithOriginal(originalContent, managedSettings, settingsMeta, options = {}) {
     const { appendMissing = true } = options;
     const lines = originalContent.split(/\r?\n/);
-    const updatedSettings = new Set(); // Track which settings we've updated
+    const updatedSettings = new Set(); // Track which settings we've updated (lowercase)
+    const seenKeys = new Set(); // Track all keys we've seen to prevent duplicates
     const result = [];
+    
+    // Build case-insensitive lookup for managed settings
+    const managedLookup = {};
+    for (const [key, value] of Object.entries(managedSettings)) {
+        managedLookup[key.toLowerCase()] = { originalKey: key, value };
+    }
+    
+    // Build case-insensitive lookup for all settings metadata (to check defaults)
+    const metaLookup = {};
+    for (const [key, meta] of Object.entries(settingsMeta)) {
+        metaLookup[key.toLowerCase()] = { originalKey: key, ...meta };
+    }
     
     for (const line of lines) {
         const trimmed = line.trim();
@@ -2658,11 +2718,23 @@ function mergeWithOriginal(originalContent, managedSettings, options = {}) {
         const eqIndex = trimmed.indexOf('=');
         if (eqIndex > 0) {
             const key = trimmed.substring(0, eqIndex).trim();
+            const keyLower = key.toLowerCase();
             
-            if (managedSettings.hasOwnProperty(key)) {
-                // Replace with our value
-                result.push(`${key}=${managedSettings[key]}`);
-                updatedSettings.add(key);
+            // Skip duplicate keys we've already processed
+            if (seenKeys.has(keyLower)) {
+                continue; // Skip this duplicate line
+            }
+            seenKeys.add(keyLower);
+            
+            // Check if this is a setting we manage
+            if (metaLookup.hasOwnProperty(keyLower)) {
+                const meta = metaLookup[keyLower];
+                // Only include if value differs from default
+                if (isValueDifferentFromDefault(meta.value, meta.defaultValue, meta.type)) {
+                    result.push(`${meta.originalKey}=${meta.value}`);
+                }
+                // Mark as updated either way
+                updatedSettings.add(keyLower);
             } else {
                 // Keep original line (unmanaged setting)
                 result.push(line);
@@ -2674,9 +2746,10 @@ function mergeWithOriginal(originalContent, managedSettings, options = {}) {
     }
     
     // Optionally add managed settings that weren't in the original file
+    // (managedSettings already only contains settings different from defaults)
     if (appendMissing) {
         const missedSettings = Object.entries(managedSettings)
-            .filter(([key]) => !updatedSettings.has(key));
+            .filter(([key]) => !updatedSettings.has(key.toLowerCase()));
 
         if (missedSettings.length > 0) {
             // Find the last section header to add settings under it
@@ -2706,16 +2779,25 @@ function mergeWithOriginalSectioned(originalContent, settingsMeta, options = {})
     const result = [];
     let currentSection = '';
     
-    // Build a lookup by sectionKey for each section
+    // Build a lookup by sectionKey for each section (case-insensitive)
     const sectionKeyLookup = {};
     for (const [name, meta] of Object.entries(settingsMeta)) {
         const section = meta.section;
-        const key = meta.sectionKey;
+        const key = meta.sectionKey.toLowerCase();
         if (!sectionKeyLookup[section]) {
             sectionKeyLookup[section] = {};
         }
-        sectionKeyLookup[section][key] = { name, value: meta.value };
+        sectionKeyLookup[section][key] = { 
+            name, 
+            value: meta.value, 
+            originalKey: meta.sectionKey,
+            defaultValue: meta.defaultValue,
+            type: meta.type
+        };
     }
+    
+    // Track which keys we've already seen in each section to prevent duplicates
+    const seenKeysPerSection = {};
     
     for (const line of lines) {
         const trimmed = line.trim();
@@ -2723,6 +2805,9 @@ function mergeWithOriginalSectioned(originalContent, settingsMeta, options = {})
         // Track section headers
         if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
             currentSection = trimmed.slice(1, -1);
+            if (!seenKeysPerSection[currentSection]) {
+                seenKeysPerSection[currentSection] = new Set();
+            }
             result.push(line);
             continue;
         }
@@ -2737,11 +2822,27 @@ function mergeWithOriginalSectioned(originalContent, settingsMeta, options = {})
         const eqIndex = trimmed.indexOf('=');
         if (eqIndex > 0) {
             const key = trimmed.substring(0, eqIndex).trim();
+            const keyLower = key.toLowerCase();
             
-            // Check if this key in this section is one we manage
-            if (sectionKeyLookup[currentSection] && sectionKeyLookup[currentSection][key]) {
-                const meta = sectionKeyLookup[currentSection][key];
-                result.push(`${key}=${meta.value}`);
+            // Skip duplicate keys we've already processed in this section
+            if (seenKeysPerSection[currentSection] && seenKeysPerSection[currentSection].has(keyLower)) {
+                continue; // Skip this duplicate line
+            }
+            
+            // Mark this key as seen
+            if (!seenKeysPerSection[currentSection]) {
+                seenKeysPerSection[currentSection] = new Set();
+            }
+            seenKeysPerSection[currentSection].add(keyLower);
+            
+            // Check if this key in this section is one we manage (case-insensitive)
+            if (sectionKeyLookup[currentSection] && sectionKeyLookup[currentSection][keyLower]) {
+                const meta = sectionKeyLookup[currentSection][keyLower];
+                // Only include if value differs from default; otherwise skip (remove from output)
+                if (isValueDifferentFromDefault(meta.value, meta.defaultValue, meta.type)) {
+                    result.push(`${meta.originalKey}=${meta.value}`);
+                }
+                // Mark as updated either way so we don't append it later
                 updatedSettings.add(meta.name);
             } else {
                 // Keep original line (unmanaged setting)
@@ -2752,16 +2853,19 @@ function mergeWithOriginalSectioned(originalContent, settingsMeta, options = {})
         }
     }
     
-    // Optionally add managed settings that weren't in the original file
+    // Optionally add managed settings that weren't in the original file (only if modified from default)
     if (appendMissing) {
-        // Group by section
+        // Group by section - only include settings that differ from defaults
         const missedBySection = {};
         for (const [name, meta] of Object.entries(settingsMeta)) {
             if (!updatedSettings.has(name)) {
-                if (!missedBySection[meta.section]) {
-                    missedBySection[meta.section] = [];
+                // Only add if value differs from default
+                if (isValueDifferentFromDefault(meta.value, meta.defaultValue, meta.type)) {
+                    if (!missedBySection[meta.section]) {
+                        missedBySection[meta.section] = [];
+                    }
+                    missedBySection[meta.section].push({ key: meta.sectionKey, value: meta.value });
                 }
-                missedBySection[meta.section].push({ key: meta.sectionKey, value: meta.value });
             }
         }
 

@@ -121,6 +121,7 @@ const gameUserSettings = {
         { name: 'HarvestHealthMultiplier', default: '1.0', type: 'float', description: 'Multiplies the health of harvestable objects like trees, rocks, and corpses. Objects with more health require more hits to destroy but yield more total resources.', effect: '2.0 = objects take twice as many hits, yielding more total resources. Useful when combined with HarvestAmountMultiplier for balanced gathering.' },
         { name: 'ResourcesRespawnPeriodMultiplier', default: '1.0', type: 'float', description: 'Scales how long resources take to respawn after being harvested. Affects trees, rocks, bushes, and other respawning nodes.', effect: '0.5 = resources respawn twice as fast; 2.0 = takes twice as long to respawn. Lower values keep areas resource-rich.' },
         { name: 'ClampResourceHarvestDamage', default: 'False', type: 'boolean', description: 'When enabled, prevents "overkill" harvesting where high-damage creatures would otherwise get extra resources from destroying objects in one hit.', effect: 'True limits resources to what the object health would naturally provide. False allows powerful creatures to get bonus resources from overkill damage.' },
+        { name: 'UseOptimizedHarvestingHealth', default: 'False', type: 'boolean', description: 'Enables an optimized calculation method for harvesting health calculations. May improve server performance but could affect certain resource drops.', effect: 'True = optimized harvesting calculations; False = standard calculations.' },
     ],
 
     'rates-stacking': [
@@ -270,7 +271,6 @@ const gameUserSettings = {
         { name: 'MaxStructuresInSmallRadius', default: '0', type: 'integer', description: 'Sets the maximum structures allowed in a small radius defined by RadiusStructuresInSmallRadius. Used to prevent extreme structure density.', effect: '0 = disabled; positive values enforce density limits. Works with RadiusStructuresInSmallRadius.' },
         { name: 'RadiusStructuresInSmallRadius', default: '0.0', type: 'float', description: 'Defines the radius in game units for the small structure density check. Works with MaxStructuresInSmallRadius to prevent structure spam.', effect: '0 = disabled; positive values define the check radius. Smaller radius = more localized limits.' },
         { name: 'MaxStructuresToProcess', default: '0', type: 'integer', description: 'Limits how many structures the server processes per tick for decay and other calculations. Used to prevent performance issues on heavily built servers.', effect: '0 = default processing; positive values cap per-tick processing. May delay decay checks.' },
-        { name: 'UseOptimizedHarvestingHealth', default: 'False', type: 'boolean', description: 'Enables an optimized calculation method for harvesting structure health. May improve performance but could reduce certain rare resource drops.', effect: 'True = optimized harvesting (possible rare resource reduction); False = standard calculations.' },
         { name: 'MaxTrainCars', default: '8', type: 'integer', description: 'Sets the maximum number of train cars that can be connected to a single train locomotive. Trains are a transport feature in some ARK maps.', effect: 'Higher values = longer trains; lower values limit train length.' },
     ],
 
@@ -390,9 +390,9 @@ const gameUserSettings = {
 
     // Lost Colony - Outpost Settings
     'lostcolony-outpost': [
-        { name: 'MaxActiveOutposts', default: '', type: 'text', description: 'Sets the maximum number of Outpost capture points that can be active simultaneously on the Lost Colony map. Outposts are contestable objectives.', effect: 'Empty = no limit (all outposts active). Set a number to limit active outposts at any time.' },
-        { name: 'MaxActiveResourceCaches', default: '', type: 'text', description: 'Sets the maximum number of Resource Cache locations that can be active simultaneously on Lost Colony. Resource caches provide bonus materials.', effect: 'Empty = no limit. Set a number to limit how many resource caches spawn at once.' },
-        { name: 'MaxActiveCityOutposts', default: '', type: 'text', description: 'Sets the maximum number of City Outposts that can be active simultaneously on Lost Colony. City outposts are larger, more valuable capture points.', effect: 'Empty = no limit. Set a number to limit active city outposts for balanced competition.' },
+        { name: 'MaxActiveOutposts', default: '', type: 'integer', description: 'Sets the maximum number of Outpost capture points that can be active simultaneously on the Lost Colony map. Outposts are contestable objectives.', effect: 'Empty = no limit (all outposts active). Set a number to limit active outposts at any time.' },
+        { name: 'MaxActiveResourceCaches', default: '', type: 'integer', description: 'Sets the maximum number of Resource Cache locations that can be active simultaneously on Lost Colony. Resource caches provide bonus materials.', effect: 'Empty = no limit. Set a number to limit how many resource caches spawn at once.' },
+        { name: 'MaxActiveCityOutposts', default: '', type: 'integer', description: 'Sets the maximum number of City Outposts that can be active simultaneously on Lost Colony. City outposts are larger, more valuable capture points.', effect: 'Empty = no limit. Set a number to limit active city outposts for balanced competition.' },
     ],
 
     // Lost Colony - Creature Settings
