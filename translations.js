@@ -2627,7 +2627,11 @@ function applyTranslations() {
     // Update header
     const headerTitle = document.querySelector('.header-content h1');
     const headerSubtitle = document.querySelector('.header-content p');
-    if (headerTitle) headerTitle.textContent = t('headerTitle');
+    if (headerTitle) {
+        const title = t('headerTitle');
+        // Wrap emoji in span for mobile hiding
+        headerTitle.innerHTML = title.replace(/^(🦖\s*)/, '<span class="dino-icon">$1</span>');
+    }
     if (headerSubtitle) headerSubtitle.textContent = t('headerSubtitle');
     
     // Update loading text

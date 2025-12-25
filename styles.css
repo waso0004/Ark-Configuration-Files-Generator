@@ -348,6 +348,7 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-start;
     padding: 1rem 1.5rem;
     background: var(--bg-input);
     border: 2px solid var(--border-color);
@@ -358,6 +359,11 @@ main {
     width: 100%;
     text-align: center;
     word-break: break-word;
+}
+
+.action-desc,
+.preset-desc {
+    margin-top: auto;
 }
 
 .action-btn:hover,
@@ -445,7 +451,7 @@ main {
 .search-container input {
     width: 100%;
     padding: 1rem 1.5rem;
-    background: var(--bg-input);
+    background: var(--bg-secondary);
     border: 2px solid var(--border-color);
     border-radius: 8px;
     color: var(--text-primary);
@@ -777,10 +783,11 @@ main {
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
     white-space: nowrap;
-    margin-left: auto;
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
     flex-shrink: 0;
     max-width: 150px;
-    position: relative;
     cursor: help;
 }
 
@@ -929,6 +936,7 @@ main {
 
 .number-btn {
     width: 32px;
+    min-width: 32px;
     height: 100%;
     background: var(--bg-input);
     border: none;
@@ -941,6 +949,7 @@ main {
     align-items: center;
     justify-content: center;
     user-select: none;
+    flex-shrink: 0;
 }
 
 .number-btn:hover {
@@ -989,6 +998,7 @@ main {
 
 .password-toggle-btn {
     width: 56px;
+    min-width: 56px;
     height: 100%;
     background: var(--bg-input);
     border: none;
@@ -1002,6 +1012,7 @@ main {
     justify-content: center;
     user-select: none;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .password-toggle-btn:hover {
@@ -1034,6 +1045,7 @@ main {
 /* Per-setting reset buttons: square, aligned right, matching input height */
 .setting-card .reset-btn {
     width: 36px;
+    min-width: 36px;
     height: 36px;
     padding: 0;
     display: inline-flex;
@@ -1119,6 +1131,10 @@ footer a:hover {
 
 /* Responsive - Half screen */
 @media (max-width: 1000px) {
+    .dino-icon {
+        display: none;
+    }
+
     .language-selector {
         top: 0.5rem;
         right: 0.5rem;
@@ -1245,16 +1261,23 @@ footer a:hover {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        align-items: baseline;
+        align-items: center;
+        overflow: hidden;
     }
 
     .header-content {
-        text-align: center;
+        text-align: left;
+        min-width: 0;
         flex: 1;
     }
 
     .header-content h1 {
         font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .dino-icon {
+        display: none;
     }
 
     .header-content p {
@@ -1262,7 +1285,7 @@ footer a:hover {
     }
 
     .language-selector {
-        position: relative;
+        position: static;
     }
 
     .lang-btn {
@@ -1317,13 +1340,15 @@ footer a:hover {
 
     .tabs {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         width: 100%;
         gap: 0.5rem;
     }
 
     .tabs .filter-btn {
-        flex: 1;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
     }
 
     .filter-btn.reset-btn {
@@ -1354,10 +1379,36 @@ footer a:hover {
     .settings-grid {
         grid-template-columns: 1fr;
         padding: 0.5rem;
+        overflow: hidden;
     }
 
-    .header-content h1 {
-        font-size: 1.8rem;
+    .file-section-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.25rem;
+    }
+
+    .file-header-title {
+        font-size: clamp(0.9rem, 4vw, 1.1rem);
+    }
+
+    .file-header-desc {
+        font-size: clamp(0.65rem, 3vw, 0.8rem);
+    }
+
+    .setting-card {
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .setting-name {
+        word-break: break-word;
+        white-space: normal;
+    }
+
+    main {
+        overflow-x: hidden;
     }
 
     header {
@@ -1735,5 +1786,82 @@ footer a:hover {
     
     .guide-close-btn {
         width: 100%;
+    }
+
+    /* Setting cards for very small screens */
+    .setting-card {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .setting-header {
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 0;
+    }
+
+    .setting-name {
+        font-size: 0.8rem;
+        flex-basis: 100%;
+    }
+
+    .setting-default {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.35rem;
+        max-width: 100%;
+    }
+
+    .setting-description {
+        font-size: 0.75rem;
+        margin-bottom: 0;
+    }
+
+    .setting-input-container {
+        flex-wrap: nowrap;
+        gap: 6px;
+    }
+
+    .setting-input {
+        font-size: 0.8rem;
+        height: 32px;
+        padding: 6px 8px;
+        min-width: 0;
+    }
+
+    .number-input-wrapper {
+        height: 32px;
+        min-width: 0;
+    }
+
+    .password-input-wrapper {
+        height: 32px;
+        min-width: 0;
+    }
+
+    .number-btn {
+        width: 28px;
+        min-width: 28px;
+        font-size: 0.9rem;
+    }
+
+    .password-toggle-btn {
+        width: 40px;
+        min-width: 40px;
+        font-size: 0.7rem;
+    }
+
+    .setting-card .reset-btn {
+        width: 32px;
+        min-width: 32px;
+        height: 32px;
+    }
+
+    .settings-grid {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .file-section-header {
+        padding: 12px;
     }
 }
