@@ -219,7 +219,7 @@ main {
 
 .tabs {
     display: flex;
-    gap: 0.5rem;
+    gap: 1rem;
 }
 
 /* Actions & Presets Section */
@@ -227,7 +227,7 @@ main {
 .preset-section {
     background: var(--bg-card);
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 1rem;
     margin-bottom: 1.5rem;
     box-shadow: var(--shadow);
     border: 1px solid var(--border-color);
@@ -341,7 +341,7 @@ main {
 .preset-buttons {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 0.75rem;
+    gap: 1rem;
 }
 
 .action-btn,
@@ -1167,7 +1167,7 @@ footer a:hover {
 
     .actions-section,
     .preset-section {
-        padding: 0.75rem;
+        padding: 1rem;
         margin-bottom: 0.5rem;
     }
 
@@ -1374,7 +1374,7 @@ footer a:hover {
 
     .preset-section,
     .actions-section {
-        padding: 0.75rem;
+        padding: 0.5rem;
         margin-bottom: 0.75rem;
     }
 
@@ -1422,6 +1422,10 @@ footer a:hover {
 
     header {
         padding: 1rem;
+    }
+
+    .import-status {
+        margin-bottom: 0.5rem;
     }
 }
 
@@ -1872,7 +1876,7 @@ footer a:hover {
 
     .settings-grid {
         padding: 0.5rem;
-        gap: 12px;
+        gap: 0.5rem;
     }
 
     .file-section-header {
