@@ -22,8 +22,6 @@ const gameUserSettings = {
     'server-messages': [
         { name: 'MessageOfTheDay', default: 'Welcome to the server!', type: 'text', section: 'MessageOfTheDay', sectionKey: 'Message', description: 'A welcome message displayed to players when they connect to the server. Great for sharing rules, Discord links, or server information.', effect: 'Displayed on login for the duration set by MessageDuration. Use \\n for line breaks.' },
         { name: 'MessageDuration', default: '20', type: 'integer', section: 'MessageOfTheDay', sectionKey: 'Duration', description: 'How long in seconds the Message of the Day is displayed on screen when players connect to the server.', effect: 'Higher = message stays longer; 0 = message may not show. 20 seconds is default.' },
-        { name: 'AutoSavePeriodMinutes', default: '15.0', type: 'float', description: 'How often the server automatically saves the world in minutes. More frequent saves protect against data loss but can cause brief lag spikes.', effect: '15 = saves every 15 minutes (default). Lower = safer but more lag; 0 = constant saving (not recommended).' },
-        { name: 'AutoRestartIntervalSeconds', default: '', type: 'float', description: 'Automatically restarts the server after the specified number of seconds. Useful for scheduled restarts to clear memory and apply updates.', effect: 'Empty = no auto-restart. 86400 = daily restart. Server shuts down and must be restarted by external script/service.' },
     ],
 
     'server-mods': [
@@ -47,9 +45,14 @@ const gameUserSettings = {
         { name: 'EnableAFKKickPlayerCountPercent', default: '0.0', type: 'float', description: 'Only enables AFK kicking when server population reaches this percentage of MaxPlayers. Prevents kicking when server has room, kicks only when crowded.', effect: '0 = always kick AFK; 0.9 = only kick when server is 90% full. Official uses ~0.9 to free slots when needed.' },
         { name: 'DontRestoreBackup', default: 'False', type: 'boolean', description: 'Prevents the server from automatically restoring from backup when save corruption is detected. Only use if you have your own backup solution.', effect: 'True = no automatic backup restore (risky); False = automatic restore on corruption. Use with -DisableDupeLogDeletes.' },
         { name: 'EnableMeshBitingProtection', default: 'True', type: 'boolean', description: 'Enables protection against mesh biting exploits where creatures can attack through terrain. An important anti-cheat measure for base protection.', effect: 'True = mesh bite protection active (recommended); False = disables protection (not recommended).' },
+        { name: 'SpectatorPassword', default: '', type: 'text', description: 'Sets a password that allows non-admin players to enter spectator mode. Useful for tournaments or content creation without full admin access.', effect: 'Empty = spectator requires admin; any value = that password enables spectator mode.' },
+        { name: 'AdminLogging', default: 'False', type: 'boolean', description: 'Broadcasts admin command usage to all players in the server chat. Provides transparency for admin actions on the server.', effect: 'True = admin commands are announced in chat; False = admin commands are silent.' },
+        { name: 'ExtinctionEventTimeInterval', default: '', type: 'text', description: 'Enables ARKpocalypse mode where the server periodically wipes and restarts fresh. The value is the time in seconds between extinction events.', effect: 'Empty = disabled; 2592000 = 30-day wipe cycle. Server completely resets when timer expires.' },
     ],
 
     'admin-performance': [
+        { name: 'AutoSavePeriodMinutes', default: '15.0', type: 'float', description: 'How often the server automatically saves the world in minutes. More frequent saves protect against data loss but can cause brief lag spikes.', effect: '15 = saves every 15 minutes (default). Lower = safer but more lag; 0 = constant saving (not recommended).' },
+        { name: 'AutoRestartIntervalSeconds', default: '', type: 'float', description: 'Automatically restarts the server after the specified number of seconds. Useful for scheduled restarts to clear memory and apply updates.', effect: 'Empty = no auto-restart. 86400 = daily restart. Server shuts down and must be restarted by external script/service.' },
         { name: 'ServerEnableMeshChecking', default: 'False', type: 'boolean', description: 'Enables mesh checking used for foliage repopulation calculations. Part of the terrain/environment system. Disabled by -forcedisablemeshchecking flag.', effect: 'True = mesh checking enabled; False = disabled. Primarily affects foliage systems.' },
         { name: 'UseCharacterTracker', default: 'False', type: 'boolean', description: 'Enables character position tracking system for anti-cheat and debugging purposes. Can also be enabled via command line argument.', effect: 'True = character tracking enabled; False = disabled. May have minor performance impact.' },
         { name: 'NPCNetworkStasisRangeScalePlayerCountStart', default: '0', type: 'integer', description: 'Minimum number of online players required before NPC stasis range scaling kicks in. Stasis range affects how far creatures are simulated from players.', effect: '0 = disabled (no scaling). Set to player count threshold to begin performance optimization scaling.' },
@@ -91,18 +94,16 @@ const gameUserSettings = {
     'gameplay-rules': [
         { name: 'ServerHardcore', default: 'False', type: 'boolean', description: 'Enables Hardcore mode where death resets your character to level 1. You keep your tribe membership but lose all levels, engrams, and stats permanently.', effect: 'True = death resets to level 1 (high stakes); False = normal respawn with XP penalty.' },
         { name: 'ImplantSuicideCD', default: '28800', type: 'float', description: 'Sets the cooldown in seconds between uses of the implant "Respawn" suicide feature. This prevents abuse of fast respawning to teleport across the map.', effect: 'Default 28800 = 8 hours between implant suicides. Lower values allow more frequent use; 0 removes the cooldown entirely.' },
+        { name: 'PreventSpawnAnimations', default: 'False', type: 'boolean', description: 'Skips the wake-up animation when players spawn or respawn. Provides faster respawn experience but removes some immersion.', effect: 'True = instant spawn (no wake-up animation); False = normal spawn animation plays.' },
         { name: 'AllowCrateSpawnsOnTopOfStructures', default: 'False', type: 'boolean', description: 'Allows supply drops (beacons) to spawn on top of player structures. By default, structures block supply drop spawns in their area.', effect: 'True = drops can appear on structures; False = structures block nearby drop spawns.' },
+        { name: 'RandomSupplyCratePoints', default: 'False', type: 'boolean', description: 'Makes supply drops spawn at random locations instead of fixed beacon spawn points. Creates unpredictable loot opportunities.', effect: 'True = randomized drop locations; False = drops spawn at predetermined points. May have issues on some maps.' },
         { name: 'AllowIntegratedSPlusStructures', default: 'True', type: 'boolean', description: 'Enables the integrated Structures Plus (S+) building pieces that were added to the base game. These include improved versions of vanilla structures with quality-of-life features.', effect: 'True = S+ structures available; False = only vanilla structures available.' },
         { name: 'EnableExtraStructurePreventionVolumes', default: 'False', type: 'boolean', description: 'Blocks building in additional resource-rich areas beyond the default prevention zones. Protects important resource spawns from being blocked by structures.', effect: 'True = extra building restrictions; False = only default prevention zones apply.' },
-        { name: 'TribeNameChangeCooldown', default: '15.0', type: 'float', description: 'Sets the cooldown time in minutes between tribe name changes. Prevents frequent name changes that could be used to confuse other players.', effect: 'Higher values = longer wait between name changes. Default 15 minutes.' },
         { name: 'PreventOutOfTribePinCodeUse', default: 'False', type: 'boolean', description: 'Prevents players outside your tribe from using PIN codes to access your structures. Normally, sharing a PIN allows anyone to use locked containers and doors.', effect: 'True = PIN codes only work for tribe members; False = anyone with the PIN can access.' },
     ],
 
     'gameplay-transfers': [
         { name: 'noTributeDownloads', default: 'False', type: 'boolean', description: 'Completely disables all Cross-ARK downloads from Obelisks and Transmitters. More restrictive than individual download prevention settings.', effect: 'True = all transfers blocked; False = transfers allowed (subject to other settings).' },
-        { name: 'ServerAutoForceRespawnWildDinosInterval', default: '0.0', type: 'float', description: 'Forces all wild creatures to respawn when the server restarts if the specified number of seconds has passed. Useful for refreshing creature populations periodically.', effect: '0 = disabled; 86400 = respawn wilds if server has been up for 24+ hours. Clears stuck or problematic wild spawns.' },
-        { name: 'FreezeReaperPregnancy', default: 'False', type: 'boolean', description: 'Stops the Reaper King pregnancy timer from progressing. The embryo will not grow and the player will not gain XP from it until this is disabled.', effect: 'True = pregnancy frozen (useful for timing births); False = pregnancy progresses normally.' },
-        { name: 'AllowAnyoneBabyImprintCuddle', default: 'False', type: 'boolean', description: 'Allows any tribe member to perform imprinting care actions, not just the original imprinter. Normally only the person who claimed the baby can imprint it.', effect: 'True = anyone in tribe can imprint; False = only the claimer can imprint (imprint bonus still goes to claimer).' },
     ],
 
     // Rates & Multipliers - Difficulty & XP
@@ -178,8 +179,6 @@ const gameUserSettings = {
 
     'environment-weather': [
         { name: 'DisableWeatherFog', default: 'False', type: 'boolean', description: 'Disables the fog weather effect that reduces visibility. Fog can significantly impact gameplay, especially in PvP situations.', effect: 'True = no fog ever; False = normal fog weather patterns.' },
-        { name: 'PreventSpawnAnimations', default: 'False', type: 'boolean', description: 'Skips the wake-up animation when players spawn or respawn. Provides faster respawn experience but removes some immersion.', effect: 'True = instant spawn (no wake-up animation); False = normal spawn animation plays.' },
-        { name: 'RandomSupplyCratePoints', default: 'False', type: 'boolean', description: 'Makes supply drops spawn at random locations instead of fixed beacon spawn points. Creates unpredictable loot opportunities.', effect: 'True = randomized drop locations; False = drops spawn at predetermined points. May have issues on some maps.' },
     ],
 
     'environment-items': [
@@ -196,11 +195,7 @@ const gameUserSettings = {
         { name: 'MaxTributeItems', default: '50', type: 'integer', description: 'Sets the maximum number of item stacks that can be stored in the cross-ARK upload system simultaneously. Cannot be reduced below default.', effect: 'Higher values allow more item storage; values below 50 revert to default.' },
     ],
 
-    'environment-admin': [
-        { name: 'ExtinctionEventTimeInterval', default: '', type: 'text', description: 'Enables ARKpocalypse mode where the server periodically wipes and restarts fresh. The value is the time in seconds between extinction events.', effect: 'Empty = disabled; 2592000 = 30-day wipe cycle. Server completely resets when timer expires.' },
-        { name: 'SpectatorPassword', default: '', type: 'text', description: 'Sets a password that allows non-admin players to enter spectator mode. Useful for tournaments or content creation without full admin access.', effect: 'Empty = spectator requires admin; any value = that password enables spectator mode.' },
-        { name: 'AdminLogging', default: 'False', type: 'boolean', description: 'Broadcasts admin command usage to all players in the server chat. Provides transparency for admin actions on the server.', effect: 'True = admin commands are announced in chat; False = admin commands are silent.' },
-    ],
+    // Admin settings moved to admin-security category
 
     // Dinosaur Settings
     'dino-damage': [
@@ -214,7 +209,6 @@ const gameUserSettings = {
         { name: 'DinoCharacterFoodDrainMultiplier', default: '1.0', type: 'float', description: 'Scales how quickly all creatures (wild and tamed) consume food. For wild creatures, this affects knockout taming speed since faster food drain means more frequent feeding.', effect: '2.0 = creatures get hungry twice as fast (faster knockout taming); 0.5 = half as fast (slower taming).' },
         { name: 'DinoCharacterStaminaDrainMultiplier', default: '1.0', type: 'float', description: 'Scales how quickly creatures lose stamina when running, flying, or performing stamina-consuming actions.', effect: '0.5 = creatures can run/fly longer before resting; 2.0 = creatures tire twice as fast.' },
         { name: 'DinoCharacterHealthRecoveryMultiplier', default: '1.0', type: 'float', description: 'Scales the natural health regeneration rate for all creatures. Affects how quickly wounded creatures heal over time.', effect: '2.0 = creatures heal twice as fast; 0.5 = heal half as fast. Important for post-combat recovery.' },
-        { name: 'RaidDinoCharacterFoodDrainMultiplier', default: '1.0', type: 'float', description: 'Scales food consumption specifically for "raid" dinosaurs like the Titanosaur. These creatures normally cannot be fed and starve after taming.', effect: '2.0 = raid dinos starve twice as fast; 0.5 = half as fast. Only relevant if AllowRaidDinoFeeding is disabled.' },
     ],
 
     'dino-spawns': [
@@ -222,12 +216,14 @@ const gameUserSettings = {
         { name: 'MaxPersonalTamedDinos', default: '0', type: 'integer', description: 'Sets a per-tribe limit on how many tamed creatures a tribe can own. This is separate from the global MaxTamedDinos server cap.', effect: '0 = no tribe limit (uses global cap only). Official PvE uses 500; Official PvP uses 300. Platform saddle creatures may count extra.' },
         { name: 'AutoDestroyDecayedDinos', default: 'False', type: 'boolean', description: 'Automatically deletes tamed creatures that have reached the "claimable" decay state when the server restarts. Without this, decayed tames remain claimable by any player.', effect: 'True = decayed tames are deleted on restart; False = decayed tames become claimable by anyone.' },
         { name: 'DinoCountMultiplier', default: '1.0', type: 'float', description: 'Scales the number of wild creatures that spawn across the map. Affects creature density and how populated the world feels.', effect: '2.0 = double the wild creatures; 0.5 = half as many spawns. High values may impact server performance.' },
+        { name: 'ServerAutoForceRespawnWildDinosInterval', default: '0.0', type: 'float', description: 'Forces all wild creatures to respawn when the server restarts if the specified number of seconds has passed. Useful for refreshing creature populations periodically.', effect: '0 = disabled; 86400 = respawn wilds if server has been up for 24+ hours. Clears stuck or problematic wild spawns.' },
     ],
 
     'dino-special': [
         { name: 'AllowFlyerCarryPvE', default: 'False', type: 'boolean', description: 'Allows flying creatures like Argentavis and Quetzal to pick up wild creatures while in PvE mode. By default, flyer carry is disabled in PvE to prevent griefing.', effect: 'True = flyers can grab wild dinos in PvE; False = flyer carrying is disabled in PvE mode.' },
         { name: 'bForceCanRideFliers', default: 'False', type: 'boolean', description: 'Overrides map-specific flying restrictions (like Aberration) to allow flyer riding. Some maps disable flying creatures by design.', effect: 'True = flyers can be ridden on all maps; False = respects map-specific flying restrictions.' },
         { name: 'AllowRaidDinoFeeding', default: 'False', type: 'boolean', description: 'Allows Titanosaurs (raid dinosaurs) to be fed after taming, making them permanent tames. By default, Titanosaurs cannot eat and eventually starve.', effect: 'True = Titanosaurs can be fed and kept permanently; False = Titanosaurs will starve. Note: Maps have limited Titanosaur spawns.' },
+        { name: 'RaidDinoCharacterFoodDrainMultiplier', default: '1.0', type: 'float', description: 'Scales food consumption specifically for "raid" dinosaurs like the Titanosaur. These creatures normally cannot be fed and starve after taming.', effect: '2.0 = raid dinos starve twice as fast; 0.5 = half as fast. Only relevant if AllowRaidDinoFeeding is disabled.' },
         { name: 'DisableImprintDinoBuff', default: 'False', type: 'boolean', description: 'Disables the combat bonus that imprinted creatures receive when ridden by their imprinter. Normally, 100% imprint gives +30% damage and +30% resistance when the imprinter rides.', effect: 'True = no rider imprint bonus (imprint only affects base stats); False = imprinters get combat bonuses on their imprinted creatures.' },
         { name: 'PreventMateBoost', default: 'False', type: 'boolean', description: 'Disables the mate boost buff that creatures receive when near an opposite-gender mate of the same species. Mate boost normally provides +33% damage resistance.', effect: 'True = creatures do not receive mate boost; False = mate boost functions normally.' },
         { name: 'AllowFlyingStaminaRecovery', default: 'False', type: 'boolean', description: 'Allows players standing on flying creatures (not mounted) to regenerate stamina. By default, being on a flyer prevents stamina recovery.', effect: 'True = stamina regenerates while standing on flyers; False = must land or dismount to regenerate stamina.' },
@@ -337,12 +333,6 @@ const gameUserSettings = {
     // Fjordur Settings
     'server-fjordur': [
         { name: 'UseFjordurTraversalBuff', default: 'False', type: 'boolean', description: 'Enables the realm teleportation ability on Fjordur, allowing players to press R to travel between the main world, Asgard, Jotunheim, and Vanaheim.', effect: 'True = realm teleportation enabled; False = must use terminals to travel between realms.' },
-    ],
-
-    // Genesis Settings
-    'server-genesis': [
-        { name: 'AllowTekSuitPowersInGenesis', default: 'False', type: 'boolean', description: 'Enables TEK suit abilities (flight, dash, underwater breathing) on Genesis: Part 1. By default, TEK suit powers are disabled on this map for balance.', effect: 'True = TEK suits work normally on Genesis Part 1; False = TEK suit abilities are disabled.' },
-        { name: 'MaxHexagonsPerCharacter', default: '2000000000', type: 'integer', description: 'Sets the maximum Hexagons (Genesis currency) a single character can hold. Hexagons are earned from missions and spent in the HLNA store.', effect: 'Default is 2 billion; Official uses 2,500,000. Lower values limit wealth accumulation.' },
     ],
 
     // Aberration Settings
@@ -483,6 +473,7 @@ const gameIniSettings = {
         { name: 'MaxTribeLogs', default: '400', type: 'integer', description: 'Sets the maximum number of entries stored in the tribe log. The tribe log records events like taming, deaths, structure destruction, and member activity.', effect: 'Higher = more log history kept; 400 is default. Very high values may increase memory usage.' },
         { name: 'MaxNumberOfPlayersInTribe', default: '0', type: 'integer', description: 'Limits the maximum number of players that can be members of a single tribe. Used to enforce small tribe gameplay modes.', effect: '0 = unlimited members; 1 = solo only (no tribes); 6 = Official Small Tribes limit.' },
         { name: 'TribeSlotReuseCooldown', default: '0.0', type: 'float', description: 'When a player leaves or is kicked from a tribe, their slot is locked for this many seconds. Prevents rapid tribe member cycling.', effect: '0 = no cooldown; 3600 = 1 hour cooldown. Used on Official Small Tribes to prevent slot abuse.' },
+        { name: 'TribeNameChangeCooldown', default: '15.0', type: 'float', description: 'Sets the cooldown time in minutes between tribe name changes. Prevents frequent name changes that could be used to confuse other players.', effect: 'Higher values = longer wait between name changes. Default 15 minutes.' },
         { name: 'TribeLogDestroyedEnemyStructures', default: 'False', type: 'boolean', description: 'Records in the tribe log when tribe members destroy structures belonging to enemy tribes. Useful for tracking raid activity.', effect: 'True = log enemy structure destruction; False = only log own tribe events.' },
     ],
 
@@ -628,6 +619,7 @@ const gameIniSettings = {
     'breeding-eggs': [
         { name: 'EggHatchSpeedMultiplier', default: '1.0', type: 'float', description: 'Scales how quickly fertilized eggs hatch. Also affects the gestation time for live-bearing creatures like mammals.', effect: '10.0 = eggs hatch 10x faster; common for boosted servers. Affects both egg incubation and pregnancy duration.' },
         { name: 'LayEggIntervalMultiplier', default: '1.0', type: 'float', description: 'Scales how frequently female creatures lay unfertilized eggs. These eggs are used for kibble crafting and some taming methods.', effect: '0.5 = eggs laid twice as often; 2.0 = half as often. Affects kibble farm productivity.' },
+        { name: 'FreezeReaperPregnancy', default: 'False', type: 'boolean', description: 'Stops the Reaper King pregnancy timer from progressing. The embryo will not grow and the player will not gain XP from it until this is disabled.', effect: 'True = pregnancy frozen (useful for timing births); False = pregnancy progresses normally.' },
     ],
 
     // Breeding - Crops & Farming
@@ -645,6 +637,7 @@ const gameIniSettings = {
 
     // Breeding - Imprinting
     'breeding-imprinting': [
+        { name: 'AllowAnyoneBabyImprintCuddle', default: 'False', type: 'boolean', description: 'Allows any tribe member to perform imprinting care actions, not just the original imprinter. Normally only the person who claimed the baby can imprint it.', effect: 'True = anyone in tribe can imprint; False = only the claimer can imprint (imprint bonus still goes to claimer).' },
         { name: 'BabyCuddleIntervalMultiplier', default: '1.0', type: 'float', source: 'wiki', description: 'Scales the time between required imprinting care actions (cuddles, walks, feeding requests). Imprinting provides stat bonuses and rider bonuses at 100%.', effect: '0.1 = imprint requests 10x more often (faster total imprinting); 2.0 = twice as long between requests. Adjust alongside BabyMatureSpeedMultiplier for balance.' },
         { name: 'BabyCuddleGracePeriodMultiplier', default: '1.0', type: 'float', description: 'Scales the grace period after an imprint request before imprint quality starts degrading. Missing the window reduces final imprint percentage.', effect: '2.0 = twice as long to respond before penalty; 0.5 = half the grace time. More forgiving for busy players.' },
         { name: 'BabyCuddleLoseImprintQualitySpeedMultiplier', default: '1.0', type: 'float', description: 'Scales how quickly imprint quality drops after missing the grace period for a care request. Faster drop means missing requests is more punishing.', effect: '0.5 = imprint drops half as fast (more forgiving); 2.0 = drops twice as fast (harsh penalty for missed cuddles).' },
