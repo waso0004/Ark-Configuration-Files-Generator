@@ -48,6 +48,7 @@ const gameUserSettings = {
         { name: 'SpectatorPassword', default: '', type: 'text', description: 'Sets a password that allows non-admin players to enter spectator mode. Useful for tournaments or content creation without full admin access.', effect: 'Empty = spectator requires admin; any value = that password enables spectator mode.' },
         { name: 'AdminLogging', default: 'False', type: 'boolean', description: 'Broadcasts admin command usage to all players in the server chat. Provides transparency for admin actions on the server.', effect: 'True = admin commands are announced in chat; False = admin commands are silent.' },
         { name: 'ExtinctionEventTimeInterval', default: '', type: 'text', description: 'Enables ARKpocalypse mode where the server periodically wipes and restarts fresh. The value is the time in seconds between extinction events.', effect: 'Empty = disabled; 2592000 = 30-day wipe cycle. Server completely resets when timer expires.' },
+        { name: 'ForceExploitedTameDeletion', default: 'True', type: 'boolean', description: 'Enables automatic deletion of creatures that were tamed through exploits or bugs. Also prevents these creatures from being deployed from cryopods.', effect: 'True = exploited tames are deleted/blocked; False = exploited tames remain (not recommended).' },
     ],
 
     'admin-performance': [
@@ -97,9 +98,6 @@ const gameUserSettings = {
         { name: 'PreventSpawnAnimations', default: 'False', type: 'boolean', description: 'Skips the wake-up animation when players spawn or respawn. Provides faster respawn experience but removes some immersion.', effect: 'True = instant spawn (no wake-up animation); False = normal spawn animation plays.' },
         { name: 'AllowCrateSpawnsOnTopOfStructures', default: 'False', type: 'boolean', description: 'Allows supply drops (beacons) to spawn on top of player structures. By default, structures block supply drop spawns in their area.', effect: 'True = drops can appear on structures; False = structures block nearby drop spawns.' },
         { name: 'RandomSupplyCratePoints', default: 'False', type: 'boolean', description: 'Makes supply drops spawn at random locations instead of fixed beacon spawn points. Creates unpredictable loot opportunities.', effect: 'True = randomized drop locations; False = drops spawn at predetermined points. May have issues on some maps.' },
-        { name: 'AllowIntegratedSPlusStructures', default: 'True', type: 'boolean', description: 'Enables the integrated Structures Plus (S+) building pieces that were added to the base game. These include improved versions of vanilla structures with quality-of-life features.', effect: 'True = S+ structures available; False = only vanilla structures available.' },
-        { name: 'EnableExtraStructurePreventionVolumes', default: 'False', type: 'boolean', description: 'Blocks building in additional resource-rich areas beyond the default prevention zones. Protects important resource spawns from being blocked by structures.', effect: 'True = extra building restrictions; False = only default prevention zones apply.' },
-        { name: 'PreventOutOfTribePinCodeUse', default: 'False', type: 'boolean', description: 'Prevents players outside your tribe from using PIN codes to access your structures. Normally, sharing a PIN allows anyone to use locked containers and doors.', effect: 'True = PIN codes only work for tribe members; False = anyone with the PIN can access.' },
     ],
 
     'gameplay-transfers': [
@@ -195,8 +193,6 @@ const gameUserSettings = {
         { name: 'MaxTributeItems', default: '50', type: 'integer', description: 'Sets the maximum number of item stacks that can be stored in the cross-ARK upload system simultaneously. Cannot be reduced below default.', effect: 'Higher values allow more item storage; values below 50 revert to default.' },
     ],
 
-    // Admin settings moved to admin-security category
-
     // Dinosaur Settings
     'dino-damage': [
         { name: 'DinoDamageMultiplier', default: '1.0', type: 'float', description: 'Multiplies damage dealt by wild creatures. Affects how dangerous wild dinosaurs are to players, tames, and structures.', effect: '2.0 = wild creatures deal double damage; 0.5 = half damage. Important for PvE difficulty balancing.' },
@@ -219,14 +215,15 @@ const gameUserSettings = {
         { name: 'ServerAutoForceRespawnWildDinosInterval', default: '0.0', type: 'float', description: 'Forces all wild creatures to respawn when the server restarts if the specified number of seconds has passed. Useful for refreshing creature populations periodically.', effect: '0 = disabled; 86400 = respawn wilds if server has been up for 24+ hours. Clears stuck or problematic wild spawns.' },
     ],
 
-    'dino-special': [
+    'dino-flyers': [
         { name: 'AllowFlyerCarryPvE', default: 'False', type: 'boolean', description: 'Allows flying creatures like Argentavis and Quetzal to pick up wild creatures while in PvE mode. By default, flyer carry is disabled in PvE to prevent griefing.', effect: 'True = flyers can grab wild dinos in PvE; False = flyer carrying is disabled in PvE mode.' },
         { name: 'bForceCanRideFliers', default: 'False', type: 'boolean', description: 'Overrides map-specific flying restrictions (like Aberration) to allow flyer riding. Some maps disable flying creatures by design.', effect: 'True = flyers can be ridden on all maps; False = respects map-specific flying restrictions.' },
+        { name: 'AllowFlyingStaminaRecovery', default: 'False', type: 'boolean', description: 'Allows players standing on flying creatures (not mounted) to regenerate stamina. By default, being on a flyer prevents stamina recovery.', effect: 'True = stamina regenerates while standing on flyers; False = must land or dismount to regenerate stamina.' },
+    ],
+
+    'dino-titans': [
         { name: 'AllowRaidDinoFeeding', default: 'False', type: 'boolean', description: 'Allows Titanosaurs (raid dinosaurs) to be fed after taming, making them permanent tames. By default, Titanosaurs cannot eat and eventually starve.', effect: 'True = Titanosaurs can be fed and kept permanently; False = Titanosaurs will starve. Note: Maps have limited Titanosaur spawns.' },
         { name: 'RaidDinoCharacterFoodDrainMultiplier', default: '1.0', type: 'float', description: 'Scales food consumption specifically for "raid" dinosaurs like the Titanosaur. These creatures normally cannot be fed and starve after taming.', effect: '2.0 = raid dinos starve twice as fast; 0.5 = half as fast. Only relevant if AllowRaidDinoFeeding is disabled.' },
-        { name: 'DisableImprintDinoBuff', default: 'False', type: 'boolean', description: 'Disables the combat bonus that imprinted creatures receive when ridden by their imprinter. Normally, 100% imprint gives +30% damage and +30% resistance when the imprinter rides.', effect: 'True = no rider imprint bonus (imprint only affects base stats); False = imprinters get combat bonuses on their imprinted creatures.' },
-        { name: 'PreventMateBoost', default: 'False', type: 'boolean', description: 'Disables the mate boost buff that creatures receive when near an opposite-gender mate of the same species. Mate boost normally provides +33% damage resistance.', effect: 'True = creatures do not receive mate boost; False = mate boost functions normally.' },
-        { name: 'AllowFlyingStaminaRecovery', default: 'False', type: 'boolean', description: 'Allows players standing on flying creatures (not mounted) to regenerate stamina. By default, being on a flyer prevents stamina recovery.', effect: 'True = stamina regenerates while standing on flyers; False = must land or dismount to regenerate stamina.' },
     ],
 
     // Structure Settings
@@ -239,7 +236,6 @@ const gameUserSettings = {
     'structure-damage': [
         { name: 'StructureDamageMultiplier', default: '1.0', type: 'float', description: 'Multiplies damage dealt by defensive structures like spike walls and turrets. Affects how dangerous your base defenses are to attackers.', effect: '2.0 = defenses deal double damage; 0.5 = half damage. Important for base defense balance.' },
         { name: 'StructureResistanceMultiplier', default: '1.0', type: 'float', description: 'Scales how much damage structures receive. Works inversely - higher values mean MORE damage taken. Critical for raid balance in PvP.', effect: '0.5 = structures take half damage (harder to raid); 2.0 = double damage (easier to raid).' },
-        { name: 'StructurePreventResourceRadiusMultiplier', default: '1.0', type: 'float', description: 'Scales the radius around structures where resources cannot respawn. Structures naturally block resource regrowth in their vicinity.', effect: '2.0 = double the no-respawn radius; 0.5 = half the radius. Affects resource availability near bases.' },
     ],
 
     'structure-decay': [
@@ -259,6 +255,10 @@ const gameUserSettings = {
     ],
 
     'structure-density': [
+        { name: 'AllowIntegratedSPlusStructures', default: 'True', type: 'boolean', description: 'Enables the integrated Structures Plus (S+) building pieces that were added to the base game. These include improved versions of vanilla structures with quality-of-life features.', effect: 'True = S+ structures available; False = only vanilla structures available.' },
+        { name: 'EnableExtraStructurePreventionVolumes', default: 'False', type: 'boolean', description: 'Blocks building in additional resource-rich areas beyond the default prevention zones. Protects important resource spawns from being blocked by structures.', effect: 'True = extra building restrictions; False = only default prevention zones apply.' },
+        { name: 'PreventOutOfTribePinCodeUse', default: 'False', type: 'boolean', description: 'Prevents players outside your tribe from using PIN codes to access your structures. Normally, sharing a PIN allows anyone to use locked containers and doors.', effect: 'True = PIN codes only work for tribe members; False = anyone with the PIN can access.' },
+        { name: 'AllowDeprecatedStructures', default: 'False', type: 'boolean', description: 'Allows seasonal event structures (like Halloween decorations) to remain placeable after the event ends. Normally these become unavailable.', effect: 'True = event structures usable year-round; False = event structures only during events.' },
         { name: 'AllowCaveBuildingPvE', default: 'False', type: 'boolean', description: 'Allows players to build structures inside caves when the server is in PvE mode. By default, cave building is restricted in PvE to prevent blocking resources and artifacts.', effect: 'True = cave building allowed in PvE; False = caves are no-build zones in PvE.' },
         { name: 'AllowCaveBuildingPvP', default: 'True', type: 'boolean', description: 'Allows players to build structures inside caves when the server is in PvP mode. Cave bases are common defensive positions in PvP due to limited entry points.', effect: 'True = cave building allowed in PvP; False = caves are no-build zones in PvP.' },
         { name: 'IgnoreLimitMaxStructuresInRangeTypeFlag', default: 'False', type: 'boolean', description: 'Removes the 150-structure limit for decorative items like flags, signs, trophy mounts, and other non-essential structures within an area.', effect: 'True = no limit on decorative structures; False = enforces 150 decorative item cap per area.' },
@@ -410,8 +410,6 @@ const gameUserSettings = {
     // Cosmetics & Mods
     'server-cosmetics': [
         { name: 'CosmeticWhitelistOverride', default: '', type: 'string', description: 'URL to a text file containing a comma-separated list of approved custom cosmetic item IDs. Only cosmetics on this list will be allowed on the server.', effect: 'Empty = use default cosmetics. Custom URL = restrict to whitelisted cosmetics only.' },
-        { name: 'ForceExploitedTameDeletion', default: 'True', type: 'boolean', description: 'Enables automatic deletion of creatures that were tamed through exploits or bugs. Also prevents these creatures from being deployed from cryopods.', effect: 'True = exploited tames are deleted/blocked; False = exploited tames remain (not recommended).' },
-        { name: 'AllowDeprecatedStructures', default: 'False', type: 'boolean', description: 'Allows seasonal event structures (like Halloween decorations) to remain placeable after the event ends. Normally these become unavailable.', effect: 'True = event structures usable year-round; False = event structures only during events.' },
     ],
 
     // PvP-Specific Settings
@@ -445,8 +443,6 @@ const gameIniSettings = {
     // Taming - Damage & Limits
     'taming-damage-limits': [
         { name: 'DinoHarvestingDamageMultiplier', default: '3.2', type: 'float', description: 'Multiplies damage tamed creatures deal to harvestable objects (trees, rocks, corpses). Higher damage means faster resource gathering with tames.', effect: '5.0 = tames harvest ~56% faster than default 3.2; affects gathering efficiency with creatures like Ankylosaurus.' },
-        { name: 'DinoTurretDamageMultiplier', default: '1.0', type: 'float', description: 'Scales the damage auto turrets deal specifically to creatures. Separate from general turret damage settings.', effect: '2.0 = turrets deal double damage to dinos; important for base defense balance against tame raids.' },
-        { name: 'bDisableDinoBreeding', default: 'False', type: 'boolean', description: 'Completely disables creature breeding on the server. Tames cannot mate and no eggs or babies will be produced.', effect: 'True = breeding disabled (no mutations, no imprinting); False = normal breeding enabled.' },
         { name: 'bUseTameLimitForStructuresOnly', default: 'False', type: 'boolean', description: 'Makes the tame unit system only count platform saddle creatures with structures and rafts. Regular tames do not count toward tribe limits.', effect: 'True = only platforms count toward tame limit; False = all tames count toward the limit.' },
     ],
 
@@ -510,6 +506,7 @@ const gameIniSettings = {
 
     // Loot - Resources
     'loot-resources': [
+        { name: 'StructurePreventResourceRadiusMultiplier', default: '1.0', type: 'float', description: 'Scales the radius around structures where resources cannot respawn. Structures naturally block resource regrowth in their vicinity.', effect: '2.0 = double the no-respawn radius; 0.5 = half the radius. Affects resource availability near bases.' },
         { name: 'ResourceNoReplenishRadiusPlayers', default: '1.0', type: 'float', description: 'Scales the radius around players where resources (trees, rocks, bushes) cannot respawn. Players naturally block resource regrowth nearby.', effect: 'Higher = larger no-respawn zone around players; lower = resources respawn closer to players.' },
         { name: 'ResourceNoReplenishRadiusStructures', default: '1.0', type: 'float', description: 'Scales the radius around structures where resources cannot respawn. Building naturally blocks resource regrowth in the surrounding area.', effect: 'Higher = larger no-respawn zone around buildings; lower = resources respawn closer to structures.' },
         { name: 'HarvestResourceItemAmountClassMultipliers', default: '', type: 'text', description: 'Advanced configuration to set individual harvest multipliers for specific resource types. Allows customizing yields for specific materials.', effect: 'Complex syntax for per-resource multipliers. Refer to ARK wiki for format.', placeholder: 'Advanced: see wiki format' },
@@ -533,6 +530,7 @@ const gameIniSettings = {
 
     // Turret Limits
     'turrets-limits': [
+        { name: 'DinoTurretDamageMultiplier', default: '1.0', type: 'float', description: 'Scales the damage auto turrets deal specifically to creatures. Separate from general turret damage settings.', effect: '2.0 = turrets deal double damage to dinos; important for base defense balance against tame raids.' },
         { name: 'bLimitTurretsInRange', default: 'True', type: 'boolean', description: 'Enables the turret limit system that restricts how many turrets can be placed within a certain radius of each other. Prevents excessive turret stacking.', effect: 'True = turret limits enforced; False = unlimited turrets in any area.' },
         { name: 'bHardLimitTurretsInRange', default: 'False', type: 'boolean', description: 'Enforces a hard cap of 100 turrets within 10,000 units. When enabled, turrets placed over this limit may be subject to removal during server maintenance.', effect: 'True = turrets exceeding limit may be destroyed; False = soft limit only (placement blocked but existing turrets remain).' },
         { name: 'LimitTurretsNum', default: '100', type: 'integer', description: 'Sets the maximum number of turrets (including Plant Species X) allowed within the radius defined by LimitTurretsRange.', effect: 'Higher allows more turrets per area; Official uses 100. Affects defensive density.' },
@@ -611,8 +609,10 @@ const gameIniSettings = {
 
     // Breeding - Mating
     'breeding-mating': [
+        { name: 'bDisableDinoBreeding', default: 'False', type: 'boolean', description: 'Completely disables creature breeding on the server. Tames cannot mate and no eggs or babies will be produced.', effect: 'True = breeding disabled (no mutations, no imprinting); False = normal breeding enabled.' },
         { name: 'MatingIntervalMultiplier', default: '1.0', type: 'float', description: 'Scales the cooldown time between breeding attempts for creatures. After mating, creatures cannot breed again until this cooldown expires.', effect: '0.5 = creatures can breed twice as often; 2.0 = twice as long between breeding. Lower values speed up breeding programs.' },
         { name: 'MatingSpeedMultiplier', default: '1.0', type: 'float', description: 'Scales how quickly the mating progress bar fills when two creatures are breeding. Does not affect gestation or egg incubation time.', effect: '2.0 = mating completes twice as fast; 0.5 = takes twice as long. Only affects the initial pairing process.' },
+        { name: 'PreventMateBoost', default: 'False', type: 'boolean', description: 'Disables the mate boost buff that creatures receive when near an opposite-gender mate of the same species. Mate boost normally provides +33% damage resistance.', effect: 'True = creatures do not receive mate boost; False = mate boost functions normally.' },
     ],
 
     // Breeding - Eggs & Hatching
@@ -638,6 +638,7 @@ const gameIniSettings = {
     // Breeding - Imprinting
     'breeding-imprinting': [
         { name: 'AllowAnyoneBabyImprintCuddle', default: 'False', type: 'boolean', description: 'Allows any tribe member to perform imprinting care actions, not just the original imprinter. Normally only the person who claimed the baby can imprint it.', effect: 'True = anyone in tribe can imprint; False = only the claimer can imprint (imprint bonus still goes to claimer).' },
+        { name: 'DisableImprintDinoBuff', default: 'False', type: 'boolean', description: 'Disables the combat bonus that imprinted creatures receive when ridden by their imprinter. Normally, 100% imprint gives +30% damage and +30% resistance when the imprinter rides.', effect: 'True = no rider imprint bonus (imprint only affects base stats); False = imprinters get combat bonuses on their imprinted creatures.' },
         { name: 'BabyCuddleIntervalMultiplier', default: '1.0', type: 'float', source: 'wiki', description: 'Scales the time between required imprinting care actions (cuddles, walks, feeding requests). Imprinting provides stat bonuses and rider bonuses at 100%.', effect: '0.1 = imprint requests 10x more often (faster total imprinting); 2.0 = twice as long between requests. Adjust alongside BabyMatureSpeedMultiplier for balance.' },
         { name: 'BabyCuddleGracePeriodMultiplier', default: '1.0', type: 'float', description: 'Scales the grace period after an imprint request before imprint quality starts degrading. Missing the window reduces final imprint percentage.', effect: '2.0 = twice as long to respond before penalty; 0.5 = half the grace time. More forgiving for busy players.' },
         { name: 'BabyCuddleLoseImprintQualitySpeedMultiplier', default: '1.0', type: 'float', description: 'Scales how quickly imprint quality drops after missing the grace period for a care request. Faster drop means missing requests is more punishing.', effect: '0.5 = imprint drops half as fast (more forgiving); 2.0 = drops twice as fast (harsh penalty for missed cuddles).' },
